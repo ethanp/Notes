@@ -51,6 +51,9 @@ latex footer:       mmd-memoir-footer
         out.println(aLine);
         out.printf("%s%n", more);
         out.close();
+
+### Ints and Bytes and streams
+
 * When a stream's method says it returns or accepts `int`s, it's probably
   assuming they're all in the range \\([0, 255]\\) and internally converting
   them to/from `byte`s
@@ -67,6 +70,7 @@ latex footer:       mmd-memoir-footer
 * Subclassers *must* define a method for returning the next byte
 * You probably don't want to operate on a `byte` level, so use a subclass that
   does what you want
+* `skip(long)` is often faster than `read`ing and then discarding
 
 #### Interface
 
@@ -108,7 +112,11 @@ latex footer:       mmd-memoir-footer
 
 ### OutputStream
 
-Analogous to `InputStream` above
+* Analogous to `InputStream` above
+* Using `write(byte[] arr)` instead of `write(int b)` will be *WAY* faster
+* To subclass it, you *have* to implement `write(int b)`, but you'll probably
+  also *want* to implement `write(byte[] data, int offset, int length)` to
+  improve performance
 
 #### Interface
 
@@ -131,34 +139,105 @@ Analogous to `InputStream` above
         abstract void write(int aByte)
     }
 
+#### FilterOutputStreams
+
+* `ProgressMonitorInputStream` automatically pops up a `javax.swing` dialog box
+  with a progress meter if the operation is taking too long
+* `PushbackInputStream` allows you to "`unread`" data *into* the stream, which
+  will then be the first data you `read` back out
+
+### Network streams
+
+#### URL
+
+* You create a `URL(...)` with parameters
+    1. `String url`
+    2. `String protocol, String host, String file`
+    4. `URL context, String url` (retrieves relative `url` to the given
+       `context`)
+* Now you can get `InputStream in = url.openStream(); in.read();` etc.
+    * You probably want to buffer it though
+* Now you can just go ahead and read the page, because Java takes care of
+  sending the `GET` request etc.
+    * This is *unlike* just using a `Socket`
+
 ### Data streams
 
-Support I/O of primitive data types
+* Read/write Strings, ints, doubles, and other primitive types
+
+### Streams in Memory
+
+* `SequenceInputStream` --- chain input streams together so they appear as a
+  single stream. Each is `close`d as its end is reached
+* `ByteArray[In|Out]putStream` --- read/write from/to a byte array
+* `Piped[In|Out]putStream` --- you create both and connect them to each other,
+  then you can write from one and read from the other, potentially in different
+  threads, in a produce/consumer-type arrangement
+
+### Compressing Streams
+* E.g. for un/compressing G/Zips and JAR files
+
+### Cryptographic Streams
+
+#### Example using `MessageDigest`
+
+From (Java I/O pg. 225), calculate SHA-1 hash of given webpage
+
+    public class URLDigest {
+        public static void main(String[] args) 
+                    throws IOException, NoSuchAlgorithmException {
+            URL u = new URL(args[0]);
+            InputStream in = u.openStream(); 
+
+            // choose which one-way hash algorithm
+            MessageDigest sha = MessageDigest.getInstance("SHA"); 
+
+            // read the whole input, one chunk at a time
+            byte[] data = new byte[128]; 
+            while (true) { 
+                int bytesRead = in.read(data); 
+                if (bytesRead < 0) break; 
+
+                // feed each chunk to the hasher
+                sha.update(data, 0, bytesRead); 
+            } 
+
+            // retrieve the resulting hash
+            byte[] result = sha.digest(); 
+
+            // print the hash one byte at a time
+            for (int i = 0; i < result.length; i++) { 
+                System.out.print(result[i] + " "); 
+            } 
+            System.out.println(); 
+
+            // print the hash as a giant integer
+            System.out.println(new BigInteger(result)); 
+        } 
+    }
+
+* using `Digest[In|Out]putStream` is basicaly the same, except you don't have
+  to call `update`
+* Encryption is also roughly the same
 
 ### Object streams
 
+* `Object[In|Out]putStream`
 * Support I/O of objects
-* Objects that support serialization implement `Serializable` (more in
-  "[Serialization][]")
+* Objects that support serialization
+    1. implement `Serializable` (more in "[Serialization][]")
+    2. have a no argument constructor
+    3. mark non-zerializable fields "`transient`"
+* This way of serializing is very slow
+* When you serialize an object like this, it cannot be garbage collected until
+  the stream is `reset` or `close`d
+* So one should "save the entire state only when the entire state is available
+  and then close the stream immediately." (Java I/O, 265)
 
 E.g.
 
     out.writeObject(obj);
     Object obj = in.readObject();
-
-## Pipes
-**11/11/14**
-
-> `Pipe` in Java IO provides the ability for two **threads** running *in the
-> **same JVM*** to **communicate**. You cannot use a pipe to communicate with
-> a thread in a different JVM (different process), so it is different from the
-> Unix pipe concept. (-- Jenkov's Tutorial)
-
-* `Output` *sends* data, `Input` *receives* data
-* In one thread, you create and write to a `PipedOutputStream`, then in
-  another thread you read from that `OutputStream` using a `PipedInputStream`
-* You construct the `PipedInputStream` by passing it your instance of the
-  `PipedOutputStream`
 
 ## Readers and Writers
 
@@ -175,6 +254,21 @@ E.g.
 
         s.useDelimiter(",\\s*");
 
+## New I/O: Buffers and Channels
+
+* For nonblocking I/O (since 1.4), "buffers are filled with data from the
+  channel and then drained of data by the application" (Java I/O, pg. 13).
+* This API is not always helpful, but it *is* helpful for
+    * Network servers with tons of simultaneous clients
+    * Repeated random access to parts of large files
+
+### Buffers
+* There is a buffer class for each primitive data type
+* These allow you to perform I/O operations directly on the files without
+  copying them into RAM first
+* The fastest way to use these is *heavily* task and OS specific
+* Buffers have a *fixed* size
+
 ## Files and Paths
 
 ### class File
@@ -184,6 +278,7 @@ E.g.
   represented by a `File` object will never change
 * Remove, rename, create directory find `mtime`, file-system stuff
 * Can be *"relative"* or *"absolute"*
+    * Relative paths begin searching in the `cwd`
 * Consists of two components
     1. A *prefix string* (e.g. "`/`" on Unix)
         * *"Relative"* pathnames have *no prefix*

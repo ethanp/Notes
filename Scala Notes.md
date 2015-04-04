@@ -290,12 +290,12 @@ The more specific callbacks you can register for are
 
 * `Futures` can be chained with the standard "combinators": `map, flatMap,
   filter, foreach, collect`
-* The exceptions work nicely in this situation: which ever chained Future threw
-  the exception gets to declare the type of the exception
-* These combinators allow use to use *for-comprehensions*
+* The exceptions work nicely in this situation: whichever chained `Future`
+  `throws` gets to declare the `Exception` type
+* These combinators allow you to use *for-comprehensions*
 
-In the following example, the `purchase` Future is only computed both required
-Futures have completed.
+In the following example, the `purchase` `Future` is only computed both
+required `Futures` have completed.
 
     val usdQuote = future { connection.getCurrentValue(USD) }
     val chfQuote = future { connection.getCurrentValue(CHF) }
@@ -310,7 +310,7 @@ Futures have completed.
       case _ => println("Purchased " + amount + " CHF")
     }
     
-If we want our future to contain 0 instead of the exception, we use the
+If we want our `Future` to contain `0` instead of the `Exception`, we use the
 `recover` combinator:
 
     val purchase: Future[Int] = rateQuote map {
@@ -319,10 +319,11 @@ If we want our future to contain 0 instead of the exception, we use the
       case QuoteChangedException() => 0
     }
 
-Combinator `fallbackTo` creates a new future which holds the result of *this*
-future if it was completed successfully, or otherwise the successful result of
-the *argument* future. In the event that both this future and the argument
-future fail, the new future is completed with the exception from *this* future.
+Combinator `fallbackTo` creates a new `Future` which holds the result of *this*
+`Future` if it was completed successfully, or otherwise the successful result
+of the *argument* `Future`. In the event that both this `Future` and the
+argument `Future` fail, the new `Future` is completed with the `Exception` from
+*this* `Future`.
 
     val usdQuote = future {
       connection.getCurrentValue(USD)
@@ -341,7 +342,7 @@ future fail, the new future is completed with the exception from *this* future.
     anyQuote onSuccess { println(_) }
     
 The `andThen` combinator is used purely for side-effecting purposes. Multiple
-`andThen` calls are ordered.
+`andThen` calls are *ordered*.
 
     val allposts = mutable.Set[String]()
     future {
@@ -357,7 +358,7 @@ The `andThen` combinator is used purely for side-effecting purposes. Multiple
 
 ### The "Failed" projection
 
-If the original future fails, the `failed` projection returns a future
+If the original `Future` *fails*, the `failed` projection returns a `Future`
 containing a value of type `Throwable`. If the original future succeeds, the
 `failed` projection fails with a `NoSuchElementException`. The following is an
 example which prints the exception to the screen:
@@ -377,7 +378,7 @@ The following example does not print anything to the screen:
 
 ### Intentionally Blocking
 
-Here is an example of how to block on the result of a future:
+Here is an example of how to *block* on the result of a `Future`:
 
     import scala.concurrent._
     import scala.concurrent.duration._
@@ -398,9 +399,9 @@ Here is an example of how to block on the result of a future:
 In the case that the future fails, the caller is forwarded the exception that
 the future is failed with.
 
-Alternatively, calling `Await.ready` waits until the future becomes completed,
-but does not retrieve its result. In the same way, calling `Await.ready` will
-not throw an exception if the future is failed.
+Alternatively, calling `Await.ready` waits until the `Future` becomes
+*completed*, but does not retrieve its result. In the same way, calling
+`Await.ready` will not throw an `Exception` if the `Future` fails.
 
 The `Future` trait implements the `Awaitable` trait with methods method
 `ready()` and `result()`. These methods **cannot** be called directly by the
@@ -420,17 +421,17 @@ forwarded to the caller.
 
 ### Promises
 
-* A `promise` can be used to successfully complete a `future` with a value (by
+* A `Promise` can be used to successfully complete a `Future` with a value (by
   “completing” the promise) using the `success` method.
-* Conversely, a `promise` can also be used to complete a `future` with an
+* Conversely, a `Promise` can also be used to complete a `Future` with an
   exception, using the `failure` method.
 
 Read my comments to understand what's going on
 
-    import scala.concurrent.{ future, promise }
+    import scala.concurrent.{ Future, Promise }
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    val p = promise[T]
+    val p = Promise[T]
     val f = p.future                      // get the future from *inside* of promise p
 
     val producer = future {
@@ -449,19 +450,20 @@ Read my comments to understand what's going on
 To `fail` the `promise` instead, use `p failure (new MyExceptionException)`
 instead of `p success r`.
 
-> One nice property of programs written using promises with operations
-> described so far and futures which are composed through monadic operations
-> without side-effects is that these programs are deterministic. Deterministic
-> here means that, given that no exception is thrown in the program, the result
-> of the program (values observed in the futures) will always be the same,
-> regardless of the execution schedule of the parallel program.
+> One nice property of programs written using `Promises` with operations
+> described so far and `Futures` which are composed through monadic operations
+> without side-effects is that these programs are *deterministic*.
+> Deterministic here means that, *given* that no `Exception` is thrown in the
+> program, the result of the program (values observed in the `Futures`) will
+> always be the same, regardless of the execution schedule of the parallel
+> program.
 
-The method `completeWith` completes the promise with another future. After the
-future is completed, the promise gets completed with the result of that future
-as well. The following program prints `1`:
+The method `completeWith` completes the `Promise` with another `Future`. After
+the `Future` is completed, the `Promise` gets completed with the result of that
+`Future` as well. The following program prints `1`:
 
     val f = future { 1 }
-    val p = promise[Int]
+    val p = promise[Int]    // sic, lowercase
 
     p completeWith f
 
@@ -481,7 +483,7 @@ Case classes just add to classes, they don't take away. They give you:
 
 1. **pattern matching support**
 2. default implementations of `equals` and `hashCode`
-3. default implementations of serialization
+3. default implementations of *serialization*
 4. a prettier default implementation of `toString`, and
 5. the small amount of functionality that they get from automatically
    inheriting from `scala.Product`.
@@ -491,12 +493,13 @@ Implicit Variables and Parameters
 
 **2/2/14**
 
-#### Defining an implicit val makes it available to future uses of implicit parameters
-
-Must be last argument to function's last set of arguments
+* Defining an implicit val makes it available to future uses of implicit
+  parameters
+* Must be last argument to function's last set of arguments
 
 [This](http://www.drmaciver.com/2008/03/an-introduction-to-implicit-arguments/)
-article spells them out quite simply, and the following example is based on theirs.
+article spells them out quite simply, and the following example is based on
+theirs.
 
 ##### E.g.
 
@@ -514,15 +517,14 @@ article spells them out quite simply, and the following example is based on thei
 
 ## Functions on Collections
 
-### Iterator.collect[B]\\(pf: PartialFunction[A,B|)
+### Iterator.collect[B]\(pf: PartialFunction[A,B])
 
 **1/18/14**
 
 #### A convenient way to **simultaneously map and filter**.
 
-The `PartialFunction` parameter means you can use a *Pattern Matching Anonymous
-Function* as the argument, and if none of your `cases` match an element, that
-element gets filtered
+* You can use a *pattern matching anonymous function* as the argument
+* **If none of your `cases` match an element, that element gets filtered**
 
 ##### E.g.
   
@@ -545,15 +547,20 @@ E.g. getting word count via MapReduce type algorithm
 
     // Oops!
     scala> val wordsGrouped = words.groupBy(_)
-    <console>:9: error: missing parameter type for expanded function ((x$1) => words.groupBy(x$1))
+    error: missing parameter type for function ((x$1) => words.groupBy(x$1))
            val wordsGrouped = words.groupBy(_)
                                             ^
     // If you insist
     scala> val wordsGrouped = words.groupBy(identity)
-    wordsGrouped: scala.collection.immutable.Map[String,Array[String]] = Map(qwer -> Array(qwer), rtyu -> Array(rtyu, rtyu), asdf -> Array(asdf, asdf, asdf))
+    wordsGrouped: immutable.Map[String,Array[String]] = 
+        Map(
+          qwer -> Array(qwer), 
+          rtyu -> Array(rtyu, rtyu), 
+          asdf -> Array(asdf, asdf, asdf)
+        )
     
     scala> val wordCounts = wordsGrouped.map { case (k, v) => k -> v.length }
-    wordCounts: scala.collection.immutable.Map[String,Int] = Map(qwer -> 1, rtyu -> 2, asdf -> 3)
+    wordCounts: immutable.Map[String,Int] = Map(qwer->1, rtyu->2, asdf-> 3)
 
 
 ### Appending List to List with `++` & `:::`
@@ -609,14 +616,14 @@ the first value in the collection for whom the predicate is `false`.
     d: List[Int] = List(1, 2, 3, 1, 2, 3)
     e: List[Int] = List(45, 56)
     
-Example from **P09** in [Ninety-Nine Scala Problems](http://aperiodic.net/phil/scala/s-99/p09.scala)
+Example from **P09** in 
+[Ninety-Nine Scala Problems](http://aperiodic.net/phil/scala/s-99/p09.scala)
 
-    // P09 (**) Pack consecutive duplicates of list elements into sublists.
-    //     If a list contains repeated elements they should be placed in separate
-    //     sublists.
-    //
+    // P09 (**) Pack consecutive duplicates of list elements into sublists. 
+    // If a list contains repeated elements they should be placed in separate 
+    // sublists.
     //     Example:
-    //     scala> pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e))
+    //     scala> pack(List('a,'a,'a,'a,'b,'c,'c,'a,'a,'d,'e,'e))
     //     res0: List[List[Symbol]] = List(
     //                List('a, 'a, 'a, 'a), 
     //                List('b), List('c, 'c), List('a, 'a), 
