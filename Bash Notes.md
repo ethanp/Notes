@@ -354,6 +354,14 @@ more flexible because you can go by 3's etc. (see `seq` command below)
 
 ## Commands to Command
 
+### netstat -anp --- list all stocket usages
+
+* `-a`, `--all` --- show both listening and non-listening sockets
+* `-n`, `--numeric` --- Show numerical addresses instead of trying
+  to determine symbolic host, port or user names
+* `-p`, `--program` --- Show the PID and name of the program to which
+  each socket belongs.
+
 ### apropos --- pertaining too ...
 
     $ apropos database
