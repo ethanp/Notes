@@ -392,6 +392,7 @@ This is *just* too cool.
 * -f2,4 -d, --- extract the 2nd and 4th **fields** of each line, where a field
   delimiter is a comma
 * by default, the *delimiter* (`-d`) is a `TAB`
+    * to make it a space, try `-d' '`
 * --output-delimiter=C --- when you're printing multiple fields, use this
   delimiter (default is `TAB`)
 * -s --- suppress (don't print) lines not containing the delimiter character

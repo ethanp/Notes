@@ -13,6 +13,42 @@ latex footer:		mmd-memoir-footer
 
 # CS Theory
 
+## Strings
+### String Search with Rabin-Karp
+See hashing section below
+
+## Hashing
+
+### Building a hash-table of strings
+
+**4/27/15**
+
+From *The Algorithm Design Manual*.
+
+A reasonable hashing algorithms for strings is
+
+\\[H(S)=\sum_{i=0}^{|S|-1}{\alpha^{|S|-(i+1)}\times char(s_i)} % m\\]
+
+In which you map each string to a unique integer by treating each character as
+a "digit" in a base-\\(\alpha\\) number system. Then you stick the string in
+slot \\(m\\) of the underlying array. \\(m\\) should be a large prime not too
+close to \\(2^{i}-1\\) so that hash values are fairly uniformly distributed
+
+### String Search with Rabin-Karp
+
+To find a pattern \\(p\\) in a a text \\(t\\), where \\(n=|t|,m=|p|\\)
+
+We calculate the hash of \\(p\\) with the simple base-conversion hashing
+algorithm above ("with a random \\(m\\)" [not sure why]), then slide along
+\\(t\\), hashing as we go. Calculating the hash of each new letter given the
+previous hash can be done in *constant* if we note that our hash algorithm is a
+"rolling-hash" in the following manner:
+
+\\[H(S,j+1)=\alpha(H(S,j)-\alpha^{m-1}char(s_j))+char(s_j+m)\\]
+
+So now we just have to worry about hash collisions (NBD), but otherwise we've
+solved the problem in *expected-time* \\(O(m+n)\\).
+
 ## Finite State Machines
 
 **9/13/14**

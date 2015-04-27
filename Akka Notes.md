@@ -12,7 +12,59 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
-## Again from the Akka Docs
+## Testing
+From the Akka Docs
+
+4/13/15
+
+They provide a framework for unit testing the impact of receiving messages on
+`Actor`s.
+
+###  A Few Useful Methods for testing `ActorSystem`s
+
+1. `expectMsg[T](d: Duration, msg: T): T`
+    * The given message object must be received within the specified time; the
+      object will be returned.
+2. `awaitCond(p: => Boolean, max: Duration, interval: Duration)`
+    * Poll the given condition every interval until it returns true or the max
+      duration is used up. The interval defaults to 100 ms and the maximum
+      defaults to the time remaining in the innermost enclosing within block.
+
+Since an integration test doesn't allow direct asserts on the `Actor`'s state,
+the suggested workaround is to write asserts for logged messages. They provide
+a simple technique for accomplishing this.
+
+## Routers
+From the Akka Docs
+
+4/9/15
+
+A `Router` is an `Actor` that has a list of `ActorRef`s that it forwards
+messages to according to some predefined logic, e.g. in package `akka.routing`
+we find:
+
+1. Round robin
+2. Random
+3. Broadcast
+4. Smallest mailbox
+5. Ballancing pool
+5. Consistent hashing --- select routee based on sent message
+6. Scatter gather --- broadcast message, *first* result is sent back to sender
+7. Tail chopping --- send to one, then another after delay, etc.; send *first*
+   result back to sender
+
+It can load everything it needs from a config file, or configuration can be
+done programmatically.
+
+The router forwards without changing the message's original sender.
+
+By default, replies to routee messages will be routed back to the routee.
+
+The number of routees can be dynamic according to your resizing policy
+
+## Actor Refs and Paths
+From the Akka Docs
+
 4/8/15
 
 Actors each have independent state and behavior, so it may be helpful to think
@@ -37,8 +89,8 @@ my own.
 Communication between actors is "transparent", whether it is within-JVM,
 across-JVM, across network, across world, etc.
 
-Akka itself has no shared global state; we can have multiple actor systems
-coexisting in one JVM.
+Akka itself has no shared global state; **we can have multiple actor systems
+coexisting in one JVM.**
 
 Do not pass mutable objects or closures between actors.
 
@@ -59,11 +111,56 @@ There are different types of `ActorRef`s, here are a few
     * If you send one a msg, Akka will serialize that msg for you
 
 Each actor goes by a unique slash-separated path name, like a directory tree,
-where the older ancestors are the earlier entries in the path.
+where the "anchor" identifies the actor system, and the path elements are the
+names of the traversed actors.
  
 You *can* create an actor *path* without creating an actor, but *cannot* create
 an actor *reference* without creating the corresponding actor.
 
+References to an old actor will not work even if there is a new actor at that
+same path.
+
+Here are their given examples
+
+    1. "akka://my-sys/user/service-a/worker1"                   // local
+    2. "akka.tcp://my-sys@host.example.com:5678/user/service-b" // remote
+
+You can get an `ActorRef` by
+
+1. **Creating the actor**
+    1. Create a top-level actor beneith the guardian actor using
+       `ActorSystem.actorOf`
+    2. Create a child of an actor via an actor's `context` using
+       `ActorContext.actorOf`
+        * Each actor has references to its self, parent, and children
+2. **Looking up the actor** by its concrete path
+    1. Using `ActorSystem.actorSelection`, then sending it an `Identify`
+       message
+    2. Don't use `actorFor` because it's *deprecated*
+    3. Using `ActorContext.actorSelection`, you can use *relative paths*,
+       like `context.actorSelection("../brother") ! msg`
+
+You can *glob* using `*` and `?` to send msg's to e.g. all siblings (including
+self) `"../*"`
+
+`ActorRef`s are `equal` if they correspond to the same actor incarnation at the
+same path. A failed-then-restarted actor is the *same* incarnation. If you
+don't care about comparing equal incarnation, compare `ActorPath`s instead.
+
+Messages sent to terminated actors go into the dead letter mailbox.
+
+When an actor creates a child, the actor system’s deployer will decide whether
+the new actor is "remote" or not. If it is, all appropriate actions will be
+taken by Akka to create the actor in the remote JVM.
+
+#### Top Level Actor Paths
+
+* `/` ("root guardian") --- parent of "top-level" actors
+* `/user` --- actors created using `ActorSystem.actorOf`
+* `/system` --- system-created actors, for e.g. logging
+* `/deadLetters` --- where messages sent to stopped/non-existent actors go
+* `/temp` --- temporary system-created actors; implementation detail
+* `/remote` --- "artificial" path under which remote actor's live? not sure.
 
 ## Akka for PlayFramework
 

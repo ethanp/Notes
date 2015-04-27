@@ -12,6 +12,27 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Suffix Tree (for String Search)
+**4/27/15**
+
+From *The Algorithm Design Manual*
+
+A Trie containing all the suffixes of a given set of strings.
+
+E.g. the suffixes of *ACAC* are
+
+* ACAC
+* CAC
+* AC
+* C
+
+The suffix tree for {*ACAC*, *CACT*} has a root with no value, pointing to a,
+c, and t nodes, where c and t are noted to be terminal (though may still have
+children). Then a points to c, which is terminal, but also points to a and t,
+etc.
+
+If this runs out space, look up and use a "compressed suffix tree" instead,
+which always takes up linear space.
 
 ## Tree
 
