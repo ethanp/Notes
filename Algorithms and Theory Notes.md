@@ -13,6 +13,65 @@ latex footer:		mmd-memoir-footer
 
 # CS Theory
 
+## Graphs
+
+### Minimum spanning tree
+Tree with all nodes of graph (i.e. spanning tree) such that the some of the
+weights of the edges is less or equal to any other spanning tree of this graph.
+
+#### Prim's algorithm
+Greedy algorithm that finds a minimum spanning tree for connected weighted
+undirected graph.
+
+1. Initialize tree with arbitrary vertex of graph
+2. Continually the add minimum weight edge that adds a new vertex to the tree
+
+#### Kruskal's algorithm
+(Another) greedy algorithm that finds a minimum spanning tree for connected
+weighted undirected graph.
+
+1. Initialize a set F of trees, where each vertex in the graph is its own tree
+2. Initialize a set S with all edges of the graph, sorted by length
+   (\\(O(m \log m)\\))
+3. Continually use the smallest edge from S to combines two trees in F
+
+To implement this efficiently, we need to use Union Find (below) to combine
+trees in F.
+
+### Union Find
+The goal of this **data structure** is to handle the following situation:
+
+We have a set of sets of elements, where are elements are globally distinct.
+We would like to be able to quickly:
+
+1. determine whether two elements are in the same [inner] set
+2. merge two [inner] sets with each other
+3. know the size of the outer set
+
+So we give each element an id, and put all ids in an array, and organize each
+inner set as a tree, defined by the array in the following manner:
+
+* `elem`'s *parent* is the value in `array[elem_id]`.
+
+So we can find the root of the set containing an element by traversing until we
+reach an element such that `array[elem_id] == elem_id`. This will be guaranteed
+\\(O(\log n)\\) if the tree is kept balanced. To ensure this, whenever
+combining two trees, we make the root of the *smaller* tree point to the root
+of the *bigger* one, rather than any other method of combining the trees. To
+facilitate this, we have a `sizeArray[num_elems]` that says how many nodes
+(including itself) are contained in the (sub-)tree defined by this node down.
+
+That's really all there is to it.
+
+## I know I'm going to forget
+
+### Find the median in \\(O(n)\\)
+Use [random-pivot] quicksort, but always only recurse into the half containing
+desired index (e.g. \\(n/2\\)). If the pivot goes in that index, we're done.
+The complexity is
+
+\\[O(n)+O(n/2)+O(n/4)+\cdots\rightarrow O(2n)=O(n)\\]
+
 ## Strings
 ### String Search with Rabin-Karp
 See hashing section below
@@ -27,7 +86,7 @@ From *The Algorithm Design Manual*.
 
 A reasonable hashing algorithms for strings is
 
-\\[H(S)=\sum_{i=0}^{|S|-1}{\alpha^{|S|-(i+1)}\times char(s_i)} % m\\]
+\\[H(S)=\sum_{i=0}^{|S|-1}{\alpha^{|S|-(i+1)}\times char(s_i)} \,\%\,m\\]
 
 In which you map each string to a unique integer by treating each character as
 a "digit" in a base-\\(\alpha\\) number system. Then you stick the string in

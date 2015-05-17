@@ -12,6 +12,12 @@ latex input:		mmd-natbib-plain
 latex input:		mmd-article-begin-doc
 latex footer:		mmd-memoir-footer
 
+## Things that come in handy
+
+Delete all non-pdf files recursively from directory
+
+    find . ! -name '*.pdf' -delete
+
 ## Syntax
 
 ### The Environment

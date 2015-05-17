@@ -473,3 +473,16 @@ key came from Alice.
 6. Now they can talk safely because no one else knows their session symmetric key
     * However, a third party with access to the shared secret will be able to
       generate the session symmetric key and decrypt the communication.
+
+## Cryptography
+
+### XOR
+`XOR` is represented by the symbol "\\(\oplus\\)"
+
+Properties:
+\\[x\oplus x \equiv 0\\]
+\\[x\oplus 0 \equiv x\\]
+Associativity & commutativity
+
+From these we can derive that
+\\[(x\oplus y)\oplus x = (x\oplus x)\oplus y = 0 \oplus y = y\\]

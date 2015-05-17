@@ -272,6 +272,25 @@ as `global` first**
 **Stuff the iterable in the second parameter
 through the function in the first parameter.**
 
+#### 5/17/15
+##### filter(None, iterable)
+
+There's a little trick you can do
+
+    >>> L = [0, 3, 7, 4, None, 0, 1]
+    >>> filter(None, L)
+    [3, 7, 4, 1]
+
+The computation it does is a *special case* of `filter()`, which is
+
+    [item for item in iterable if item]
+
+You can also use it e.g. to filter out empty-strings (`''`) from a list of
+strings.
+
+I first found it in `translate_path` of `SimpleHTTPServer.py` in the standard
+Python 2.7.3 library.
+
 #### 4/15/14
 
     >>> a = [1,2,3,4,5,6]
