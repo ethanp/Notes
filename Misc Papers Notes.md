@@ -221,4 +221,111 @@ latex footer:   mmd-memoir-footer
 
 #### Customer Examples for Application Delivery
 
-1. Performance, reliability, less latency for international traffic, large file transfers using Akamai's overlay network, avoid building out regional data centers
+1. Performance, reliability, less latency for international traffic, large file
+   transfers using Akamai's overlay network, avoid building out regional data
+   centers
+
+# Distributed Computing
+## Kafka: a Distributed Messaging System for Log Processing
+> Kreps, Narkhede, and Rao of LinkedIn; Published in NetDB'11, Jun. 12, 2011.
+
+**Most of these notes may be direct quotes from the paper**
+
+### Abstract
+* a distributed messaging system for collecting and delivering high volumes of
+  log data with low latency.
+* suitable for both offline and online message consumption
+
+### Introduction
+Internet companies generate large amounts of log data for
+
+1. __User activity events__ --- logins, clicks, likes, comments, and queries
+2. __Operational metrics__ --- service call stack, latency, and utilization
+
+These can then be used for
+
+1. __Analytics__ --- tracking engagement, and utilization
+2. __Features__ --- search, recommendations, ad targeting, security, newsfeed
+
+Facebook and Yahoo have their own systems for loading data into Hadoop for
+offline consumption, but LinkedIn wants to use this data for real- time (order
+of seconds) application delays.
+
+Their Kafka implementation is __open source__, and greatly simplifies their
+architecture for both online and offline data processing.
+
+### Related Work
+Traditional enterprise messaging systems have existed for a long time and often
+play a critical role as an event bus for processing asynchronous data flows.
+
+Those systems have the following feature mismatches:
+
+* Focus on rich delivery guarantees (overkill for log data) over throughput
+* Don't provide easy way to partition messages across multiple machines.
+* Assume near immediate consumption of messages
+    * Performance degrades significantly if messages are allowed to accumulate
+
+"At LinkedIn, we find the “pull” model more suitable for our applications since
+each consumer can retrieve the messages at the maximum rate it can sustain and
+avoid being flooded by messages pushed faster than it can handle. The pull
+model also makes it easy to rewind a consumer."
+
+### Kafka Architecture and Design Principles
+
+#### High-level
+* __Topic__ --- a __stream__ of messages of a particular type
+* __Producer__ --- publishes messages to a _topic_
+* __Broker__ --- where published messages are stored by a _producer_
+    * A single producer may store at multiple brokers
+* __Consumer__ --- __subscribes__ to one or more _topics_ from the _brokers_
+    * Consume _subscribed_ messages by _pulling_ data from _brokers_.
+* __Subscription__ --- provides the _consumer_ an _iterator interface_ over the
+  messages being produced, so it may process them
+    * The iterator _blocks_ when it's empty until new messages are published to
+      the _topic_.
+
+##### Sample producer code
+
+    producer = new Producer(...);
+    message = new Message(“test message str”.getBytes());
+    set = new MessageSet(message);
+    producer.send(“topic1”, set);
+
+##### Sample consumer code
+    streams[] = Consumer.createMessageStreams(“topic1”, 1);
+    for (message : streams[0]) {
+        bytes = message.payload();
+        // do something with the bytes
+    }
+
+#### Efficiency on a Single Partition
+* Producer publishes to a partition by simply appending the message to the last
+  segment file.
+* No "message ID", each message only has a logical offset in log
+* Consumer only consumes sequentially
+* Consumer acknowledges message offset, implying it has received all prior
+  messages in that partition
+* They have numerous optimizations which they list, mainly ways of allowing
+  themselves to rely on caching provided by the OS
+* Experiments show that "production and the consumption have consistent
+  performance linear to the data size, up to many terabytes of data."
+* They use the "`sendfile` API" that Witchel talked about
+    * this is where you directly transfer bytes from an OS file channel to a
+      socket channel, without having to go through an application buffer
+    * this reduces 4 data copies and 2 syscalls into 2 copies and 1 "sendfile"
+      syscall
+* Messages are (only, automatically) deleted after a defined time-period
+  (typically 7 days)
+    * This is a much simpler mechanism than one might initially dream up, but
+      is useful in practice
+    * It allows consumers to *rewind* and re-consume data
+        * E.g. to re-play messages after fixing an error
+
+#### Distributed Coordination
+* __Consumer group__ --- "one or more consumers that jointly consume a set of
+  subscribed topics"
+    * "I.e. each message is delivered to only one of the consumers within each
+      group"
+    * ***I don't understand what's going on here...***
+* I have reached the top of page 4
+* I need to recall that I should SPEED THE FUCK UP...lol
