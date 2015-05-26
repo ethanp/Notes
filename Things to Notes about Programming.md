@@ -11,6 +11,31 @@ latex input:	mmd-natbib-plain
 latex input:	mmd-article-begin-doc
 latex footer:	mmd-memoir-footer
 
+Apache Software Foundation
+--------------------------
+**5/26/15** --- This is basically a summary of the Wikipedia article
+
+* American non-profit corporation [501(c)(3)] supporting Apache software
+  projects, including Apache HTTP Server, formed in 1999
+* Apache projects are distrubuted under the Apache License, making them "free
+  and open source software (FOSS)"
+* Projects have collaberative, consensus-based development process
+* Membership of the foundation is granted only to volunteers who have actively
+  contributed to Apache projects
+* The foundation provides legal protection to its volunteers, and prevents its
+  name from being used without permission
+* It holds several ApacheCon conferences each year
+* History is linked to Apache HTTP Server, development beginning in 1995, where
+  8 people worked on enhancing NCSA HTTPd
+    * NCSA itself was among the earliest webservers developed, following Tim
+      Berners-Lee's CERN httpd and others
+* Development occurs in semi-autonomous "top-level projects"
+    * Some of which have their own sub-projects
+* As part of the process of becoming an Apache project, ASF gains the necessary
+  intellectual property rights for the development and distribution of all its
+  projects
+
+
 Local databases
 ---------------
 

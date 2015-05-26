@@ -314,6 +314,15 @@ synonym for PATCH.
   server with a certificate to prevent spoofing.
 *  Uses long-term public and secret keys to exchange a short term session key
    to encrypt the data flow between client and server
+* First an X.509 certificate (asymmetric) authenticates the counterparty
+* Then they negotiate a symmetric key to be used to encrypt data between the
+  two parties
+    * They start by finding a cipher and hash function that both support
+    * The client encrypts a random number with the server's public key, and
+      sends it; from this they negotiate a session key
+    * Importantly, this symmetric key cannot be derived from the X.509
+* This creates a *stateful* connection
+* There are numerous known attacks on each version of SSL & TLS
 
 #### HTTPS (HTTP Secure)
 

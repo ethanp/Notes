@@ -131,6 +131,7 @@ latex footer:		mmd-memoir-footer
       between them
     * Often uses port 443 for **HTTPS**
     * *Uses:* eCommerce and banking
+    * For more, see `Networking and Network Programming Notes.md`
 * **Vulnerability** --- a *security-relevant* **software defect** that can be
   *exploited*
 
