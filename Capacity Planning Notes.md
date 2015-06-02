@@ -9,6 +9,8 @@
     * disk
 
 ### The Book
+* If you don't have a way to measure your current capacity, you can't conduct
+  capacity planning --- you'll only be guessing
 * When will each part of your infrastructure fail? Find capacity ceilings.
 * Taking into account the specific hardware configuration, how many queries per
   second (QPS) can the database server manage?
@@ -39,6 +41,18 @@
 * It would be good to know database queries per second
 * How much CPU, cache, bus bandwidth, and so on does each component of the
   system need?
-* If everyhting ends up being disk-bound, don't buy amazing CPUs!
+* If everything ends up being disk-bound, don't buy amazing CPUs!
 * __Once you plot load vs throughput, use it to find the performance ceilings
   for each of the key components above__
+* It is a great idea to collect application-level metrics
+    * E.g. 'photos uploaded' (daily, cumulative, per hour)
+    * This will help you uncover the monetary value of the health of your
+      server capacity as it relates to *the key components* above
+* Storage is like a glass of water
+    * It has a finite limit (the size of the glass)
+    * And a variable (the amount of water inside it at any moment)
+        * And this rate of change in this variable is capped
+* For storage consumption, the central question is
+    * When will I run out of disk space?
+    * For this we want to track storage _consumption_ over time
+* I'm 30% through.
