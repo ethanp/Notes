@@ -31,6 +31,12 @@
 1. E.g: plot disk-io-util & disk-io-wait vs replication lag time to determine
    which is the cause of major lag spikes
 
+#### Useful Cache Metrics
+1. Cache hit ratio
+2. Total request size
+3. Average object size
+4. LRU reference age (if you use LRU)
+
 ### The Book
 * If you don't have a way to measure your current capacity, you can't conduct
   capacity planning --- you'll only be guessing
@@ -102,3 +108,10 @@
     * The goal is to be able to _handle_ spikes that are inevitably produced by
       everyone else
     * Find cause the _after_ your capacity plan is in-hand
+* Measuring and recording your cache's hit ratio is "imperative" to
+  understanding how efficient it is
+* The *working set of cacheable files* is the number of unique objects
+  requested over a given time period
+* Servers doing multiple tasks are harder to figure out
+    * Maybe you can hold other tasks' resource-usage constant to isolate
+      the last

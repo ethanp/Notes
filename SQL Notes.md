@@ -12,6 +12,40 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Hive
+
+### Sampling
+#### Table Sample
+* Query *samples* of the data instead of the whole table
+* Can be added to any table in the from clause
+* Bucket numbers start at 1
+*
+
+### UNION
+* *Combine results from multiple SELECT statements into a single
+  result set*
+* The number and names of columns returned by each SELECT statement
+  must be the same
+
+
+#### UNION ALL
+Bag union; don't deduplicate rows
+
+#### UNION DISTINCT
+Same as just plain `UNION`
+
+#### Example
+
+		SELECT u.id, actions.date
+		FROM (
+				SELECT av.uid AS uid
+				FROM action_video av
+				WHERE av.date = '2008-06-03'
+				UNION ALL
+				SELECT ac.uid AS uid
+				FROM action_comment ac
+				WHERE ac.date = '2008-06-03'
+		) actions JOIN users u ON (u.id = actions.uid)
 
 ### Make Up Your Own Table ("Scalar Query") ###
 
@@ -24,6 +58,18 @@ Creates the database row
 | q | treasury |  1 |
 
 as a standalone row.
+
+## RDBMS SQL
+
+### Group By
+
+From StackOverflow.
+
+`Group By X` means put all those with the same value for X in the one group.
+
+`Group By X, Y` means put all those with the same values for both X and Y in the one group.
+
+
 
 ### Unique vs Distinct
 
