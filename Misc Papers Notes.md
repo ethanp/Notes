@@ -11,6 +11,60 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+# Databases
+
+## C-Store: A Column-oriented DBMS
+
+> M. Stonebraker, D. J. Abadi, A. Batkin, X. Chen, M. Cherniack, M. Ferreira,
+> E. Lau, A. Lin, S. R. Madden, E. J. O'Neil, P. E. O'Neil, A. Rasin, N. Tran,
+> and S. B. Zdonik. C-Store: A Column-Oriented DBMS. In VLDB, pages 553–564,
+> 2005. MIT, Brandeis, UMass Boston, Brown (i.e. it's diversely *Bostonian*.)
+
+### Abstract & Introduction
+
+1. C-Store is a __relational database management system__ (DBMS)
+2. It is __read-optimized__
+    * Whereas most systems are write-optimized
+    * C-Store gets reasonable write speed as well
+    * Reduces the number of disk-accesses per query
+3. __Data is stored by column__ rather than by row
+4. Read-only transactions are implemented to include high availability and
+   snapshot isolation
+5. It is shown to be __substantially faster__ than popular commercial products
+6. In most DBMSs, attributes for a record ("tuple") are placed contiguously in
+   storage
+    * This makes writing new records to disk easy
+7. However data warehouses are optimized for ad-hoc queriyng, ie. _"read-
+   optimized"_, like CRM systems, card catalogs, etc.
+    * For this, the *column store* architecture---in which values for a single
+      column ("attribute") are stored contiguously---are more efficient
+8. Column storage means irrelevant attributes needn't be brought into memory
+9. With modern speed-tradeoffs, we should trade CPU ineffiency for disk
+   efficiency because disk bandwidth is so low compared to CPU speeds
+10. We can do this by encoding abbreviations of the set of values, and storing
+    the encoded form of our attribute values
+    * Also we can forget about byte/word-aligning values on disk
+11. B-trees are good for a write-, but not a read-optimized world
+    * For read-optimization, we prefere bit-map, cross-table, and materialized-
+      view index structures, with _no_ B-tree at all.
+12. So here, each column is stored separately, each sorted in its own way
+    * Or the same column may be stored multiple times, sorted in different ways
+        * This redundancy also happens to increase data availability
+12. Projection --- groups of columns sorted on the same attribute
+13. A "grid" environment is assumed, where each node has private disk and
+    memory
+14. Data is horizontally partitioned across various nodes
+    * This facilitates _intra-query parallelism_
+15. Data structures are allocated to grid nodes automatically
+16. Want transactional, on-line updates, with delay to data visibility
+17. One writes to the write-optimized Writeable Store (WS) component, then the
+    _tuple mover_ batches writes into the Read-optimized Store (RS)
+    * Both are column-oriented
+18. Deletes go to RS, inserts to WS, and updates are implemented as an insert
+    and a delete
+
+End of intro. Rest is work in progress.
+
 # Networking
 
 ## The Akamai Network: A Platform for High-Performance Internet Applications
