@@ -11,6 +11,63 @@ latex input:	mmd-natbib-plain
 latex input:	mmd-article-begin-doc
 latex footer:	mmd-memoir-footer
 
+Deadlock
+--------
+**6/7/15**
+
+### How do we ensure that deadlock does not occur?
+
+1. Assign an order to locks
+2. Require that they're always acquired in that order
+
+### How can we detect a deadlock?
+
+Look for a cycle in the wait-for graph (WFG).
+
+1. Assign each thread a node.
+2. If thread *p* wants a lock that thread *q* owns, draw a line \\(p\rightarrow
+   q\\).
+3. Having a cycle in the WFG implies the system is in deadlock.
+
+#### But how can we detect a cycle in a graph?
+
+[One recommended option](http://www.geeksforgeeks.org/detect-cycle-in-a-graph/)
+is to use depth-first search (DFS), and keep tracker of vertices on the current
+recursion stack.
+
+##### Pseudocode
+
+Suppose we are creating a method on `class Graph` with an adjacency-list `adj`.
+The graph does not have to be connected or anything. It will still work,
+because we start the search from every node in the graph.
+
+    # the kicker-off-er
+    def hasCycle():
+        visited = [false] * numNodes
+        onStack = [false] * numNodes
+        for node in range(numNodes):
+            if inCycle(node, visited, onStack):
+                return True
+        return False
+
+    # does the actual DFS
+    def inCycle(node, visited, onStack):
+        if not visited[node]:
+            visited[node] = true
+            onStack[node] = true
+            for adjNode in adj[v]:
+                # THIS IS THE KEY PART OF IT ALL
+                if !visited[adjNode] and inCycle(adjNode, visited, onStack):
+                    # a cycle was found furth down the search
+                    # so we must bubble it up
+                    return True
+                elif onStack[adjNode]:
+                    # a cycle was found here; pass True to parent stack frame
+                    return True
+        onStack[node] = False
+        return False
+
+
 Apache Software Foundation
 --------------------------
 **5/26/15** --- This is basically a summary of the Wikipedia article
