@@ -115,3 +115,7 @@
 * Servers doing multiple tasks are harder to figure out
     * Maybe you can hold other tasks' resource-usage constant to isolate
       the last
+* Predictions require two essential bits of information, your ceilings and
+  your historical data
+* Don't fit a curve using a higher-than-2nd-order polynomial, that would be
+  based on bizarre assumptions that you don't have a basis to make
