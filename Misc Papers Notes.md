@@ -246,7 +246,9 @@ End of intro. Rest is work in progress.
 
 #### Data Collection and Analysis System
 
-1. Collect 100TB of logs per day, compressed and aggregated to a set of clusters with dedicated processing pipelines, then passed to systems for analytics, storage, and delivery to customers
+1. Collect 100TB of logs per day, compressed and aggregated to a set of
+   clusters with dedicated processing pipelines, then passed to systems for
+   analytics, storage, and delivery to customers
 2. Real-time monitoring of status information of just about every software
    component can be done through a standard SQL interface to their Query system
 
@@ -280,6 +282,105 @@ End of intro. Rest is work in progress.
    centers
 
 # Distributed Computing
+
+## Spark: Resilient Distributed Datasets, In-Memory Cluster Computing
+
+> Zaharia, Matei, Mosharaf Chowdhury, Tathagata Das, Ankur Dave, Justin Ma,
+> Murphy McCauley, Michael J. Franklin, Scott Shenker, and Ion Stoica.
+> **"Resilient distributed datasets: A fault-tolerant abstraction for in-memory
+> cluster computing."** In Proceedings of the 9th USENIX conference on
+> Networked Systems Design and Implementation, pp. 2-2. USENIX Association,
+> 2012.
+
+### Abstract / Intro
+
+1. They've invented the concept of "Resilient Distributed Datasets" (RDDs) and
+   released the primary implementation of them in Apache Spark
+2. It's a *distributed memory abstraction* that facilitates writing fault-
+   tolerant in-memory computations on large clusters
+3. Only allow coarse-grained transformations/updates to shared state
+4. Addresses the fact that MapReduce lacks the ability to leverage distrubuted
+   RAM, making it inefficient for
+    1. applications that reuse intermediate results across multiple
+       computations
+        * e.g. iterative machine learning and graph algorithms
+            * e.g. PageRank, K-means, logistic regression
+    2. Running interactive, ad-hoc queries on the same subset of the data
+5. Existing abstractions for in-memory cluster storage can only provide fault
+   tolerance by replicating the data, or logging updates across machines
+    * This is because those systems allow fine-grained updates to mutable state
+    * This is expensive for data-intensive workloads because of all the network
+      bandwidth used for copying data around
+    * In contrast, RDDs only log the *transformations* used in its creation
+      (i.e. it's *"lineage"*)
+6. Spark can also be used to interactively query big datasets from the Scala
+   interpreter
+
+### Resilient Distributed Datasets (RDDs) 
+
+1. An RDD is a read-only, partitioned collection of records
+2. Can only be created through deterministic operations on (1) data in stable
+   storage or (2) other RDDs
+3. An operation that creates an RDD is called a "transformation" and includes
+   `map`, `filter`, and `join`.
+4. You are allowed to define the data partitioning scheme across machines for
+   optimizing joins to co-locate the data
+5. As opposed to *transformations*, **actions** return a value to the
+   application, or export data to a storage system
+    * e.g. `count`, `collect` (returns the elements), `save`
+6. RDDs aren't actually computed until they're used in an action, allowing
+   transformations to be pipelined
+7. Calling `persist` on an RDD means you want to save an RDDs transformed data
+   after it has been computed for further transformations or other actions,
+   etc.
+8. The system get mitigate stragglers by running backup copies (a la MapReduce)
+9. Partitions that don't fit in RAM will basically devolve to MapReduce jobs
+10. Note that this "coarse-update-only" model is *only* good for batch
+    analytics
+
+### Spark Programming Interface
+
+1. Scala was chosen because it is consice and efficient
+2. Developers write a *driver program* that connects to a cluster of *workers*
+3. Note that `flatMap` in Scala/Spark corresponds to the `map` in "map-reduce"
+
+More about this is best left to a Spark programming tutorial.
+
+### Representing RDDs
+
+1. All RDDs are represented through an common `interface` to simplify the
+   scheduler and overall system design. This interface includes
+    * Set of *partitions* -- pieces of the dataset
+    * Set of *dependencies* on parent RDDs, which can be either
+        * *narrow* -- ≤ 1 child has it, e.g. `map`; allows pipelining
+          transformations on a single cluster node, and simple recovery
+        * *wide* -- otw, e.g. `join`; requires "shuffling" data across nodes, a
+          la MapReduce
+    * A *function* for computing RDD from parents
+    * And *metadata* about partitioning scheme and preferred (node) locations
+      for getting easy access to the data
+
+### Implementation
+
+1. 14,000 lines of Scala
+2. System runs over the Mesos cluster manager
+3. Scala itself was unmodified (though you have to use *their* modified
+   interpreter to do the interactive ad-hoc querying stuff)
+4. Failed tasks are re-run on another node
+5. Scheduler chooses the best node to run each task based on data-locality
+6. The data in persistent RDDs can be stored
+    * In the JVM heap as deserialized Java objects
+    * serialized in-memory data, or
+    * on-disk
+7. The user can choose to checkpoint RDDs at will via API (`persist`)
+
+### Evaluation
+
+**TODO**
+
+
+
+
 ## Kafka: a Distributed Messaging System for Log Processing
 > Kreps, Narkhede, and Rao of LinkedIn; Published in NetDB'11, Jun. 12, 2011.
 
