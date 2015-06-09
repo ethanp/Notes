@@ -13,6 +13,20 @@ latex footer:		mmd-memoir-footer
 
 # CS Theory
 
+## Algorithmic Complexity
+
+Ref: [StOve](http://stackoverflow.com/questions/1857244/)
+
+* **P** -- *decision* problem that can be *solved* in polynomial time
+	* E.g. check whether a graph can be two colored -- greedy algorithm works
+* **NP** -- *decision* problem where a "yes" result can be *verified* in polynomial time
+	* E.g. prime factorization (do the prime factors multiply to the number?)
+* **NP-Complete** -- NP problem `x` s.t. any NP problem `y` can be *reduced* to `x` in polynomial time
+	* So if we can solve `x` quickly, we can also solve `y` quickly
+	* Example: 3-SAT -- find a satisfying interpretation for a conjunction of 3-clause conjunctions
+* **NP-Hard** -- *any* problem `x` s.t. any NP-complete problem `y` can be *reduced* to `x` in polynomial time
+	* The halting problem: given a program `P` on input `I`, will it halt?
+
 ## Graphs
 
 ### Minimum spanning tree
