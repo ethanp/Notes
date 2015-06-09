@@ -11,6 +11,18 @@ latex input:		mmd-natbib-plain
 latex input:		mmd-article-begin-doc
 latex footer:		mmd-memoir-footer
 
+# Interview-type Questions
+
+## Find the \\(k^{th}\\) largest element of array `arr`
+
+[Reference](http://courses.csail.mit.edu/iap/interview/Hacking_a_Google_Interview_Handout_2.pdf).
+It's also near the beginning of *The Algorithm Design Manual*.
+
+Use *random-pivot quicksort*, but always only recurse into the half containing
+desired index (e.g. \\(n/2\\) to __find the median__). If the pivot goes in
+that index, we're done. The complexity is
+\\(O(n)+O(n/2)+O(n/4)+\cdots\rightarrow O(2n)=O(n)\\).
+
 # CS Theory
 
 ## Algorithmic Complexity
@@ -77,15 +89,6 @@ facilitate this, we have a `sizeArray[num_elems]` that says how many nodes
 
 That's really all there is to it.
 
-## I know I'm going to forget
-
-### Find the median in \\(O(n)\\)
-Use [random-pivot] quicksort, but always only recurse into the half containing
-desired index (e.g. \\(n/2\\)). If the pivot goes in that index, we're done.
-The complexity is
-
-\\[O(n)+O(n/2)+O(n/4)+\cdots\rightarrow O(2n)=O(n)\\]
-
 ## Strings
 ### String Search with Rabin-Karp
 See hashing section below
@@ -100,7 +103,7 @@ From *The Algorithm Design Manual*.
 
 A reasonable hashing algorithms for strings is
 
-\\[H(S)=\sum_{i=0}^{|S|-1}{\alpha^{|S|-(i+1)}\times char(s_i)} \,\%\,m\\]
+\\[H(S)=(\sum_{i=1}^{|S|}{\alpha^{|S|-i} S_i}) \,\%\,m\\]
 
 In which you map each string to a unique integer by treating each character as
 a "digit" in a base-\\(\alpha\\) number system. Then you stick the string in
