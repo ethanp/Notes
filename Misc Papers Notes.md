@@ -311,8 +311,8 @@ End of intro. Rest is work in progress.
     * This is because those systems allow fine-grained updates to mutable state
     * This is expensive for data-intensive workloads because of all the network
       bandwidth used for copying data around
-    * In contrast, RDDs only log the *transformations* used in its creation
-      (i.e. it's *"lineage"*)
+    * In contrast, an RDD only logs the *transformations* used in its creation
+      (i.e. its *"lineage"*)
 6. Spark can also be used to interactively query big datasets from the Scala
    interpreter
 
@@ -333,14 +333,14 @@ End of intro. Rest is work in progress.
 7. Calling `persist` on an RDD means you want to save an RDDs transformed data
    after it has been computed for further transformations or other actions,
    etc.
-8. The system get mitigate stragglers by running backup copies (a la MapReduce)
+8. The system mitigate "stragglers" by running backup copies (a la *MapReduce*)
 9. Partitions that don't fit in RAM will basically devolve to MapReduce jobs
 10. Note that this "coarse-update-only" model is *only* good for batch
     analytics
 
 ### Spark Programming Interface
 
-1. Scala was chosen because it is consice and efficient
+1. Scala was chosen because it is concise and efficient
 2. Developers write a *driver program* that connects to a cluster of *workers*
 3. Note that `flatMap` in Scala/Spark corresponds to the `map` in "map-reduce"
 
@@ -376,10 +376,25 @@ More about this is best left to a Spark programming tutorial.
 
 ### Evaluation
 
-**TODO**
+1. Big speedup over Hadoop (20-100x) by avoiding I/O and deserialization by
+   leaving data in the Java heap
+2. Queried 1TB in 5-7 seconds (100 `m2.4xlarge` EC2s with 8 cores, 68 GB RAM)
+    * Querying on disk to 170s
+3. Much faster to store RDD data in Java objects rather than in-memory local
+   files (this seems to relate to Tachyon [which I don't think was out yet])
+4. Performance degrades gracefully with decreasing memory to data ratio
 
+### Discussion
 
+1. RDDs' immutability & limited API of coarse-grained transformations is still
+   suitable for a wide class of applications
+2. RDDs allow efficient expression existing programming models including
+   MapReduce, DryadLINQ, SQL, Pregel (Google's graph processing), iterative
+   MapReduce (e.g. HaLoop, Twister), batched stream processing (e.g. 15 min
+   latency on ad-click data)
+3. RDDs' immutability and coarse-grained nature makes them highly-debuggable
 
+Fin.
 
 ## Kafka: a Distributed Messaging System for Log Processing
 > Kreps, Narkhede, and Rao of LinkedIn; Published in NetDB'11, Jun. 12, 2011.
