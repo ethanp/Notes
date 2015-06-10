@@ -397,17 +397,22 @@ More about this is best left to a Spark programming tutorial.
 Fin.
 
 ## Kafka: a Distributed Messaging System for Log Processing
-> Kreps, Narkhede, and Rao of LinkedIn; Published in NetDB'11, Jun. 12, 2011.
+
+> Kreps, Jay, Neha Narkhede, and Jun Rao. "Kafka: A distributed messaging
+> system for log processing." In Proceedings of the NetDB, pp. 1-7. __2011__.
+> All (were) employees of LinkedIn Corp.
 
 **Most of these notes may be direct quotes from the paper**
 
 ### Abstract
-* a distributed messaging system for collecting and delivering high volumes of
+1. a distributed messaging system for collecting and delivering high volumes of
   log data with low latency.
-* suitable for both offline and online message consumption
+2. suitable for both offline and online message consumption
+3. unconventional design choices to optimize efficiency and *scalability*
 
 ### Introduction
-Internet companies generate large amounts of log data for
+
+Internet companies generate *terabytes* of log data *daily* for
 
 1. __User activity events__ --- logins, clicks, likes, comments, and queries
 2. __Operational metrics__ --- service call stack, latency, and utilization
@@ -430,15 +435,15 @@ play a critical role as an event bus for processing asynchronous data flows.
 
 Those systems have the following feature mismatches:
 
-* Focus on rich delivery guarantees (overkill for log data) over throughput
-* Don't provide easy way to partition messages across multiple machines.
-* Assume near immediate consumption of messages
+1. Focus on rich delivery guarantees (overkill for log data) over throughput
+2. Don't provide easy way to partition messages across multiple machines.
+3. Assume near immediate consumption of messages
     * Performance degrades significantly if messages are allowed to accumulate
 
-"At LinkedIn, we find the “pull” model more suitable for our applications since
-each consumer can retrieve the messages at the maximum rate it can sustain and
-avoid being flooded by messages pushed faster than it can handle. The pull
-model also makes it easy to rewind a consumer."
+"At LinkedIn, we find the _“pull”_ model more suitable for our applications
+since each consumer can retrieve the messages at the maximum rate it can
+sustain and _avoid being flooded_ by messages pushed faster than it can handle.
+The pull model also makes it _easy to rewind_ a consumer."
 
 ### Kafka Architecture and Design Principles
 
@@ -446,7 +451,8 @@ model also makes it easy to rewind a consumer."
 * __Topic__ --- a __stream__ of messages of a particular type
 * __Producer__ --- publishes messages to a _topic_
 * __Broker__ --- where published messages are stored by a _producer_
-    * A single producer may store at multiple brokers
+    * A single producer may store [messages from the *same* topic] at multiple
+      brokers (for load balancing)
 * __Consumer__ --- __subscribes__ to one or more _topics_ from the _brokers_
     * Consume _subscribed_ messages by _pulling_ data from _brokers_.
 * __Subscription__ --- provides the _consumer_ an _iterator interface_ over the
@@ -462,6 +468,7 @@ model also makes it easy to rewind a consumer."
     producer.send(“topic1”, set);
 
 ##### Sample consumer code
+
     streams[] = Consumer.createMessageStreams(“topic1”, 1);
     for (message : streams[0]) {
         bytes = message.payload();
@@ -469,33 +476,109 @@ model also makes it easy to rewind a consumer."
     }
 
 #### Efficiency on a Single Partition
-* Producer publishes to a partition by simply appending the message to the last
-  segment file.
-* No "message ID", each message only has a logical offset in log
-* Consumer only consumes sequentially
-* Consumer acknowledges message offset, implying it has received all prior
-  messages in that partition
-* They have numerous optimizations which they list, mainly ways of allowing
-  themselves to rely on caching provided by the OS
-* Experiments show that "production and the consumption have consistent
-  performance linear to the data size, up to many terabytes of data."
-* They use the "`sendfile` API" that Witchel talked about
-    * this is where you directly transfer bytes from an OS file channel to a
-      socket channel, without having to go through an application buffer
-    * this reduces 4 data copies and 2 syscalls into 2 copies and 1 "sendfile"
-      syscall
-* Messages are (only, automatically) deleted after a defined time-period
-  (typically 7 days)
-    * This is a much simpler mechanism than one might initially dream up, but
-      is useful in practice
-    * It allows consumers to *rewind* and re-consume data
+1. Producer _publishes_ to a partition _by simply appending_ the message to the
+   last _segment file_ (e.g. 1 GB)
+    * The message is consumable only after it is flushed
+2. No "message ID", each message only has a _logical offset_ in log (in bytes)
+    1. Removes overhead of maintaining auxiliary index mapping
+    2. The broker keeps the sorted list of offsets in memory
+    3. The consumer calculates the offset of the next message it wants on its
+       own
+3. Consumer only consumes sequentially
+4. Consumer acknowledges message offset, implying it has received all prior
+   messages in that partition
+5. They have numerous optimizations which they list, mainly ways of allowing
+   themselves to rely on caching provided by the OS
+6. Experiments show that "production and the consumption have _consistent
+   performance linear to the data size_, up to many terabytes of data."
+7. They use the "`sendfile` API" that Witchel talked about
+    1. this is where you directly transfer bytes from an OS file channel to a
+       socket channel, without having to go through an application buffer
+    2. this reduces 4 data copies and 2 syscalls into 2 copies and 1 "sendfile"
+       syscall
+8. Messages are (only, automatically) deleted after a defined time-period
+   (typically 7 days)
+    1. This is a much simpler mechanism than one might initially dream up, but
+       is useful in practice
+    2. It allows consumers to *rewind* and re-consume data
         * E.g. to re-play messages after fixing an error
+9. Broker doesn't maintain offsets of consumers ("stateless")
 
 #### Distributed Coordination
-* __Consumer group__ --- "one or more consumers that jointly consume a set of
-  subscribed topics"
-    * "I.e. each message is delivered to only one of the consumers within each
-      group"
-    * ***I don't understand what's going on here...***
-* I have reached the top of page 4
-* I need to recall that I should SPEED THE FUCK UP...lol
+1. __Consumer group__ --- "one or more consumers that jointly consume a set of
+   subscribed topics, i.e. each message is delivered to only one of the consumers within each group"
+    1. Consumers within groups could be on different machines (or not)
+2. Each partition is consumed by only one consumer in the group  
+3. Coordination of consumers is tasked to the "highly available consensus
+   service Zookeeper" which has a "file system like API"
+    1. Detecting addition and removal of brokers and consumers, and at those
+       times triggering a rebalance process (see algorithm 1 in the paper)
+        * Done by storing broker and consumer *registries* mapping
+          `hostname:port` to set of subscribed topics & partitions (broker) or
+          topics & consumer groups (consumer)
+    2. Tracking consumption offset of each partition
+
+#### Delivery Guarantees
+1. Kafka only **guarantees at-least-once delivery**
+    1. Guaranteeing *exactly-once* would require 2PC and is not necessary 
+    2. In practice, exactly-once is what happens
+        * Duplicates occur whan a consumer crashes at the wrong time
+        * You can efficiently de-dup if you google-it
+2. Kafka guarantees that **messages from a single partition** are delivered to
+   a consumer **in order**. However, there is **no guarantee** on the ordering
+   of messages coming from **different partitions**.
+3. [At the time of writing,] if the storage system on a broker is permanently
+   damaged, any unconsumed message is *lost forever*.
+
+### Kafka Usage at LinkedIn
+
+1. Frontend servers batch-publish log data to Kafka brokers in the same data
+   center, and online consumers run within the same datacenter
+2. Another Kafka cluster in a separate datacenter for offline analysis pulls
+   from the cluster described in (1) above, from which consumers pull into a
+   Hadoop infrastructure
+3. They can run ad-hoc queries against live event streams on the cluster in (2)
+4. End-to-end latency of ~10 seconds
+5. Avro is used as serialization protocol
+    1. Efficient and supports schema evolution
+    2. Each message stores Avro schema id
+    3. Schema allows producer/consumer compatibility enforcement
+    4. Schemas can be retrieved from a registry
+    5. Schemas are immutable
+
+### Experimental Results
+
+1. Compared with Apache ActiveMQ (JMS), and RabbitMQ
+2. Much *faster*, but *less features* provided compared to those services
+
+#### Producer Test
+1. Kafka is *much* faster when you *batch* messages (e.g. 50 at a time)
+2. Kafka is **way frikin faster**
+3. Why?
+    1. Producer doesn't wait for acknowledgements (this may be an option in the
+       future though)
+    2. Producer sends messages as fast as the broker can handle
+        * A single producer almost saturated the 1Gb link to the broker
+    3. More efficient storage format (less space devoted to metadata)
+    4. Batching amortizes RPC overhead
+
+#### Consumer Test
+1. 4X ActiveMQ and RabbitMQ
+2. More efficient storage format
+3. No maintenance of delivery state of every message
+4. Use of the Linux `sendfile` API
+
+### Conclusion and Future Works
+
+#### Conclusion
+1. Pull-based consumption model
+2. Much higher throughput
+3. 'Distributed' support for "scaling out"
+
+#### Future work
+1. Built-in message replication across multiple brokers
+    * for durability and availability (both synchronous and asynchronously)
+2. Support for stream processing
+    * To provide the foundation for processing distributed streams across a
+      cluster of consumer machines.
+    * Bonus library of helpful stream utilities
