@@ -76,6 +76,9 @@ WHERE(expression) ORDER BY column names;
 
 * ALL records in `SOURCE_TABLE` will be there
 * ONLY records in the `TARGET_TABLE` matching "join condition" are kept.
+* If a record for the `SOURCE_TABLE` doesn't match any records in the `TARGET_TABLE`
+  being selected in the query, but some columns must be taken from the `TARGET_TABLE`,
+  the value of those columns will be `NULL` in the result set.
 * The word "`OUTER`" is *optional* (may be deleted with no effect)
 * `USING(col)` is the *same* as saying `ON(a.col = b.col)`
 
