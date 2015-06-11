@@ -61,6 +61,24 @@ as a standalone row.
 
 ## RDBMS SQL
 
+### Left Outer Join
+
+#### What is the syntax?
+
+```sql
+SELECT *
+FROM source_table LEFT OUTER JOIN target_table -- "join clause"
+ON(expression) or USING(column_name) // you cannot use BOTH -- "join condition"
+WHERE(expression) ORDER BY column names;
+```
+
+#### What does it do?
+
+* ALL records in `SOURCE_TABLE` will be there
+* ONLY records in the `TARGET_TABLE` matching "join condition" are kept.
+* The word "`OUTER`" is *optional* (may be deleted with no effect)
+* `USING(col)` is the *same* as saying `ON(a.col = b.col)`
+
 ### Group By
 
 From StackOverflow.
