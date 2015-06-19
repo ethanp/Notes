@@ -11,6 +11,55 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Higher level thoughts about networks
+
+### The End-to-End Principle
+
+#### From Wikipedia
+
+The end-to-end principle is a classic design principle in computer networking
+first explicitly articulated in a 1981 conference paper by Saltzer, Reed, and
+Clark.
+
+The end-to-end principle states that in a general-purpose network,
+application-specific functions ought to reside in the end hosts of a network
+rather than in intermediary nodes, provided that they can be implemented
+"completely and correctly" in the end hosts.
+
+The basic intuition is that the payoffs from adding functions to a simple
+network quickly diminish, especially in cases where the end hosts have to
+re-implement those functions themselves for reasons of completeness and
+correctness.
+
+TCP over IP is the *canonical case*: IP *only* provides *[unreliable]*
+data[gram] transfer, because many clients don't need reliability. TCP is a
+whole layer *on top* of IP, that requires no special-purpose IP code to be
+implemented, that provides its user connection-oriented reliable transmission.
+
+#### From [Quora Question](http://www.quora.com/How-does-one-explain-end-to-end-principle-in-laymans-terms)
+
+> If the hosts need a mechanism to provide some functionality, then the network
+> should not interfere or participate in that mechanism unless it absolutely 
+> has to. -- *Tony Li*
+
+> If a network function can be implemented correctly and completely using the
+> functionalities available on the end-hosts, that function should be
+> implemented on the end-hosts without delegating any task to the network (ie,
+> intermediary nodes in between the end-hosts).
+> 
+> This way the new networking functions can be developed without changing the
+> existing network infrastructure. For example, there are many different ways
+> to implement something like HTTP but, you should prefer design alternatives
+> that use solely the functions available on the both ends to the designs that
+> demand new functionalities from routers and switches.
+> 
+> Intermediary nodes, on the other hands, can intercept such network functions
+> for optimization, security, and scalability purposes. For instance,
+> firewalls, load balancers, and proxies intercept HTTP flows for security,
+> scalability and optimization. Note that those features are auxiliary and
+> HTTP does not depend on them. -- *Soheil Hassas Yeganeh*
+
+
 ## Internets have Layers, like an Onion
 
 * **Internet implementations** (TCP over IP) don't actually strictly follow
@@ -97,25 +146,76 @@ latex footer:   mmd-memoir-footer
 ## Transport Layer
 
 ### TCP (Transmission Control Protocol)
-**9/5/14**
+**9/5/14**, **6/19/15**
 
 * This is the **transport layer** of the **TCP/IP suite**
 * Intermediary between the application and Internet Protocol (IP)
     * An app simply issues a *single* TCP request with the data it wants to
       transmit, and TCP handles the packet breakup and IP requests etc.
-* IP packets can be lost, duplicated, or delivered out of order
-    * TCP handles all this; specifically, it *guarantees* that all bytes are
-      perfectly received in the correct order
-* TCP uses *positive acknowledgement with retransmission* as the basis of its
+* **IP packets can be lost, duplicated, corrupted, or delivered out of order**
+    * **TCP handles all this; specifically, it *guarantees* that all bytes are
+      perfectly received in the correct order**
+* TCP uses **positive acknowledgement with retransmission** as the basis of its
   algorithm
+    * Input data is split into *segments*, and each segment is passed to the
+      IP layer wherein it will be put into a packet and actually sent/delivered
+        * Segment described below
     * Sender keeps a record of each packet it sends
     * Sender maintains a timer from when each packet was sent
-        * Sender retransmits if no ACK is received before *timeout* (due to
-          loss or data corruption)
-    * Receiver responds with an ACK message as it receives the packet
+        * Sender retransmits if no `ACK` is received before a [configurable,
+          but standardized] *timeout* (due to loss, corruption, etc.)
+    * Receiver responds with an `ACK` message as it receives the packet
     * The actual algorithm is not in these notes at this time.
-* **TCP Connection** --- 2 *sockets* (one on each end) (*sockets defined
-  below*)
+* A **TCP Connection** consists of 2 *sockets* (one on each end)
+  (*sockets defined below*)
+* Relied upon by e.g. WWW, email, file transfer, SSH, etc.
+* Use **User Datagram Protocol (UDP)** instead if you don't require reliable 
+  data transfer and want reduced *latency* (e.g. for multiplayer video games)
+* First published in a 1974 IEEE paper by Vint Cerf and Bob Kahn
+* **TCP Header** C pseudocode
+    
+        struct tcp_header {
+            uint16_t src_port,
+            uint16_t dest_port,
+            uint32_t seq_num,
+            uint32_t ack_num,
+            uint4_t data_offset, // specifies size of TCP header in 32b words
+            uint12_t reserved_and_flags, // control bits for options
+            uint16_t window_size,
+            uint16_t checksum, // for error-checking header & data
+            uint16_t urgent_pointer,
+            variable_length options,
+            padding zeros // to make sure header ends on 32 bit boundary
+        }
+    * Side note: if you use `int16_t` from `<stdint.h>`, your compiler will
+      have the appropriate e.g. `typedef short int16_t` to make that variable
+      actually by 16 bits long. There is no better way to do it.
+        - Ref: [StOve](http://stackoverflow.com/questions/9813247)
+
+#### Protocol Operation
+
+The protocol is defined by a *state machine* with *Three Phases*
+
+1. Connection establishment --- multistep handshake
+2. Data transfer
+3. Connection termination --- closes established virtual circuits and
+   releases allocated resources
+
+##### Connection Establishment
+
+1. Client sends `SYN` message to the server and sets the segment's sequence
+   number to a random value `A`
+    * I guess it is random to protect from "TCP sequence prediction attacks"
+2. Server replies with `SYN-ACK` message, acknowledgement number is `A+1`,
+   but this packet's number is random value `B`
+3. Client sends `ACK` to server, sequence number is `A+1`, ack number is `B+1`
+4. Now both are in the `ESTABLISHED` state
+
+##### Connection Termination
+
+Similar to connection establishment, but slightly different.
+
+
 
 ### Sockets
 
