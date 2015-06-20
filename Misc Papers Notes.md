@@ -100,10 +100,81 @@ this time.
 * Client data doesn't go through master, clients don't find tablets using
   master, most clients never talk to master, master is only lightly loaded
 * Tablet's are roughly 100-200 MB in size by default
+* Chubby holds *root tablet* containing location of metadata tablets which hold
+  locations of tables
+* Tablet locations are cached by the client library
+* Tablets are assigned to one tablet server at a time
+    * This is handled by the *master*, by monitoring Chubby, who keeps track of
+      which servers are alive
+    * There are plenty of complications with this that I will not repeat herein
+* Tablet updates are committed to a commit log that stores redo records
+    * This facilitates tablet recovery
+* Tablet state is stored in GFS
+* Recent commits are stored in a *memtable* buffer, which takes part in
+  handling read requests
+    * When it hits a size threshold, it's converted to a SSTable and written to
+      GFS
+* *Merging compactions* happen in the background, and merges multiple SSTables
+  with the current memtable to produce a compacted SSTable
 
-#### Tablet Location
+### Refinements
 
-Not done yet
+* Here they describe optimizations to make the above design more performant,
+  reliable, and available
+* Column families can be combined into *locality groups* which are accessed
+  together, and hence are pulled together into memory and held there for a
+  while
+* SSTables for a locality group may optionally be compressed by a supplied
+  algorithm
+* Tablet servers cache SSTables by either row or block
+* Bloom filters can optionally be used to check whether an SSTable has data for
+  a specified row/column pair to reduce the number of disk seeks for reads
+* Commit logs don't fit well with the GFS model, so they did some stuff
+* The immutability of SSTables means access needn't be synchronized across
+  reads
+* Memtable is copy-on-write to allow simultaneous reads and writes
+
+### Performance Evaluation
+
+* Performance scaling is roughly 100x as #servers goes from 1-500
+
+### Real Applications
+
+* Stores raw click data (~200 TB) and summary tables (~20 TB) for Google
+  Analytics
+* Google Earth uses MapReduce over Bigtable to transform from compressed raw
+  satelite imagery to geographic segments
+* Personalized Search stores each user's data and actions (e.g. web queries) in
+  Bigtable
+
+### Lessons
+
+* Learned that distributed systems don't just have network partitions and fail-
+  stop failures; they have memory corruption, clock skew, hung machines,
+  asymmetric network partitions, bugs in other services (e.g. Chubby), planned
+  and unplanned hardware maintenance, etc.
+* Addressed these issues by changing protocols and adding checksumming
+* Importance of system-level monitoring (e.g. Bigtable itself and its client
+  processes) for detecting and fixing bugs and performance issues
+* Don't use obscure Chubby features because they don't work properly
+
+### Related Work
+
+* "The manner in which Bigtable uses memtables and SSTables to store updates to
+  tablets is analogous to the way that the Log-Structured Merge Tree stores
+  updates to index data"
+* C-Store and Bigtable share many characteristics
+
+### Conclusions
+
+* "Our users like the perfor- mance and high availability provided by the
+  Bigtable im- plementation, and that they can scale the capacity of their
+  clusters by simply adding more machines to the system as their resource
+  demands change over time."
+* "An interesting question is how difficult it has been for our users to adapt
+  to using it. New users are sometimes uncertain of how to best use the
+  Bigtable interface, particularly if they are accustomed to using relational
+  databases that support general-purpose transactions."
 
 ## C-Store: A Column-oriented DBMS
 
