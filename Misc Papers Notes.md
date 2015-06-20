@@ -13,6 +13,98 @@ latex footer:   mmd-memoir-footer
 
 # Databases
 
+## Bigtable: A Distributed Storage System for Structured Data
+
+**Notes from 6/20/15**
+
+> Chang, Fay, Jeffrey Dean, Sanjay Ghemawat, Wilson C. Hsieh, Deborah A.
+> Wallach, Mike Burrows, Tushar Chandra, Andrew Fikes, and Robert E. Gruber.
+> "Bigtable: A distributed storage system for structured data." ACM
+> Transactions on Computer Systems (TOCS) 26, no. 2 (**2008**): 4. **Google,
+> Inc.**
+
+Note that this is old now, and Google has (at least in large part) moved on
+from using Bigtable itself. At some point I'll probably take notes on *Spanner*
+which addresses some problems raised while using Bigtable. In reading the
+paper, I'm assuming there is still something to be learnt from it after all
+this time.
+
+### Abstract & Introduction
+
+* Designed to scale to *petabytes* across 1,000s of commodity servers
+* Stores data for web indexing, Google Earth, and Google Finance, personalized
+  search, Google Analytics
+* This includes both backend bulk processing, and real-time data serving
+* Bigtables data model gives clients dynamic control over data layout and
+  format
+* Doesn't support full relational data model
+* Data indexed using row and column names (arbitrary strings)
+* Data treated as uninterpreted strings (clients can serialize their objects
+  into this)
+* Clients dynamically control whether to serve data from memory or disk
+
+### Data Model
+
+* "A Bigtable is a sparse, distributed, persistent multi-dimensional sorted
+  map, indexed by a row key, column key, and timestamp; each value
+  in the map is an uninterpreted array of bytes." 
+  \\((row:string, column:string, time:int64) → string\\)
+    * E.g. for a *Webtable*, *row-keys* are URLs, columns include contents, as
+      well as each in-reference from another page, then each \\((row, col)\\)
+      has a set of values, each associted with a *timestamp*.
+* A read or write of a row is atomic, and may affect multiple columns
+* Data is ordered lexicographic by row key
+* Row ranges are dynamically partitioned into **tablets**, the unit of
+  distribution and load balancing
+    * Due to this, one should choose row names that match your access pattern
+* Column keys are grouped into **column families**, the basic unit of *access
+  control*
+    * Access control is necessary because multiple applications may read or
+      write the same bigtable
+* "Different versions of a cell are stored in decreasing timestamp order, so
+  that the most recent versions can be read first."
+
+### API
+
+* (Create & delete) (tables & column families), change metadata (e.g. access
+  control rights)
+* Write or delete values, look up values from individual row, or iterate over
+  subset
+* Single-row transactions (atomic read-modify-write)
+* Bigtables can be inputs and outputs for MapReduce jobs
+
+### Building Blocks
+
+* Stores log and data files in Google File System (GFS)
+* Runs on a cluster of machines that are also running other applications
+* Relies on a cluster management system for scheduling jobs, resource
+  management, dealing with failures, and monitoring machine status
+* Data is stored in the Google SSTable file format, providing a persistent
+  `immutable.OrderedMap[String, String]`
+* SSTables are a sequence of indexed blocks
+    * index is loaded into memory on application launch
+    * blocks themselves can optionally be loaded into memory
+* Relies on Chubby, a distributed lock service & file system (just like
+  ZooKeeper)
+    * Ensuring the cluster has a single active *master* node, tablet server
+      discovery, finalizing server deaths, storing schema info, and storing
+      access control lists
+
+### Implementation
+
+* Tablet servers can be dynamically added and removed from a cluster
+* Master assigns tablets to tablet servers, load balances, garbage collects
+  (using client-chosen expiry algorithm [e.g. 3 days, or 10 versions])
+* Tablet servers handle read & write requests to any of their ~100s of tablets,
+  and split tablets that have grown too large
+* Client data doesn't go through master, clients don't find tablets using
+  master, most clients never talk to master, master is only lightly loaded
+* Tablet's are roughly 100-200 MB in size by default
+
+#### Tablet Location
+
+Not done yet
+
 ## C-Store: A Column-oriented DBMS
 
 > M. Stonebraker, D. J. Abadi, A. Batkin, X. Chen, M. Cherniack, M. Ferreira,
