@@ -167,8 +167,8 @@ this time.
 
 ### Conclusions
 
-* "Our users like the perfor- mance and high availability provided by the
-  Bigtable im- plementation, and that they can scale the capacity of their
+* "Our users like the performance and high availability provided by the
+  Bigtable implementation, and that they can scale the capacity of their
   clusters by simply adding more machines to the system as their resource
   demands change over time."
 * "An interesting question is how difficult it has been for our users to adapt
@@ -191,42 +191,46 @@ this time.
     * C-Store gets reasonable write speed as well
     * Reduces the number of disk-accesses per query
 3. __Data is stored by column__ rather than by row
-4. Read-only transactions are implemented to include high availability and
-   snapshot isolation
-5. It is shown to be __substantially faster__ than popular commercial products
+4. Read-only transactions include high availability and snapshot isolation
+5. Shown to be __substantially faster__ than popular commercial products
 6. In most DBMSs, attributes for a record ("tuple") are placed contiguously in
-   storage
-    * This makes writing new records to disk easy
+   storage to make writing new records to disk easy
 7. However data warehouses are optimized for ad-hoc queriyng, ie. _"read-
    optimized"_, like CRM systems, card catalogs, etc.
     * For this, the *column store* architecture---in which values for a single
       column ("attribute") are stored contiguously---are more efficient
-8. Column storage means irrelevant attributes needn't be brought into memory
-9. With modern speed-tradeoffs, we should trade CPU ineffiency for disk
-   efficiency because disk bandwidth is so low compared to CPU speeds
-10. We can do this by encoding abbreviations of the set of values, and storing
-    the encoded form of our attribute values
-    * Also we can forget about byte/word-aligning values on disk
+8. Now, irrelevant attributes needn't be brought into memory
+9. Modern speed-tradeoffs imply we should trade CPU ineffiency for disk
+   efficiency; disk bandwidth is low compared to CPU speeds
+10. Do this by encoding abbreviations of the set of values, and storing the
+    encoded form of our attribute values
+    * Also, forget about byte/word-aligning values on disk
 11. B-trees are good for a write-, but not a read-optimized world
-    * For read-optimization, we prefere bit-map, cross-table, and materialized-
+    * For read-optimization, we prefer bit-map, cross-table, and materialized-
       view index structures, with _no_ B-tree at all.
 12. So here, each column is stored separately, each sorted in its own way
     * Or the same column may be stored multiple times, sorted in different ways
         * This redundancy also happens to increase data availability
 12. Projection --- groups of columns sorted on the same attribute
-13. A "grid" environment is assumed, where each node has private disk and
-    memory
-14. Data is horizontally partitioned across various nodes
-    * This facilitates _intra-query parallelism_
-15. Data structures are allocated to grid nodes automatically
-16. Want transactional, on-line updates, with delay to data visibility
+13. We assume "grid" environment, where each node has private disk and memory
+14. Horizontally partition data across nodes for _intra-query parallelism_
+15. Allocate data structures to grid nodes automatically
+16. Want transactional, on-line updates; minimize delay to data visibility
 17. One writes to the write-optimized Writeable Store (WS) component, then the
     _tuple mover_ batches writes into the Read-optimized Store (RS)
     * Both are column-oriented
 18. Deletes go to RS, inserts to WS, and updates are implemented as an insert
     and a delete
 
-End of intro. Rest is work in progress.
+### Data Model
+
+* Relational logical data model, but physically only store projections
+
+Hmm
+
+* Reading this would probably be much more profitable *after* having read more
+  about typical relational database internals because this is all about what
+  they did *w.r.t.* what is normally done.
 
 # Networking
 
@@ -745,3 +749,107 @@ The pull model also makes it _easy to rewind_ a consumer."
     * To provide the foundation for processing distributed streams across a
       cluster of consumer machines.
     * Bonus library of helpful stream utilities
+
+# Operating Systems & Linux
+
+## Linux Kernel Development
+
+> Robert Love; Linux Kernel Development, 2010, Pearson
+
+#### Forward by Andrew Morton
+
+As the kernel gets more complex, it becomes harder for new developers to become
+contributors. Code simplicity helps, code comments about intent help, but
+written word for the point of essential high-level understanding is necessary
+as well. That's where this book comes in.
+
+#### Preface
+
+* This book is about the Linux kernel's design and implementation
+* Specifically version 2.6
+* The goal of this book is to help you begin developing code in the kernel
+* It balances theory and application, it covers API and internals
+
+### Introduction to the Linux Kernel
+
+* Unix-family operating systems all implement a similar API
+* Unix development was started by Dennis Ritchie and Ken Thompson in 1969 after
+  Multics failed to provide a multiuser operating system at Bell Labs
+* It was rewritten in C in 1973
+* UC Berkeley created variants of Unix (BSDs) 1977-1994 with added veatures
+  like `csh`, `vi`, virtual memory, job control, demand paging, and TCP/IP.
+* Workstation and server companies sold their own versions for their hardware
+  as well
+
+#### Key Successes of Unix
+
+1. Only 100s of system calls (instead of 1,000s) with clear goals and design
+2. Everything is a file (except a socket)
+3. Kernel and utilities leverage C to make them portable
+4. Fast process creation time via `fork()`
+5. Simple IPC primitives allow piping simple programs into each other
+6. Clean layering with strong separation of policy from mechanism
+
+#### Key Features of Unix
+
+1. Preemptive multitasking
+2. Multithreading
+3. Virtual memory
+4. Demand paging
+5. Shared libraries with demand loading
+6. TCP/IP networking
+
+#### Intro to Linux
+
+* Linus developed first version of Linux in 1991 at school for the new and
+  advanced Intel 80386 microprocessor
+* It's based on Minix, but Minix did not have a permissive license
+* It took off quickly, with new developers contributing
+* Now it runs on watches and super-computer clusters
+* It is not a commercial product
+* If you distribute your changes you must make the source available
+* A "Linux system" may include the kernel, C library, utilities, windowing
+  system, desktop environment (e.g. GNOME), etc. Here Linux refers to just the
+  kernel
+
+#### What is a kernel
+
+The kernel is software that
+
+1. provides basic services
+2. manages hardware
+3. distributes system resources
+
+Typical components include
+
+1. Interrupt handlers
+2. Scheduler
+3. Memory management system
+4. Networking
+5. IPC
+
+#### Some Linux kernel specifics
+
+* It resides in *kernel-space*, where it has full access to the hardare and,
+  apps execute in *user-space*, where they do not
+* It runs in **process context** when an application uses the C library which
+  calls system calls which instruct the kernel to do particular tasks
+* It runs in an **interrupt context** when hardware interrupts the processor,
+  which interrupts the kernel, which uses the interrupt number to index to an
+  interrupt handler which does something. This all is not associated with any
+  process.
+* It is monolothic -- it is a single static binary executable image running in
+  a single address space as a single process, which communicates with itself
+  using simple method calls
+    * However it still has a modular design, the ability to preempt tasks
+      executing within the kernel, kernel threads, and can dynamically load
+      kernel modules into the kernel image
+* It does not differentiate between threads and normal processes
+
+##### Versioning
+
+* 2.6.4.2 -- major version, minor version, revision, stable version
+* Even minor versions are stable releases (intended to work for a long time)
+* Odd minor versions are development releases (in which new features are tried
+  out)
+* This versioning system is not set in stone and is itself under development
