@@ -754,7 +754,7 @@ The pull model also makes it _easy to rewind_ a consumer."
 
 ## Linux Kernel Development
 
-> Robert Love; Linux Kernel Development, 2010, Pearson
+> Robert Love; Linux Kernel Development, 3rd ed., 2010, Pearson
 
 #### Forward by Andrew Morton
 
