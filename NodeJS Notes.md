@@ -160,6 +160,7 @@ Brown.
    are available to everyone downstream
 3. Insert middleware into the pipeline with `app.use`
 4. **Don't forget to call `next()`** -- otherwise the request will terminate!
+
     ```javascript
     app.use(function(req, res, next) { 
       console.log('processing request for "' + req.url + '"....');
@@ -184,15 +185,12 @@ Brown.
 ## How To
 
 1. Install a package *globally* (make it available to your whole system)
-    ```bash
-    npm install -g grunt-cli
-    ```
+
+        npm install -g grunt-cli
 2. Save the package(s) in `node_modules/` *and* update the `package.json` file
-    ```bash
-    npm install --save express
-    ```
+
+        npm install --save express
 3. Save the package in `devDependencies` instead of `dependencies` to reduce
    dependencies required to deploy (e.g. for *testing*-related modules)
-    ```bash
-    npm install --save-dev mocha
-    ```
+   
+        npm install --save-dev mocha
