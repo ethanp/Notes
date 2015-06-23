@@ -38,6 +38,57 @@ This document requires MathJax (and possibly
 
 ## Statistics #
 
+## Markov Models
+
+### Mathematical Monk Chapter 14
+
+1. **Markov models -- "the future is independent of the past, given the
+   present"**
+    1. This is *true* in the Newtonian physics view of the world if you think
+       about it
+    2. *Except* that we can't expect to perfectly understand the current state
+       of the system -- i.e. there is "hidden" information
+2. The canonical probabilistic model for temporal or sequential data
+3. Comes from Russian mathematician Andrey Markov's work in "stochastic
+   processes" through the start of the 1900s
+4. Useful for weather, finance, language, music, etc.
+    1. Useful when the data has *periodicity* (e.g. yearly cycles)
+    2. Useful for finding a robot given noisy sensor data
+    3. Good for "fill in the blank" when a sentence is missing a word
+5. We assume discrete time and space
+6. We can't say the data points are iid because nearby points are clearly more
+   closely related
+7. Our "first order" singly-linked simple "Markov Chain" can be also written
+   \\(p(x_t | x_1,...,x_{t-1}) = p(x_t | x_{t-1})\\)
+8. This means \\(p(x_1,...,x_n)=p(x_1)p(x_2|x_1)\cdots p(x_n|x_{n-1})\\)
+9. In the graphical model for a "second order" Markov chain, each node is
+   pointed to by the previous *two* nodes
+10. A continuous-time MC is "Brownian motion" or a "Poisson process"
+11. **Hidden Markov Models** model the fact that the current state of the world
+    contains information hiden to our understanding of the state
+12. HMMs are popular because they work well because they are simple enough
+    that you can accurately generate parameters, but complex enough to handle
+    real world applications
+13. It's based on the "Trellis diagram" (graphical model for HMM), in which
+    you observe X's, which are each pointed to by corresponding Z's, and Z's
+    form a first-order Markov chain
+14. The video series itself is much better than my notes of course...
+15. We must specify parameters for the HMM
+    1. Transition probabilities between hidden states
+    2. Emission probabilities -- *pdf*'s or *pmf*'s on *X* given each hidden
+       state value *Z*
+    3. Initial distribution -- probability of having each *Z* as the initial
+       state
+16. The *Forward-Backward Algorithm* will compute \\(p(z_k|x_{1:n})\\); it is
+    composed of:
+    1. Forward algorithm computes \\(p(z_k,x_{1:k})\\)
+    2. Backward algorithm computes \\(p(x_{(k+1):n}|z_k)\\)
+17. *Viterbi Algorithm* computes \\(z^*=argmax_{z} p(z|x)\\)
+18. These algorithms are efficient because they are examples of Dynamic
+    Programming, meaning each level of the recursive computation relies on
+    cmputations already performed for preceding levels
+
+
 ### Bayesian Inference ###
 
 Use **Bayes' Rule** to update the probability for a hypothesis as evidence is
