@@ -450,7 +450,54 @@ Hmm
 
 # Distributed Computing
 
+## Event Sourcing, Martin Fowler
+
+**7/3/15**
+
+> "Capture all changes to an application state as a sequence of events."
+> [Link](http://martinfowler.com/eaaDev/EventSourcing.html)
+
+1. Normally for a given application, you can query its current state
+2. For this pattern, we also store the state changes applied to reach the
+   current state as a "sequence of events"
+3. We can query the event log, use it to reconstruct past states, and cope with
+   retroactive changes
+4. Why not store each item's history in the instance?
+    * Because this way, the log persisting the Event objects is the source of
+      truth of state changes, and we can build independent services over this
+      log (replication, query back-in-time, undo and recompute using new code)
+5. Code-structure-wise, the event contains model-selection logic which helps
+   the event processor object decide which models to update. The processor
+   calls the right method on those model objects, which contains the processing
+   domain logic.
+6. We can make events reversable by including reversal logic in the object
+    * This isn't strictly necessary because we can *also* just revert to a
+      snapshot and play the relevant events onto that
+7. It's problematic if your events "fire the missiles" because they will try to
+   re-fire them on replay, when the target has already been demolished.
+    * To handle this wrap missile-firing with the "Gateway" pattern [details
+      ommitted]
+    * You should replay past events "in replay mode" so the event processor
+      knows what to tell the gateway
+8. If your events rely on non-deterministic external response data, you have to
+   store them and re-apply those stored responses on replay
+    * *"This all sounds strangely familiar..."* -- Lorenzo Alvisi
+9. You can backfill data from
+    1. New features by adding it to past events
+    2. After a bug-fix (which is great)
+    3. As always, the problem is dealing with the Gateways
+10. This log is great for debugging
+    * You can create a test environment and replay events into there
+11. If you have a system with lots of readers and few wriers, Event Sourcing is
+    great because you stream events to a cluster of systems with in-memory
+    databases, and route updates to a single message queue to a persisted
+    database
+    * *"This all sounds strangely familiar..."* -- Pat K
+
+
 ## Spark: Resilient Distributed Datasets, In-Memory Cluster Computing
+
+**6/9/15**
 
 > Zaharia, Matei, Mosharaf Chowdhury, Tathagata Das, Ankur Dave, Justin Ma,
 > Murphy McCauley, Michael J. Franklin, Scott Shenker, and Ion Stoica.

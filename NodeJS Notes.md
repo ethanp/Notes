@@ -56,8 +56,8 @@ Brown.
     * To look in current directory
     
             var fortune = require('./lib/fortune.js')
-4. [`module.exports`][modexp] is the object that's actually returned as the result of
-   a `require` call. ([StOve][stove modexp])
+4. [`module.exports`][modexp] is the object that's actually returned as the
+   result of a `require` call. ([StOve][stove modexp])
     * `x.js`:
       ```javascript
       module.exports = { a: "hello" };
@@ -77,12 +77,11 @@ Brown.
     1. querystring
     2. session (cookies)
     3. request body (POST)
-    4. named routing parameters (`'/:name'`)
-   
-   and the `req.param` method of the request object munges all of these
-   parameters together. For this reason, one should avoid it, and instead
-   use dedicated properties that hold the various types of parameters
-   added by Express.
+    4. named routing parameters (`'/:name'`)   
+2.  Book author says
+    1. normal `req.param` method munges all parameters together
+    2. so avoid it
+    3. instead, use Express's explicit parameter-holding properties
 
 ### Hooking in MongoDB
 
@@ -105,10 +104,12 @@ Brown.
 
 1. Here is an example route
 
-        app.get('/ab', function(req, res){
-          res.type('text/plain');
-          res.send('Meadowlark Travel');
-        });
+    ```javascript
+    app.get('/ab', function(req, res) {
+      res.type('text/plain');
+      res.send('Meadowlark Travel');
+    });
+    ```
 
     This says,
     
@@ -129,8 +130,10 @@ Brown.
     });
     ```
 5. The `static` middleware makes serving static files easier
-6. By default, Express looks for *views* in the `views/` directory
-    * And *layouts* in `views/layouts/`
+6. By default, Express looks for *views* to render (e.g. `index` above) in the
+   `views/` directory
+    * It looks for *layouts* (html reused on multiple pages) in
+      `views/layouts/`
 
 
 ### Request/Response object
@@ -169,10 +172,12 @@ Brown.
     ```
 5. Add middleware to specific verbs with `app.VERB`
 
-        app.get('/b', function(req, res, next) {
-          console.log('/b: route not terminated');
-          next();
-        });
+    ```javascript
+    app.get('/b', function(req, res, next) {
+      console.log('/b: route not terminated');
+      next();
+    });
+    ```
 
 
 # npm
