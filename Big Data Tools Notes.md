@@ -1,3 +1,37 @@
+## Parquet
+
+1. *"Parquetry"* is a geometric mosaic of wood pieces used for decorative effect.
+2. The goal is to compress data for use with processing tools like Spark and Hadoop, so that it takes less time to scan the data from disk
+3. It interoperates with "object models" like Avro, Thrift, ProtoBuff, Pig, Hive SerDe, and Impala (what's that?) via specific "converters"
+4. The striping and encoding is model-agnostic
+5. The files are stored in the language-agnostic, formally specified, Parquet file format
+6. Instead of storing (a,b,c) tuples as [(a1,b1,c1),(a2,b2,c2),...], Parquet stores them as [Encoded(chunk of a's),...,Encoded(chunk of c's)].
+    * This (compressed) columnar storage at work
+    * This helps us only read the data we need
+7. Parquet's "nested representation" is "borrowed from the Google Dremel paper" ([tutorial][twdrm]).
+    * Each cell is encoded as a triplet: repetition level, definition level, value, enabling small footprint, and fast de/serialization
+8. Their code is implemented to optimize for the processor pipeline
+    * Replacing common constructs with unrolled loops, bitwise operations etc. to minimize CPU cache misses
+9. They use the right encodings in the right situations
+    * **Delta encoding** -- avoids branching, store differences between items instead of their values (eg. for timestamps, ids, metrics)
+    * **Prefix coding** -- delta encoding for strings
+    * **Dictionary encoding** -- replace values with dictionary mapping shorter values to real values
+        * Useful when there are < 50K distinct values
+        * Faster and more compression than eg. gzip, lzo, snappy
+    * **Run length encoding** -- good for repetitive data
+    * *User-defined encoding* -- supported
+10. For each chunk, they find the total number of values contained, and use the minimum number of bits to hold them, pack decompression info in the chunk header, and cram all the bits into the payload.
+11. For Twitter it helps them handle 100TB+/day of compressed data (whoa) for use with multiple 1K+ node Hadoop clusters (whoa)
+    * Using Parquet saves them terabytes in "data scanning" per day
+12. It's among the best at compressing, and by far the fastest for querying (according to the creators' benchmarks)
+13. What is stored is a block containing a "row group" (50MB to 1GB), inside which there are chunks of individual columns, inside which there are "pages" of the column chunks (8KB to 1MB), inside which there is a header containing metadata, and the values
+14. Stores metadata statistics relevant for query planners and predicate pushdown
+15. Main contributors are from Twitter, Cloudera, Criteo, Stripe, UC-Berkeley, and LinkedIn
+
+[twdrm]: https://blog.twitter.com/2013/dremel-made-simple-with-parquet
+
+## Spark
+
 ### Overall
 * Gracefully degrades wrt how much of working set fits in cache
 * **Shuffle** --- triggered by certain Spark operations (e.g. `reduceByKey`)
@@ -74,6 +108,7 @@ The **Master**
 4. Sends *tasks* for the executors to run
 
 **RDD** --- Resilient Distributed Dataset
+
 * Primary abstraction of fault-tolerant collections that can be operated
   on in parallel
 * Two types of RDD

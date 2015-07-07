@@ -12,7 +12,20 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
-Most of these Notes are from *before* I actually took the course. So maybe
+## Buffer Cache
+
+1. This is the thing you always here them clearing in systems papers' benchmarks.
+2. It is the memory used by the operating system to cache information from disk
+3. It is used for reads as well as writes (eg. to batch writes, optimize location, and complete asynchronously)
+    * This is why you're not supposed to rip your floppy drive out (lol), because some data might *seem* like it has been written, but lo and behold it is still in the buffer cache
+4. The `sync` command *flushes* the buffer to disk
+5. Specifically, the buffer cache holds file *blocks*, the smallest units of disk I/O
+6. The cache may hold directories, super blocks, etc. too [cached `ls`]
+7. Linux automatically uses all free RAM for buffer cache, and takes some space back when programs need it for memory
+8. The cache data is shared between processes
+
+
+# Most of these Notes are from *before* I actually took the course. So maybe
 they're wrong.
 
 ## Unix System Calls
