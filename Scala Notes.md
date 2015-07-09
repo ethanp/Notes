@@ -691,3 +691,40 @@ Check out the following function from a nice [tutorial on Iteratees](http://blog
       **input** element from the `head` of the `List`, and (I think) appending
       it to the `Iteratee` using the function `k()`
 
+
+# SBT
+
+### Keys
+
+Your `build.sbt` file defines a `Project` which holds a list of Scala
+expressions called `settings`
+
+    version := "0.1.0"
+
+    scalaVersion := "2.11.4"
+
+On the left-side of a `Setting` is a *key*. There are 3 types of keys
+
+1. `SettingKey[T]` -- computed once, when project is loaded
+2. `TaskKey[T]` -- key for a value which is a *task*, potentially with side
+   effects (e.g. `compile` or `package`)
+3. `InputKey[T]` -- key for a task which takes command line args as input
+
+
+`version`, `name` and, `scalaVersion` are examples of keys which are 
+*implicitly imported* into your `build.sbt` file.
+
+To create a command line task, you first associate the key name with what type
+of task it is.
+
+    lazy val hello = taskKey[Unit]("An example task")
+
+And then you associate the key with code to execute when it is called
+
+    hello := { println("Hello!") }
+
+Keys have *scopes* which might be subprojects, test sources, `.class` files,
+etc. Often the scope is implied or has a default, but you can always set it
+explicitly.
+
+
