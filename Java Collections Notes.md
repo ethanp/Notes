@@ -159,8 +159,8 @@ Doesn't extend anything. Comments are mine.
 
  * A `SortedMap`  which allows searches for "closest matches"
     * `lowerEntry`, `floorEntry`, `ceilingEntry`, `higherEntry`,
-      \\(\Longrightarrow\\) `Map.Entry<K,V>`
-    * `lowerKey`, ..., \\(\Longrightarrow\\) `K`
+      \\(\Rightarrow\\) `Map.Entry<K,V>`
+    * `lowerKey`, ..., \\(\Rightarrow\\) `K`
 
 * **can be traversed in either direction**.
 * The `descendingMap` method returns a view of the map with the senses of all
@@ -180,4 +180,22 @@ Doesn't extend anything. Comments are mine.
 * If you (re-)insert a `key` that the map already `contains`, the order is
   *not* affected
 
+### IdentityHashMap
+
+1. Implements `Map` interface, but uses `k1==k2` for comparisons instead of `k1==null ? k2 == null : k1.equals(k2)` (thereby violating `Map`'s general contract).
+2. Useful for _topology-preserving object graph transformations_, such as serialization or deep-copying
+    * I found it in Spark's [SizeEstimator.scala][sparkSizeEst] for calculating the `sizeof` a Java object
+3. Permits `null` values and the `null` key (woudn't have guessed that.)
+4. No ordering guarantees, including ordering may not be preserved between different traversals
+5. Uses hash table to achieve constant-time performance for `get` and `put` given well-chosen identity hash codes for the objects stored
+    * This is implemented using *linear-probing* rather than *chaining*
+6. To _synchronize_ its operations easily, use
+
+    ```java
+    Map m = Collections.synchronizedMap(new IdentityHashMap(maxSizeEstimate));
+    ```
+7. [(JavaDocs)][idhm]
+
+[sparkSizeEst]: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/SizeEstimator.scala
+[idhm]: http://docs.oracle.com/javase/7/docs/api/java/util/IdentityHashMap.html
 [SO Maps]: http://stackoverflow.com/questions/2889777

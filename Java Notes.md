@@ -57,7 +57,6 @@ This is from a [2008 blog post][codeInstr] referring to the 32-bit hotspot. I ha
 
 1. In the Spark source code, they want to estimate sizes in order to build "memory bounded caches" [(source code)][mbc], which are caches that have a fixed upper-bound on how much heap they are allowed to use, and use LRU to dump keys that can no longer fit.
 2. This is because in your Spark program, different machines in your cluster may have different amounts of RAM, and you may cache heterogeneous values and don't want to figure out quota's for each type you're going to store
-3. 
 
 ### Refs:
 
