@@ -189,3 +189,13 @@ Creating one
     * You can use this to share RDDs between applications
 * Also Ooyala has an open source REST end-point called "Spark Job Server"
   which manages sharing RDDs used by multiple services
+
+### spark.sql.DataFrame
+
+7/10/15
+
+1. First announced 2/17/15
+2. API inspired by R and Python's "Pandas"
+3. Scales to petabytes on a large cluster
+4. State-of-the-art optimization and code generation
+5. A `DataFrame` is a distributed collection of data organized into named columns, conceptually equivalent to a table in a relational database.

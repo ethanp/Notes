@@ -12,6 +12,29 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Dispatchers
+From the Akka Docs
+
+7/9/15
+
+The `MessageDispatcher` is "the engine of the Akka machine". Every `ActorSystem` has a dispatcher
+
+    val system = ActorSystem()
+    val executor: ExecutionContextExecutor = system.dispatcher
+
+You can override the default in your configuration file, or pass your own `ExecutionContext` instance to the `ActorSystem` constructor. The default is a `fork-join-executor` which is very fast.
+
+There are in general 4 types of Dispatcher
+
+1. A normal Dispatcher is an event-based object that binds a set of a Actors 
+   to a thread pool. It creates one mailbox per actor. 
+2. The PinnedDispatcher creates a unique thread for each actor.
+3. A BalancingDispatcher has a set of similar actors sharing a single mailbox. 
+4. The CallingThreadDispatcher has the reception logic run on the same thread
+   as the message-sending logic. This is useful for testing and debugging, so 
+   that a contiguous stack trace is generated in case of an error.
+
+
 ## Testing
 From the Akka Docs
 

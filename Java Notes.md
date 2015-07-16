@@ -11,6 +11,67 @@ latex input:        mmd-natbib-plain
 latex input:        mmd-article-begin-doc
 latex footer:       mmd-memoir-footer
 
+## Object Memory Structure
+**7/16/15**
+
+1. C/C++ has a special `sizeof` *operator* that lets you query the size of primitives and even classes
+2. Java doesn't have any analogous operator, and that may be because technically, Java doesn't need one because sizes are *well-defined* in the language spec, and you aren't allowed to do pointer arithmetic anyways.
+3. But for eg. big data processing with Spark, you start to get curious how much space objects really take and how they're laid out
+4. Let's define
+    * __Shallow size__ -- space occupied by the object alone, not counting objects it references
+    * __Deep size__ -- space occupied b entire object graph rooted at current object 
+5. Runtime memory structure of Java objects is not enforced by the VM spec, so memory usage of individual instances of the same class may vary between VMs, so we'll talk specifically about Sun's _HotSpot_ JVM
+
+### Objects
+
+This is from a [2008 blog post][codeInstr] referring to the 32-bit hotspot. I haven't looked into what has changed since then.
+
+1. 2 word header
+    * Recall each __word__ is 4-bytes = 32-bits = the "architecture size" or whatever that's called
+2. 1st has objects identity hash code and flags, eg. lock state and age
+3. 2nd has a reference to the object's class
+4. Objects are aligned to 8-bytes
+5. For an object with no fields, we could stop here
+6. Class attributes are aligned in memory to their size: ints to 4-bytes, longs to 8-bytes, etc.
+7. Attributes are organized in the following order to cut down on alignment-padding
+    1. doubles & longs
+    2. ints & floats
+    3. shorts & chars
+    4. booleans & bytes
+    5. references
+8. For an object that directly extends Object, we could stop here
+    * Now we know why an instance of `java.lang.Boolean` requires _16-bytes_
+9. Fields are organized in memory according to the class hierarchy, ie. inherited fields are *not* mixed in with one an other for better alignment
+10. There are the rare exceptions to the organization rules to save space in obvious wastage situations
+
+#### Arrays
+
+1. Extra header field to contain the `length` variable
+2. Then come the array elements
+
+#### Inner classes
+
+1. Non-static inner classes have that "hidden" field holding a reference to the outer class, which also gives it a sneaky 4 byte cost
+
+### Further Discussion
+
+1. In the Spark source code, they want to estimate sizes in order to build "memory bounded caches" [(source code)][mbc], which are caches that have a fixed upper-bound on how much heap they are allowed to use, and use LRU to dump keys that can no longer fit.
+2. This is because in your Spark program, different machines in your cluster may have different amounts of RAM, and you may cache heterogeneous values and don't want to figure out quota's for each type you're going to store
+3. 
+
+### Refs:
+
+1. [Code Instr 2008][codeInstr]
+2. [Madhukar's Blog 2014][Madhukar]
+3. Github -- [`spark.util.SizeEstimator.scala` 2015][sizeEst]
+4. [JavaWorld 2003][jwSizeof]
+
+[mbc]: https://github.com/phatak-dev/java-sizeof/blob/master/examples/src/main/scala/com/madhukaraphatak/sizeof/examples/BoundedMemoryCache.scala
+[jwSizeof]: http://www.javaworld.com/article/2077408/core-java/sizeof-for-java.html
+[Madhukar]: http://blog.madhukaraphatak.com/sizeof-operator-java-scala/
+[sizeEst]: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/SizeEstimator.scala
+[codeInstr]: http://www.codeinstructions.com/2008/12/java-objects-memory-structure.html
+
 ## Memory Leaks
 **6/19/15**
 
