@@ -199,3 +199,18 @@ Doesn't extend anything. Comments are mine.
 [sparkSizeEst]: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/SizeEstimator.scala
 [idhm]: http://docs.oracle.com/javase/7/docs/api/java/util/IdentityHashMap.html
 [SO Maps]: http://stackoverflow.com/questions/2889777
+
+### ConcurrentHashMap
+
+1. [(JavaDocs)][chm]
+2. A hash table supporting full concurrency of retrievals and high expected concurrency for updates.
+3. The _big win_: retrieval does *not* entail locking or block in general
+4. Retrievals can be concurrent with updates
+5. Retrievals reflect the most recently *completed* update operations holding upon their nset (ie. *happens-before* relation [thanks Leslie & Maurice])
+6. `putAll` and `clear` are not atomic with respect to retrievals
+7. Iterators will *not* throw `ConcurrentModificationExceptions`
+8. `null` may be neither used as _key_ nor _value_
+9. It's often not obvious whether using this will increase the speed of your application. Try it and see if it's any better, then you may want to play with the parameters by first setting them to the extremes and seeing which cases are more performant.
+
+[chm]: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html
+
