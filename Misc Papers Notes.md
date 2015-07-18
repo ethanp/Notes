@@ -610,6 +610,24 @@ More about this is best left to a Spark programming tutorial.
 
 Fin.
 
+## Spark SQL: Relational Data Processing in Spark
+
+> Armbrust, Michael, Reynold S. Xin, Cheng Lian, Yin Huai, Davies Liu, Joseph
+> K. Bradley, Xiangrui Meng et al. "Spark SQL: Relational data processing in
+> Spark." In Proceedings of the 2015 ACM SIGMOD International Conference on
+> Management of Data, pp. 1383-1394. ACM, __2015__. There are in total _11_
+> authors on this paper, all are part of Databricks Inc.
+
+7/12/15
+
+### Abstract & Introduction
+
+1. Spark SQL makes two main additions
+    1. tighter integration between relational and procedural processing
+    2. highly extensibly optimizer, "Catalyst"
+2. Spark SQL is officially, like, the coolest thing ever.
+3. u shld rd the paper.
+
 ## Kafka: a Distributed Messaging System for Log Processing
 
 > Kreps, Jay, Neha Narkhede, and Jun Rao. "Kafka: A distributed messaging

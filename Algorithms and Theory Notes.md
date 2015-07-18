@@ -93,6 +93,73 @@ That's really all there is to it.
 ### String Search with Rabin-Karp
 See hashing section below
 
+### String Search with KMP (Knuth Morris Pratt)
+
+The key here, is that as we inch-worm along through the `haystack`, we use a
+precomputed array to figure out how much to inch forward whenever there's a
+mismatch.
+
+#### Computing the table
+
+```python
+def computeTable(needle):
+    T = [0] * len(needle)   # alloc table
+    T[0] = -1   # fixed starting values
+    T[1] = 0    # fixed starting values
+    pos = 2   # where we are in the needle
+    ctr = 0   # number of prefix-matching letters seen so-far
+    while pos < len(needle):
+        if needle[pos-1] == needle[ctr]:
+            ctr += 1
+            T[pos] = ctr
+            pos += 1
+        elif ctr > 0:
+            ctr = T[ctr]
+        else:
+            T[pos] = 0
+            pos += 1
+    return T
+
+>>> computeTable('asdf')
+    # a  s  d  f
+ => [-1, 0, 0, 0]
+>>> computeTable('aaasdf')
+    # a  a  a  s  d  f
+ => [-1, 0, 1, 2, 0, 0]
+>>> computeTable('abcdaababcabcdef')
+    # a  b  c  d  a  a  b  a  b  c  a  b  c  d  e  f
+ => [-1, 0, 0, 0, 0, 1, 1, 2, 1, 2, 3, 1, 2, 3, 4, 0]
+```
+
+Basically the value in the table at the index *after* the match indicates *one
+more* than the number of matches seen so far. Nah mean.
+
+#### Performing the search
+
+Let `m` be the location of the start of the possible match in `haystack`. Let
+`i` be the index of the character in the `needle` against which we're currently
+checking. As long as the needle is matching the haystack, we keep checking and
+incrementing `i`, like the _naïve algorithm_. However, when we find a mismatch,
+we do the following maneuver
+
+```python
+if T[i] > -1:   
+    # we've matched beyond the 1st character of 'needle'
+    # so maybe we can scoot extra inches
+    m += i - T[i]
+    i = T[i]
+else:
+    # we're still looking to match the 1st character
+    # so we just inch along
+    i = 0
+    m += 1
+```
+
+In other words, in the fast-cast, we move to the next location for which we
+know based on the shape of the `needle` that it repeats its initial substring,
+so we can move to the next place where that much substring is matched.
+
+
 ## Hashing
 
 ### Building a hash-table of strings
@@ -103,27 +170,32 @@ From *The Algorithm Design Manual*.
 
 A reasonable hashing algorithms for strings is
 
-\\[H(S)=(\sum_{i=1}^{|S|}{\alpha^{|S|-i} S_i}) \,\%\,m\\]
+\\[H(S)=(\sum_{i=1}^{|S|}{\alpha^{|S|-i} S_i}) \,\%\,v\\]
 
 In which you map each string to a unique integer by treating each character as
 a "digit" in a base-\\(\alpha\\) number system. Then you stick the string in
-slot \\(m\\) of the underlying array. \\(m\\) should be a large prime not too
-close to \\(2^{i}-1\\) so that hash values are fairly uniformly distributed
+slot \\(H(S)\\) of the underlying array. \\(v\\) should be a large prime not
+too close to \\(2^{n}-1\\) so that hash values are fairly uniformly
+distributed. The [code][gfgrk] I looked at just uses 101 for \\(v\\).
 
 ### String Search with Rabin-Karp
 
 To find a pattern \\(p\\) in a a text \\(t\\), where \\(n=|t|,m=|p|\\)
 
 We calculate the hash of \\(p\\) with the simple base-conversion hashing
-algorithm above ("with a random \\(m\\)" [not sure why]), then slide along
+algorithm above ("with a random \\(v\\)" [not sure why *random* would be
+beneficial, the [code][gfgrk] I looked at just uses 101]), then slide along
 \\(t\\), hashing as we go. Calculating the hash of each new letter given the
-previous hash can be done in *constant* if we note that our hash algorithm is a
-"rolling-hash" in the following manner:
+previous hash can be done in \\(O(1)\\) time if we note that our hash algorithm
+"rolls" in the following manner:
 
 \\[H(S,j+1)=\alpha(H(S,j)-\alpha^{m-1}char(s_j))+char(s_j+m)\\]
 
-So now we just have to worry about hash collisions (NBD), but otherwise we've
-solved the problem in *expected-time* \\(O(m+n)\\).
+So now we just have to worry about hash collisions (which can be resolved in
+\\(O(m)\\) via actual `char` comparisons), but in sum we've solved the problem
+in *expected-time* \\(O(m+n)\\).
+
+[gfgrk]: http://www.geeksforgeeks.org/searching-for-patterns-set-3-rabin-karp-algorithm/
 
 ## Finite State Machines
 
