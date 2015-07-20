@@ -25,6 +25,49 @@ that index, we're done. The complexity is
 
 # CS Theory
 
+## Turing Machines
+
+> "A hypothetical device that manipulates symbols on an [infinite] strip of
+> tape according to a table of rules. Despite its simplicity, a Turing machine
+> can be adapted to simulate the logic of any computer algorithm, and is
+> particularly useful in explaining the functions of a CPU inside a computer."
+> -- Wikipedia
+
+* At any moment there is only one "scanned symbol" from the tape "in the
+  machine" or "under the **head**"
+    * the machine can alter alters the tape based upon the value of this symbol
+* Other symbols on the tape can_not_ affect the machine's behavior
+* A **state register** stores which one of some finite number of states the
+  Turing machine is in
+* A finite **table** of instructions maps *(state, symbol)* pairs to performing
+  some combination of the following actions
+    * _Erase_ or _write_ a symbol; _then_
+    * Move the head *k* values *left* or *right*; _then_
+    * Assume a new state \\(q_i\\)
+* The only symbol allowed to occur on the tape infinitely often at any step
+  during the computation is the *blank symbol* \\(b\in\Gamma\\)
+* If the machine meets a symbol at a state for which its transition function
+  \\(\delta\\) has no operation defined, it *halts*
+* There may be a set of *final* or *accepting* states \\(F\\), and if the
+  machine ends up in one of thse, the contents were *accepted* by the given
+  machine \\(M\\)
+
+> Operation is fully determined by a finite set of elementary instructions such
+> as "in state 42, if the symbol seen is 0, write a 1; if the symbol seen is 1,
+> change into state 17; in state 17, if the symbol seen is 0, write a 1 and
+> change to state 6;" etc. -- Wikipedia
+
+* The "machine" was invented in 1936 by (24 year old) Alan Turing
+* The symbols on the tape come from an arbitrary language (viz. not necessarily
+  binary)
+* Multi-tape and multi-track Turing machines are *equivalent*
+
+### Universal Turing Machine
+
+* **A Turing machine that is able to simulate any other Turing machine**
+* It reads the description (transition function) of another machine \\(M\\) as
+  input, then \\(M\\)'s input
+
 ## Algorithmic Complexity
 
 Ref: [StOve](http://stackoverflow.com/questions/1857244/)
