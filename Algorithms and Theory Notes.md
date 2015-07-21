@@ -25,6 +25,44 @@ that index, we're done. The complexity is
 
 # CS Theory
 
+## Automata
+
+* __Finite-state machine (FSM)__ -- abstract machine that can be in one of a
+  finite number of _states_
+    * Can only be in one state at a time, but can _transition_ to other states
+    * A _particular_ FSM is _defined_ by
+        * A list of states
+        * The triggering condition for each transation
+* __Deterministic finite automaton (DFA)__ -- an FSM that _accepts/rejects_
+  finite strings of symbols, and can only produce a _unique_ run for each input
+  string, meaning:
+    1. Each of its transitions is uniquely determined by its source state and
+       input symbol
+    2. Reading an input symbol is required for each state transition
+* __Nondeterministic finite automaton (NFA)__ -- needn't obey the restriction
+  (1 & 2) listed above for the _DFA_
+    * I.e. upon receiving an input symbol in a particular state, there may be
+      multiple possible states to which it could transition
+    * It _accepts_ its input _iff_ there is _some_ set of transitions on that
+      input which will lead it to end in an accepting state
+    * Can be used as a formal model for __regular expressions__
+    * The _empty-string_ is generally represented with a "\\(\varepsilon\\)"
+* _Diagram representation_
+    * __States__ are circles
+    * __Start states__ are pointed to by an arrow with no source
+    * __Transition triggers__ are labels on the arrows
+    * __Accepting states__ are double-circles
+
+## Language Theory
+
+* A __regular language__ is a _formal language_ that can be expressed using a
+  _regular expression_ (defined in the _Automata_ section above)
+* The language classes of Chomsky's hierarchy are (in increasing generality)
+    1. Regular
+    2. Context-free
+    3. Context-sensitive
+    4. Recursively enumerable
+
 ## Turing Machines
 
 > "A hypothetical device that manipulates symbols on an [infinite] strip of
