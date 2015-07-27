@@ -392,6 +392,35 @@ in *expected-time* \\(O(m+n)\\).
 This algorithm is very similar to **insertion sort**, except that instead of
 _inserting_ `a[i]` into `a[1:i]`, we _select_ the right `a[i]` from `a[i:n]`.
 
+## Quicksort
+
+### Pros
+
+1. \\(O(n \log n )\\)
+2. Very fast in the real world
+3. __In-place__
+
+### Cons
+
+1. \\(O(n^2)\\) in the worst case
+    * This happens when the pivot is the greatest or least element in each
+      round of the partition
+2. Extra stack frames from the recursion?
+3. Not as fast as insertion sort for small number of elements
+
+### How to
+
+#### Partition
+
+1. Select a `pivot`
+    * There are many way we might do this
+        1. The middle element -- better on (at-least) partially-sorted inputs?
+        2. Randomly -- decreases chances of worst-case?
+        3. Median of medians -- what does that mean?
+2. Move it to the end
+3. Make it so that all elements of `set1` containing those `e < pivot` are
+   _before_ all elements of `set2` containing those `e ≥ pivot`
+4. Recursively quicksort `set1` and `set2` separately
 
 ## Bubble sort
 **5/27/14**
