@@ -918,3 +918,64 @@ Typical components include
 * Odd minor versions are development releases (in which new features are tried
   out)
 * This versioning system is not set in stone and is itself under development
+
+
+## The UNIX Time-Sharing System
+
+> Ritchie, Dennis M., and Ken Thompson. "The UNIX time-sharing system."
+> Communications of the ACM 17, no. 7 (1974): 365-375.
+
+### Notes on notes provided by Emmett Witchel and Mike Dahlin
+
+1. UNIX's most important role is to provide a filesystem
+2. Unix's filesystem flavor includes a _hierarchical_ namespace
+    1. This sacrifices some generality for the sake of simplicity
+    2. It is a __DAG__
+        1. This makes _search_ and _garbage collection_ easier
+        1. Augmented with softlinks, which don't lead to cycles because
+           they don't increment the "link" (reference) count; this means
+           they can "dangle" if they're not cleaned up
+3. File metadata is stored in an __inode__ (index-node) data structure -- I
+   think the inode itself can vary between filesystems, but for the _Unix
+   File System_ & `ext3`, it
+    1. Is identified by an `inumber` -- shown via `ls -i` command
+    2. Starts with a section containing metadata
+        1. Size in bytes
+        2. Number of hard-links pointing to the file
+        3. Owner (a _user_, in a _group_)
+        4. Permissions -- `owner | group | other`
+        5. Timestamps (created, modified, accessed)
+        6. __No filename__ -- this is stored in the file's parent-
+           directory's data blocks (see below)
+    2. Followed by a set of "direct" pointers to data blocks
+    3. Folowed by a set of "indirect" pointers to direct pointers
+    4. Followed by a set of "double indirect" pointers
+4. "Everything is a file"
+    1. Directories are files
+        1. Their datablocks contain a set of lines
+        2. Each line has a contained file's `inode` number (id) and its
+           filename
+    2. Devices are files -- this makes their API the same, so either can be
+       passed as a parameter to a program
+        1. They are "located" on the filesystem in the `/dev` directory
+        2. The way this is handled has changed over time to deal with
+           various issues
+5. Hard-links vs Symbolic/Soft-links
+    1. __Hard-link__ -- an entry in a directory's data-block to an `inode`
+       as described above
+    2. __Symbolic-link__ -- an entry in a directory's data-block with an
+       absolute path-name
+6. Unix gained success & elegance via "ruthless simplification"
+7. Unix's breakthrough besides the filesystem was in process-management
+8. They provide process-mgmt primitives, not "solutions"
+    1. `fork` -- spawn a new process with parent's open files
+    2. `exec` -- load a new program image into this process
+    3. `wait` -- wait for a child process to finish executing
+    4. `stdin|stdout` -- enables redirection and pipelines
+9. A process is an executing program, and is just a bunch of bytes divided by
+   virtual-memory location into the _code, heap, and stack_ "segments"
+    1. By contrast, Multix had _N_ segments
+10. How do you teach/learn elgance?
+    1. Study case studies, try to learn lessons
+    2. When you build a system, ask yourself "What would Ritchie and Thompson
+       say about my design?"
