@@ -346,13 +346,20 @@ in *expected-time* \\(O(m+n)\\).
 ## Insertion sort
 **5/27/14**
 
-### Properties
+### Pros
 
-* A **stable** sort
-* Efficient for *very* small data sets
-* Faster than other O(n^2) algorithms (**selection** & **bubble** sort)
-* **In-place**
-* Efficient for data sets already nearly sorted
+1. **Stable**
+2. **In-place**
+3. Efficient for data sets already nearly sorted
+4. Very efficient for small data sets
+    * Ie. we can find some \\(k\\) s.t. for \\(i < k\\), insertion sort is
+      *faster* than quicksort
+5. Faster than other \\(O(n^2)\\) algorithms 
+    * viz. selection & bubble sort
+
+### Cons
+
+1. It is still \\(O(n^2)\\)
 
 ### How to do
 
@@ -365,30 +372,49 @@ in *expected-time* \\(O(m+n)\\).
 ## Selection sort
 **5/27/14**
 
-### Properties
+### Pros
+1. __Simple__
+2. **In-place**
 
-* Painfully **slow**, comfortingly **simple**
-* Similar to **insertion sort**, but slower
-* **In-place**
+### Cons
+
+1. **Slow** (painfully so)
 
 ### How to
 
 1. Scan the array for the smallest element, and put it in slot `0`
-2. Scan the *rest* of the array for its smallest element, and put it in slot `1`
+2. Scan the *rest* of the array for its smallest element, and put it in slot
+   `1`
 3. And so on.
+
+#### Note
+
+This algorithm is very similar to **insertion sort**, except that instead of
+_inserting_ `a[i]` into `a[1:i]`, we _select_ the right `a[i]` from `a[i:n]`.
+
 
 ## Bubble sort
 **5/27/14**
 
-* Repeatedly step through the list to be sorted, comparing each
-  pair of adjacent items and swap them if they are in the wrong order
-* Keep repeating this until no swaps are needed
-* The algorithm gets its name from the way smaller elements "bubble"
-  to the top of the list
-* The *only* thing good about it is that it only requires one pass
-  if the list is already sorted
-* It is a **stable** sort and **in-place**
+### Pros
 
+1. Only requires one pass if the list is already sorted
+2. **Stable**
+3. **In-place**
+
+### Cons
+
+1. Really, really slow.
+
+### How To
+
+1. Repeatedly step through the list to be sorted, comparing each
+  pair of adjacent items and swap them if they are in the wrong order
+2. Keep repeating this until no swaps are needed
+
+#### Note
+The algorithm gets its name from the way smaller elements "bubble" to the top
+of the list
 
 ## Radix Sort
 **5/27/14** [Radix sort on Wikipedia](http://en.wikipedia.org/wiki/Radix_sort)
@@ -412,7 +438,8 @@ Gazillions of options
 * In-place
 * Stable version (with size *n* buffer)
 * Hybrids -- e.g. switch to **insertion sort** when the buckets get small
-* Incremental trie-based -- create a trie then do depth-first, in-order traversal
+* Incremental trie-based -- create a trie then do depth-first, in-order
+  traversal
 
 ## Spaghetti Sort
 **5/27/14** [Found on Wikipedia](http://en.wikipedia.org/wiki/Spaghetti_sort)
