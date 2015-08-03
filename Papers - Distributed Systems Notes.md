@@ -177,7 +177,8 @@ Fin.
 > K. Bradley, Xiangrui Meng et al. "Spark SQL: Relational data processing in
 > Spark." In Proceedings of the 2015 ACM SIGMOD International Conference on
 > Management of Data, pp. 1383-1394. ACM, __2015__. There are in total _11_
-> authors on this paper, all are part of Databricks Inc.
+> authors on this paper, all are part of Databricks Inc. Matei Zaharia himself
+> is the _last_ author.
 
 7/12/15
 
@@ -185,9 +186,145 @@ Fin.
 
 1. Spark SQL makes two main additions
     1. tighter integration between relational and procedural processing
-    2. highly extensibly optimizer, "Catalyst"
+    2. highly extensible optimizer, "Catalyst"
 2. Spark SQL is officially, like, the coolest thing ever.
-3. u shld rd the paper.
+3. It is "a new module in Apache Spark that integrates relational processing
+   with Spark's functional programming API"
+4. Built on their experience with Shark (the old relational processing module
+   for Spark)
+5. "Offers richer APIs and optimizations, while keeping the benefits of the
+   Spark programming model."
+6. Raw MapReduce was too low level, that's why we got Pig, Hive, Dremel, and
+   Shark -- to allow decarative queries over Big Data
+7. But declarative queries don't work on semi- or unstructured data
+8. Declarative queries don't allow one to easily express machine learning or
+   graph processing algorithms
+9. Data pipelines normally force the user to segregate their relational queries
+   from their procedural algorithms
+10. Spark SQL is designed to change that through
+    1. The DataFrame API -- based on `R`'s `dataframe` object, but performs
+       operations lazily, like RDDs; allows relational operations on both
+       external data sources and Spark's built-in distributed collections
+    2. The extensible optimizer, "Catalyst"
+11. The DataFrame API makes it easy to compute multiple aggregates in one pass,
+    via a SQL statement
+    * This would be hard to express using the functional RDD API
+12. DataFrames store data in a columnar format that is significantly more
+    compact than Java/Python objects
+13. Spark SQL is already deployed by a large Internet company on an 8000-node
+    cluster with over 100 PB of data.
+14. Spark SQL is up to 10x faster and more memory-efficient than naive Spark
+    code in computations expressible in SQL
+15. They see Spark SQL as an evolution of the core Spark API; making it both
+    more accessible to new users, and faster for existing users
+
+### Background and Goals
+
+1. RDD optimizations are limited because the engine doesn't understand the
+   structure of data in RDDs (arbitrary Java/Python objects) or the semantics
+   of arbitrary user functions passed to the higher-order-function API
+2. The first attempt at building a relational interface was Shark, which
+   modified Hive to run on Spark
+    1. It could only query data stored in the Hive catalog, not data _inside_ a
+       spark program
+    2. It only worked on (error-prone) SQL strings crafted by the user
+    3. It was hard to extend for new features and data types
+3. The Spark SQL system is meant to fix the limitations listed above
+
+### Programming Interface
+
+1. Spark SQL is a library atop Spark itself, which exposes SQL interfaces,
+   accessible through JDBC, the console, and the DataFrame API
+2. A __DataFrame__ is a distributed collection of `Row`s with the same `Schema`
+3. It can be _viewed_ as an RDD of Row objects, allowing calls to the
+   procedural Spark API
+4. Uses a "nested data model" based on Hive
+5. Supports all major SQL data types, complex data types like structs, arrays,
+   maps, and unions (also nestable), and user-defined types
+6. Logical plans are evaluated _eagerly_, and query results computed _lazily_.
+   This means errors are reported often by the IDE, and more often once the
+   program has started, but data processing has barely begun.
+7. They built a bunch of optimizations for the case of converting RDDs into
+   DataFrames via the `.toDF` function
+8. "Cached" (aka. "materialized") DataFrames use columnar storage, as opposed
+   to RDDs which use JVM objects, reducing memory by 10x by applying columnar
+   compression schemes like dictionary encoding and run-length encoding
+    * Use it by calling `.cache()` on the DataFrame
+9. Spark allows inline definition of UDFs without the complicated packeging and
+   registration normally used
+
+### Catalyst Optimizer
+
+1. Based on functional programming constructs in SCala
+2. A goal was to make it easy to extend by external developer
+3. Supports both rule- and cost-based optimizations
+    * __Cost-based optimization__ -- performed by generating multiple _plans_
+      using _rules_ and then computing and comparing their _costs_
+4. It is the fist production-quality optimizer built in a functional language
+5. The __logical analyzer__ runs transformations defined as partial functions
+   over the input tree in batches until the tree stops changing
+    * At time of writing, it's rules 1000 lines of code
+6. The __logical optimizer__ has rules to e.g. rewrites SQL "`like`" into
+   equivalent fast Scala `.startWith` or `.contains`
+    * It's rules are 800 lines of code
+7. The __phyiscal planner__ generates one or more physical plans out of the
+   logical plan produced by the _logical optimizer_
+    * It's currently only implemented to select join algorithms in certain
+      cases, but it will be extended
+    * It also does rule-based physical optimizations like pipelineing
+      projections and filters into one `map` operation
+    * It's rules are 500 lines of code
+8. The __code generator__ uses Scala's "quasiquotes" which are Scala strings
+   fed to the Scala compiler at runtime to generate bytecode
+    * Plus the Scala compiler can apply its own expression-level optimizations
+    * It is 700 lines of code
+9. You implement a new _data source_ by implementing `createRelation`
+    * For optimization, you can write code to return an RDD of `Row` objects,
+      implement ("advisory", i.e. doesn't have to always work) pushdowns of
+      projections and filters, and enable data locality optimizations
+    * This was used to implement the CSV, Avro, Parquet, and JDBC data sources
+10. Users can register they're own types by providing a mapping to Catalyst's
+    built-in types, as well as UDFs that operate on their own types
+
+### Advanced Analytics Features
+
+1. They made a schema inference algorithm for JSON
+    * In practice it works over Twitter's firehose, and multiple other sources
+2. Spark's machine learning library is incorporating Spark SQL
+3. They support "federated queries" from disparate data sources
+
+### Evaluation (performance)
+
+1. Spark SQL is faster than Shark and the native Spark API
+    * For Python, the speedup over the native API is particularly pronounced,
+      but there is even a speedup over hand-written Scala code
+2. Applications combining Spark SQL with RDDs are faster than running separate
+   parallel jobs
+3. Spark SQL is about the same speed as (C++ & LLVM-based) Impala -- some
+   queries are faster, others slower
+
+### Research Applications
+
+1. Researchers have extended Catalyst for use in their own big data projects to
+   speed up computation times for their specialized needs with small amounts of
+   code
+
+### Related Work
+
+1. Shark is an earlier, more primitive version of the same thing
+2. DryadLINQ compiles queries written in a C# API into a distributed DAG
+   execution engine, but doesn't have such a nice interface or support for
+   iterative algorithms
+3. Hive, Pig and verious lesser-known frameworks are relational query languages
+   with UDF interfaces, but don't integrate with Spark to allow mixing
+   procedural with relational code
+4. Previous extensible optimizer frameworks require the use of a DSL to write
+   rules in, and an "optimizer compiler" to make the DSL code executable
+
+### Conclusion
+
+1. Spark SQL is open source at [`http://spark.apache.org`]()
+
 
 ## Kafka: a Distributed Messaging System for Log Processing
 
