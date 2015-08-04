@@ -208,7 +208,7 @@ Doesn't extend anything. Comments are mine.
 4. Retrievals can be concurrent with updates
 5. Retrievals reflect the most recently *completed* update operations holding upon their nset (ie. *happens-before* relation [thanks Leslie & Maurice])
 6. `putAll` and `clear` are not atomic with respect to retrievals
-7. Iterators will *not* throw `ConcurrentModificationExceptions`
+7. Iterators will *not* throw `ConcurrentModificationException`
 8. `null` may be neither used as _key_ nor _value_
 9. It's often not obvious whether using this will increase the speed of your application. Try it and see if it's any better, then you may want to play with the parameters by first setting them to the extremes and seeing which cases are more performant.
 

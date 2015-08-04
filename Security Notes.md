@@ -13,7 +13,9 @@ latex input:		mmd-article-begin-doc
 latex footer:		mmd-memoir-footer
 
 ## Glossary
-
+* **Access controll** --- are you allowed access to the data/system?
+    * You may need to acquire a *"capability"* first
+* **Auditing** --- _what did you do_ while you were logged in?
 * **Authentication** --- the process of verifying that "you are who you say you
   are", i.e. assuring the message's origin
 * **Authorization** --- the process of verifying that "you are permitted to do
@@ -138,7 +140,30 @@ latex footer:		mmd-memoir-footer
 
 ## Notes on Specific Things
 
-### Buffer Overflow (C[++] only, I think)
+### OAuth
+##### 8/4/15
+
+#### From Wikipedia
+
+OAuth is an _open standard_ for _authorization_. It specifies a process for
+resource owners to authorize third-party access to their server resources
+without sharing their credentials. It is designed to be used over HTTP. It
+provides _access tokens_ to third-party clients via an authorization server,
+with the resource owner's approval. This access token is then used by the
+client to access the protected resources in the resource server. This is the
+system used when you e.g. log into some third-party website using your Google
+account.
+
+OAuth 2.0 is the most recent version. Its different implementations are not
+necessarily interoperable. Its implementations have had numerous security flaws
+exposed, and the protocol itself has been described by security experts as
+inherently insecure.
+
+E.g. if a user wants to access their account on an app, the app is going to ask
+them for a key to their data. The user gets that key from Google and gives it
+to the app, who then lets them in.
+
+### Buffer Overflow (C[++] only, pretty much)
 ##### 12/8/14
 
 This example is from the Coursera course "Software Security" video "Buffer Overflow"
