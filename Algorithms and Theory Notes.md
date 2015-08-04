@@ -122,6 +122,77 @@ Ref: [StOve](http://stackoverflow.com/questions/1857244/)
 
 ## Graphs
 
+### Topological Sorting
+
+A topological sorting of a DAG is a linear ordering of vertices such that for
+every directed edge `uv`, vertex `u` comes before `v` in the ordering. This is
+not possible for non-DAGs.
+
+E.g. for the graph
+
+```
+6
+6
+5 2
+5 0
+4 0
+4 1
+2 3
+3 1
+```
+Among the possible sortings, we have
+```
+5 4 2 3 1 0
+4 5 2 3 1 0
+```
+
+The basic _algorithm_ looks very similar to DFS. 
+
+DFS looks roughly like this (when there is not just one "root" node)
+
+```python
+class Graph(object):
+    # ...
+    def disconnectedDFS(self):
+        self.visited = [False for node in self.nodes]
+        for node in self.nodes:
+            if not self.visited[node.id]:
+                self.dfs(node)
+
+    def dfs(self, node):
+        if not self.visited[node.id]:
+            self.visited[node.id] = True
+            print node.data
+            for a in node.adj_list:
+                dfs(a)
+```
+
+In contrast, Topological Sorting looks like this
+
+```python
+class DAG(Graph):
+    # ...
+    def disconnectedTS(self):
+        self.stack = []
+        self.visited = [False for node in self.nodes]
+        for node in self.nodes:
+            if not self.visited[node.id]:
+                self.tsUtil(node)
+        while len(self.stack) > 0:
+            print self.stack.pop()
+
+    def tsUtil(self, node):
+        self.visited[node.id] = True
+        for adj in node.adj_list:
+            if not self.visited[adj.id]:
+                self.tsUtil(adj)
+        self.stack.push(node)
+```
+
+##### Refs
+
+1. [geeksforgeeks](http://www.geeksforgeeks.org/topological-sorting/)
+
 ### Minimum spanning tree
 Tree with all nodes of graph (i.e. spanning tree) such that the some of the
 weights of the edges is less or equal to any other spanning tree of this graph.
@@ -145,7 +216,7 @@ weighted undirected graph.
 To implement this efficiently, we need to use Union Find (below) to combine
 trees in F.
 
-### Union Find
+## Union Find
 The goal of this **data structure** is to handle the following situation:
 
 We have a set of sets of elements, where are elements are globally distinct.
