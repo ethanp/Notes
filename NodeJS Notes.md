@@ -177,8 +177,120 @@ Brown.
       console.log('/b: route not terminated');
       next();
     });
+
     ```
 
+## Intermediate level
+
+### Useful packages
+
+1. fs
+2. path
+3. temp
+4. express
+5. http
+6. child_process -- spawn child processes to execute given commands
+7. async
+8. underscore -- array combinators
+9. mkdirp -- exactly whatcha think
+10. optimist -- options parsing
+11. rimraf -- `rm -rf` for node
+
+#### Testing
+
+1. jasmine-node
+
+### Grunt
+
+It's a task executor, like make, rake, sbt etc. You define what the tasks can
+do and then you can execute them with `grunt taskName`. You can also load tasks
+directly from `npm` using `grunt.loadNpmTasks('name-of-task')`.
+
+### Using CoffeeScript
+
+In the base directory, in your `Gruntfile.coffee`, have the following (stolen
+from the apm -- Atom Package Manager)
+
+```coffee
+module.exports = (grunt) ->
+  grunt.initConfig
+    pkg: grunt.file.readJSON('package.json')
+
+    coffee:
+      glob_to_multiple:
+        expand: true
+        cwd: 'src'
+        src: ['*.coffee']
+        dest: 'lib'
+        ext: '.js'
+
+  grunt.loadNpmTasks('grunt-contrib-coffee')
+
+  grunt.registerTask 'clean', -> require('rimraf').sync('lib')
+  grunt.registerTask('default', ['coffee'])
+```
+
+#### Explained
+
+We're loading the `npm` package [`grunt-contrib-coffee`][gccof], which is going
+to look at the preferences specified within the `coffee` object to configure
+where it will look for the `.coffee` files, and where it will put the compiled
+`.js` files. The package registers itself as a task called `'coffee'`
+
+Then we register `'default'` to run `'coffee'`, meaning we just have to run
+`grunt` at the command line to recompile all the `coffeescript` files.
+
+[gccof]: https://www.npmjs.com/package/grunt-contrib-coffee
+
+### module.exports
+
+Here we're assuming you followed the coffeescript directions above.
+
+When you want it to be possible to do one of these
+
+```coffee
+usefulFunctions = require('../lib/functionDefs')
+myWorkIsDone = usefulFunctions.wowSoGladIGotThis()
+```
+
+Then in `src/functionDefs.coffee`, you must attach the function objects that you want to *export* to the `module.exports` object.
+
+```coffee
+greatFunc = -> myFavoriteThings()
+module.exports.wowSoGladIGotThis = greatFunc
+```
+
+### package.json
+
+1. __name__ -- whatcha think
+2. __description__ -- like a little github repo description
+3. __version__ -- e.g. "0.0.0"
+4. __private__ -- set to true if you don't want `npm` to make your package 
+   widely available
+5. __license__ -- just use `"license" : "MIT"`
+6. __bin__ -- use this to link a name from `/usr/local/bin/my-name` to running 
+   `node my-supplied-path`
+7. __scripts__ -- commands to run at various pre-defined times
+    1. __prepublish__ -- runs before the package is published, and on a local `
+       npm install` without arguments
+    2. __test__ -- run via the `npm test` command
+8. __dependencies__ -- required to run
+9. __devDependencies__ -- required only to devolop
+    * e.g. unit tests, coffeescript transpilation, minification, etc.
+
+#### Dependency versioning syntax
+
+* `~1.2.3` will match all `1.2.x` versions but will miss `1.3.0`
+* `^1.2.3` will match all `1.x.x` versions but will hold off on `2.0.0`
+* I think you're allowed to literally just say `1.2.x` instead, which is far 
+  easier to understand than remembering the crap above
+* [ref](http://stackoverflow.com/questions/22343224)
+
+#### dependencies vs devDependencies
+If you `git clone` a package's source code, and do a `npm install` it assumes
+you're a developer of that package, and will also install the
+`devDependencies`. If you `npm install "$package"` it means you just want to
+_use_ the package, and it will only install the `dependencies`.
 
 # npm
 
