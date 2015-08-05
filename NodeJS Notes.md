@@ -186,7 +186,7 @@ Brown.
 
 1. fs
 2. path
-3. temp
+3. temp -- useful for temp files and dirs e.g. as part of `grunt` tasks
 4. express
 5. http
 6. child_process -- spawn child processes to execute given commands
@@ -249,16 +249,22 @@ Here we're assuming you followed the coffeescript directions above.
 When you want it to be possible to do one of these
 
 ```coffee
+# this is like "import my_lib" in python
 usefulFunctions = require('../lib/functionDefs')
 myWorkIsDone = usefulFunctions.wowSoGladIGotThis()
+
+# or you could emulate "from a import b" like this
+greatFunc = require('../lib/functionDefs').wowSoGladIGotThis
 ```
 
-Then in `src/functionDefs.coffee`, you must attach the function objects that you want to *export* to the `module.exports` object.
+Then in `src/functionDefs.coffee`, you must attach the function objects that 
+you want to *export* to the `module.exports` object.
 
 ```coffee
 greatFunc = -> myFavoriteThings()
 module.exports.wowSoGladIGotThis = greatFunc
 ```
+
 
 ### package.json
 
@@ -291,6 +297,16 @@ If you `git clone` a package's source code, and do a `npm install` it assumes
 you're a developer of that package, and will also install the
 `devDependencies`. If you `npm install "$package"` it means you just want to
 _use_ the package, and it will only install the `dependencies`.
+
+## Node addons & node-gyp
+
+"Addons are dynamically linked shared objects. They can __provide glue to C and
+C++ libraries__. The API (at the moment) is rather complex, involving 
+knowledge of several libraries."
+
+Basically, if you want your node program to run some C++ you've written, you
+make an addon. Then you use `node-gyp`, the cross-platform command-line tool
+written in Node.js to compile the native addon modules for Node.js.
 
 # npm
 
