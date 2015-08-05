@@ -193,6 +193,17 @@ class DAG(Graph):
 
 1. [geeksforgeeks](http://www.geeksforgeeks.org/topological-sorting/)
 
+#### Use Cases
+
+I just thought of this use-case, which is for dependency-management for a
+package manager. Say we want to download a particular package, but we don't
+want to download the package until we've downloaded all of its dependencies
+(wait...actually I don't see why that'd be a necessary requirement...) then we
+need to download them in topologically sorted order. I guess the only reason
+that'd be important is because if the depended-upon package was un-downloadable
+for some reason than we would be able to cancel before travelling further down
+the DAG of dependencies.
+
 ### Minimum spanning tree
 Tree with all nodes of graph (i.e. spanning tree) such that the some of the
 weights of the edges is less or equal to any other spanning tree of this graph.
