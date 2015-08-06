@@ -184,11 +184,12 @@ Brown.
 
 ### Useful packages
 
-1. fs
+1. fs -- this is a "core" node module (ie. it's part of the std-lib)
 2. path
 3. temp -- useful for temp files and dirs e.g. as part of `grunt` tasks
 4. express
-5. http
+5. http -- one of the "core" modules, let's you listen on ports, shove data
+   through sockets, add headers, etc.
 6. child_process -- spawn child processes to execute given commands
 7. async
 8. underscore -- array combinators
@@ -199,6 +200,72 @@ Brown.
 #### Testing
 
 1. jasmine-node
+
+### Jasmine Testing
+
+#### Testing asynchronous stuff
+
+Use `waitsFor(condName, timeMS, function(){booleanConditions;})` and
+`runs(func(){expects;})`
+
+If you have a `runs` after a `waitsFor`, the runs won't execute until the
+`waitsFor` conditions have either been met or have timed-out.
+
+#### Expecting values
+
+`expect(something).toBeTruthy()`
+
+Why don't we just [`expect(something).toBe(true)`][xpct]?
+
+Because *many* things are `truthy`, but only `true === true`.
+Things that are `truthy` include anything that is *not* one of
+
+* false
+* 0
+* ""
+* undefined
+* null
+* NaN
+
+Sure, this is a bit gross but it also makes some sense.
+
+[xpct]: http://stackoverflow.com/questions/28689122
+
+#### Spies
+
+Let you determine what methods have/not been called on a given object.
+
+```coffee
+spyOn(console, 'log')
+spyOn(console, 'error')
+
+# Now you can 
+expect(console.error).toHaveBeenCalled()
+expect(console.log).not.toHaveBeenCalled()
+
+# the first argument of the first time `error` was called
+# should "match" argVal.length > 0
+expect(console.error.argsForCall[0][0].length).toBeGreaterThan 0
+```
+
+### Express
+
+Here's an *entire* minimal REST endpoint for a file server. It may be a bit out
+of date in the API it uses (viz. I think `sendfile` is now `sendFile`), but you
+get the gist.
+
+```coffee
+app = express()
+app.get '/node/v0.10.3/node-v0.10.3.tar.gz', (request, response) ->
+  response.sendfile path.join(__dirname, 'fixtures', 'node-v0.10.3.tar.gz')
+app.get '/test-module-1.0.0.tgz', (request, response) ->
+  response.sendfile path.join(__dirname, 'fixtures', 'test-module-1.0.0.tgz')
+server =  http.createServer(app)
+server.listen(3000)
+```
+
+This server can be shut-down programmatically (e.g. for a Jasmine test) using
+`server.close()`.
 
 ### Grunt
 
@@ -242,7 +309,11 @@ Then we register `'default'` to run `'coffee'`, meaning we just have to run
 
 [gccof]: https://www.npmjs.com/package/grunt-contrib-coffee
 
-### module.exports
+### modules
+
+[the docs](https://nodejs.org/api/modules.html)
+
+#### module.exports
 
 Here we're assuming you followed the coffeescript directions above.
 
@@ -265,6 +336,19 @@ greatFunc = -> myFavoriteThings()
 module.exports.wowSoGladIGotThis = greatFunc
 ```
 
+#### using directories
+
+If your library is in a self-contained directory, it needs an entry-point so
+that it can be `require`'d. Say you want to be able to 
+`require(./library-dir-name)`. One way to allow this is to have a 
+`package.json` file with the following content
+
+```json
+{ "name" : "my-great-lib", "main" : "my-entrypoint.js" }
+```
+
+If there is no `package.json` file, then it will try to load an `index.js`
+file.
 
 ### package.json
 
