@@ -367,6 +367,7 @@ file.
 8. __dependencies__ -- required to run
 9. __devDependencies__ -- required only to devolop
     * e.g. unit tests, coffeescript transpilation, minification, etc.
+10. __main__ -- fill this in if the object you want imported by `requre('my-package')` is *not* in a file called `index.js`
 
 #### Dependency versioning syntax
 
