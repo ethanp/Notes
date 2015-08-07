@@ -199,3 +199,38 @@ Creating one
 3. Scales to petabytes on a large cluster
 4. State-of-the-art optimization and code generation
 5. A `DataFrame` is a distributed collection of data organized into named columns, conceptually equivalent to a table in a relational database.
+
+## CouchDB
+
+8/7/15
+
+* [Docs](https://cwiki.apache.org/confluence/display/COUCHDB/Introduction)
+* __This database is surprisingly interesting__
+
+#### From the Docs
+
+1. Seems a lot like __MongoDB__
+2. NoSQL database with no schema
+3. Data is stored as JSON "documents", whose structure is not pre-defined
+4. Each document has a unique ID
+5. "Views" are built on-demand for aggregating and reporting on documents
+6. Designed to store and report on large amounts of _semi-structured, document oriented_ data
+7. Greatly simplifies _document oriented applications_, such as __collaborative web applications__
+8. __Peer based__ -- any number of hosts (servers _or_ offline clients) can have independent "replica copies" of the same database, giving applications full database interactivity (CRUD)
+    * When back online, or on a schedule, database changes can be replicated bi-directionally, using built-in conflict detection and management
+9. It has extensive replication configuration functionality, for creating powerful solutions to many IT problems
+10. It was implemented in Erlang, which enhances its reliability and scalability
+11. The CouchDB CRUD API is RESTful HTTP
+12. Documents can have any number of fields and _attachments_
+13. Document updates are lockless, optimistic, and all-or-nothing (can't only partially complete)
+14. ACID semantics on a document-level
+15. "Any number of clients can be reading documents without being locked out or interrupted by concurrent updates, even on the same document."
+16. "CouchDB read operations use a Multi-Version Concurrency Control (MVCC) model where each client sees a consistent snapshot of the database from the beginning to the end of the read operation."
+17. Documents are indexed in b-triees by `(docID, seqID)`, where the seqID is incremented on updates
+18. I think commits are append-only, and then there is a compaction process
+19. Views are defined in _"design documents"_. They have a `map` function (in Javascript) that for each document emits zero or more rows to the view table
+20. When a view is computed, it is scored, so that when you want to view an updated version, it just updates the previous view
+21. You can write validation code in Javascript to limit what is allowed to be written to the database, and by whom
+22. __Eventually consistent__ replication model
+23. __Built for Offline__ -- can replicate to devices (like smartphones) that can go offline and handle data sync for you when the device is back online.
+24. Offers a built-in administration interface accessible via web called Futon
