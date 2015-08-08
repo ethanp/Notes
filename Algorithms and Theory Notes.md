@@ -120,6 +120,40 @@ Ref: [StOve](http://stackoverflow.com/questions/1857244/)
 * **NP-Hard** -- *any* problem `x` s.t. any NP-complete problem `y` can be *reduced* to `x` in polynomial time
 	* The halting problem: given a program `P` on input `I`, will it halt?
 
+### The Master Theorem
+
+> The master theorem provides a solution in asymptotic terms (using Big O
+> notation) for recurrence relations of types that occur in the analysis of
+> many divide and conquer algorithms. -- Wikipedia
+
+The master theorem concerns recurrence relations of the form:
+
+\\[T(n)=aT(\frac{n}{b})+f(n)\;\mathrm{where}\,a\leq1,b>1\\]
+
+##### Wherein
+
+* n -- size of the problem
+* a -- number of subproblems in the recursion
+* n/b -- size of each subproblem (all are assumed to be roughly the same size)
+* f(n) -- the cost of the work done outside the recursive calls
+    * Includes the cost of dividing the problem and merging the solutions
+
+#### Case 1
+
+\\[\mathrm{If}\;\;f(n)\in O(n^c)\;\mathrm{where}\;c\lt\log_{b}a\\]
+\\[\mathrm{Then}\;\;T(n)\in\Theta(n^{\log_{b}a})\\]
+
+#### Case 2
+
+\\[\mathrm{If}\;\;\exists k\geq 0\;\mathrm{s.t.}\;f(n)=\Theta(n^{c}\log^{k}n)\;\mathrm{where}\;c=\log_{b}a\\]
+\\[\mathrm{Then}\;\;T(n)=\Theta(n^{c}\log^{k+1}n)\\]
+
+#### Case 3
+
+\\[\mathrm{If}\;\;f(n)=\Omega(n^c)\;\mathrm{where}\;c>\log_{b}a\;\mathrm{and}\;\exists k\lt 1,n_{large}\;\mathrm{s.t.}\;af(\frac{n}{b})\leq kf(n)\\]
+\\[\mathrm{Then}\;\;T(n)=\Theta(f(n))\\]
+
+
 ## Graphs
 
 ### Topological Sorting
