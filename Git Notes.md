@@ -28,10 +28,36 @@ These are each tutorials that I was able to use to really *GET IT*
 [traversal]: http://stackoverflow.com/questions/2121230/
 [reset]: https://git-scm.com/blog/2011/07/11/reset.html
 
+### Intermediate commands
+
+#### 8/10/15
+
+```shell
+# set head at commit number $1
+$ gitj() { git checkout `git rev-list master | tail -n$1 | head -n1` }
+
+# now we have
+$ gitj 3
+Checked out the 3rd commit on master
+
+# show sha, author, date, and message of every commit until HEAD
+$ git log
+$ git rev-list --pretty HEAD     # same as `git log`
+
+## show commit graph (in color!)
+$ git rev-list --graph HEAD             # just hashes
+$ git rev-list --graph --pretty HEAD    # full info
+
+# list commit objects in reverse [or forwards] chronological order
+$ git rev-list [--reverse]
+
+# show diff between current snapshot `k` snapshots ago
+$ git diff HEAD~k..HEAD
+```
+
 ## Basic Tutorial
 #### 11/12/14
-
-```bash
+```shell
 
 # git fetch && git merge
 $ git pull
