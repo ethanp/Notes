@@ -17,63 +17,52 @@ Many of these notes are from O'Reilly's *Git Pocket Guide,* by Richard E. Silver
 ## Basic Commands
 #### 11/12/14
 
-### Show current branch
+```bash
 
-    $ git branch
-    * master        # for example
+# git fetch && git merge
+$ git pull
 
-### Checkout a tagged commit
+# read `man` file for git command
+$ git --help rm
 
-    $ git checkout mytag
-    You are in 'detached HEAD' state...
+# Show current branch
+$ git branch
+* master
 
-### Show `diff`erence between your working tree and the *index* (staging area)
+# Checkout a tagged commit
+$ git checkout mytag
+You are in 'detached HEAD' state...
 
-    $ git diff
+# Show `diff`erence between your working tree and the *index* (staging area)
+$ git diff
 
-### Show the `diff`erence between your *index* (staging area) and the most recent ("current") commit
+# Show `diff`erence between your *index* (staging area)
+# and the most recent ("current") commit
+$ git diff --staged
 
-    $ git diff --staged
+# Make the *index* (staging area) *become* the newest commit
+# Physically, this just adds a pointer from it to the previous commit
+$ git commit
 
-### Make the *index* (staging area) *become* the newest commit
-Physically, this just adds a pointer from it to the previous commit
+# Merge branch `refactor` into `master`.
+#   1. applies the diffs
+#   2. asks you to resolve conflicts
+#   3. commits the result
+$ git checkout master   # switch to master branch
+$ git merge refactor
 
-    $ git commit
+# Add only *some* of the changes you've made
+#    Starts an interactive loop that lets you select
+#    which "hunks" of (all) changes you want to index.
+# Use "`?`" during the interactive session to see the commands
+$ git add -p
 
-### Merge branch `refactor` into `master`.
-This applies the diffs, asks you to resolve conflicts, and commits the result.
+# Remove file from your index/"staging" **and from the working tree**
+#       WARNING: removal from "working tree" means this
+#                file disappears from your file-system!
+$ git rm [filename]
 
-    $ git checkout master   # switch to master branch
-    $ git merge refactor
-
-##### Note: A `merge` is what happens when you `git pull` after it `fetch`es the changes.
-
-### Add only *some* of the changes you've made
-Starts an interactive loop that lets you select which "hunks" of (all) changes
-you want to index.
-
-Use "`?`" to see the commands
-
-    $ git add -p
-
-### Remove a file
-
-    $ git rm [filename]
-
-What this actually does is
-
-* Remove it from your index ("staging area" from now on, that's more clear to
-  me)
-    * which will remove it from your repo from now on
-        * not really sure the best way to say this
-        * basically, if you were to clone the repo after git rm [fn] and git
-          commit
-        * then you wouldn't see the file in your clone
-        * of course it will still be there in the history
-* NB: **This also deletes the working file**
-    * as if you did a little `rm [filename]` too
-
-### Reset (empty) the staging area
-Your changes will still be there on your local filesystem
-
-    $ git reset
+# Reset (empty) the staging area
+#   Nonobviously: Your changes will still be there on your local filesystem
+$ git reset
+```
