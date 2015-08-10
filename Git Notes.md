@@ -12,9 +12,23 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
-Many of these notes are from O'Reilly's *Git Pocket Guide,* by Richard E. Silverman.
+### Refs 
+* O'Reilly's *Git Pocket Guide,* by Richard E. Silverman
+* *Ry's Git Tutorial,* by Ryan Hodson.
 
-## Basic Commands
+### Useful
+
+These are each tutorials that I was able to use to really *GET IT*
+
+* [Difference between `HEAD^` and `HEAD~`][caretTilde]
+* [Traverse forward and backward in history][traversal]
+* [`git reset --soft vs (default or --mixed) svs --hard`][reset]
+
+[caretTilde]: http://stackoverflow.com/questions/2221658/
+[traversal]: http://stackoverflow.com/questions/2121230/
+[reset]: https://git-scm.com/blog/2011/07/11/reset.html
+
+## Basic Tutorial
 #### 11/12/14
 
 ```bash
@@ -29,8 +43,15 @@ $ git --help rm
 $ git branch
 * master
 
-# Checkout a tagged commit
-$ git checkout mytag
+# Show all local and remote branches
+$ git branch -a
+* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/master
+  remotes/origin/release-1.1.3
+
+# Switch working directory's state to a particular tag, branch, commit
+$ git checkout ( tag_name | branch_name | commit_sha )
 You are in 'detached HEAD' state...
 
 # Show `diff`erence between your working tree and the *index* (staging area)
@@ -40,8 +61,8 @@ $ git diff
 # and the most recent ("current") commit
 $ git diff --staged
 
-# Make the *index* (staging area) *become* the newest commit
-# Physically, this just adds a pointer from it to the previous commit
+# Make the *index* (staging area) *become* the newest committed "snapshot"
+# Physically, this just adds a pointer from it to the previous "parent" commit
 $ git commit
 
 # Merge branch `refactor` into `master`.
