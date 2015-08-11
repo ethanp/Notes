@@ -87,6 +87,10 @@ $ git diff
 # and the most recent ("current") commit
 $ git diff --staged
 
+# add versions of files from the working tree to the index
+# (no files means all files)
+$ git add [file1 [file2 ...]]
+
 # Make the *index* (staging area) *become* the newest committed "snapshot"
 # Physically, this just adds a pointer from it to the previous "parent" commit
 $ git commit

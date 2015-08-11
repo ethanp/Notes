@@ -740,7 +740,9 @@ Wait for all background jobs to finish
 
 Read and execute commands contained in a separate file.
 
-## Craziest bash command I've written to date
+## Some crazed bash commands
+
+### Coursera Lecture Time Aggregator
 
 In a folder containing a bunch of videos with titles of the format *"Compilers
 3.0 04-01 Lexical Specification (14m30s).mp4"*, I'd like to count the total
@@ -751,3 +753,25 @@ number of hours of video.
     >   | awk -Fm '{s+=$1;t+=$2} END {printf "%.2f hrs\n", (t/60+s)/60}'
 
     #=> 19.50 hrs
+
+
+### Bootleg Spellchecker
+
+August 11, 2015
+
+Look for spelling errors in some crappy Mac-provided dictionary file. Based on
+the UNIX command given in the [AT&T Archives Video][arch], but many of the
+commands have disappeared since then and new ones have been introduced.
+
+[arch]: https://www.youtube.com/watch?v=tc4ROCJYbm0
+
+```bash
+$ echo "The quick brown Fox jumped over." \
+  | tr ' ' '\n' \                     # replace spaces with newlines
+  | tr '[:upper:]' '[:lower:]' \      # convert to lowercase
+  | sed 's|[^[:alpha:]\n]||g' \       # only keep letters
+  | sort -u \                         # sort and dedup
+  | comm -23 - /usr/share/dict/words  # keep only words not found in dictionary
+
+=> jumped
+```
