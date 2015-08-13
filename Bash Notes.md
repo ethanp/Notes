@@ -748,12 +748,21 @@ In a folder containing a bunch of videos with titles of the format *"Compilers
 3.0 04-01 Lexical Specification (14m30s).mp4"*, I'd like to count the total
 number of hours of video.
 
-    $ ls \
-    >   | sed 's/[^(]*(\([^s]*\)s).*/\1/' \  # get lines containing e.g. 6m29
-    >   | awk -Fm '{s+=$1;t+=$2} END {printf "%.2f hrs\n", (t/60+s)/60}'
+Algo
 
-    #=> 19.50 hrs
+1. Morph list of filenames into just the time-pieces, e.g. 6m29
+2. Split those strings on `m`
+3. Add up the hours and minutes separately
+4. Add up the total number of minutes and divide it into hours
+5. Print it out
 
+```bash
+$ ls \
+  | sed 's/[^(]*(\([^s]*\)s).*/\1/' \
+  | awk -Fm '{s+=$1;t+=$2} END {printf "%.2f hrs\n", (t/60+s)/60}'
+
+#=> 19.50 hrs
+```
 
 ### Bootleg Spellchecker
 
