@@ -11,8 +11,196 @@ latex input:	mmd-natbib-plain
 latex input:	mmd-article-begin-doc
 latex footer:	mmd-memoir-footer
 
-Deadlock
---------
+# 10 Tips for Proper Application Logging
+
+| Attribute | Value |
+| ---------- | ------------------ |
+| Posted by | Tomasz Nurkiewicz |
+| In | Software Development  |
+| On | January 17th, 2011 |
+| At | javacodegeeks.com/2011/01/10-tips-proper-application-logging.html |
+
+## Main things I got out of it
+
+1. Consider the fact that the log levels are not JUST for being able to
+   selectively tune the number of log messages that show up in your console.
+    1. They can be `grep`d for particular levels, post-execution
+2. Use SLF4J
+3. Look at the table of logging levels and their respective use-cases below
+4. Avoid side-effects (and NPEs!) in your logs
+5. Log exceptions _only_ at the point where you catch them, and use
+   the following code
+    ```java
+    log.error("Error reading configuration file", e);
+    ```
+6. Log arguments and return values
+7. Log stuff returned from an external system or API
+
+## Summary
+
+### Use the appropriate tools for the job
+
+1. That means SLF4J because it allows pattern subsitution
+    ```java
+    log.debug("Found {} records matching filter: '{}'", records, filter);
+    ```
+    1. Use it with the Logback framework instead of Log4J
+        * I'll need to look into _that_...
+    2. Perf4J is also a great simple tool for making graphs to address
+       performance issues
+
+### Don’t forget, logging levels are there for you
+
+#### Error
+
+An untolerable event occurd that brought the system down and must be
+investigated immediately. e.g: NPE, database unavailable, mission critical use
+case cannot be continued.
+
+#### Warn
+
+"Current data unavailable, using cached values" "Application running in
+ development mode or "Administration console is not secured with a password".
+ The application can tolerate warning messages, but they should always be
+ justified and examined.
+
+ #### Info
+
+Important business process has finished. User should be able to understand INFO
+messages and quickly find out what the application is doing. E.g. one INFO
+statement per each ticket saying `"{Who} booked ticket from {Where} to
+{Where}"`. Also notes each action that changes the state of the application
+significantly (database update, external system request).
+
+#### Debug
+
+For developers' eyes.
+
+#### Trace
+
+Stuff only useful while developing a piece of code. Then should be removed so it doesn't conflict with someone else trying to do the same thing.
+
+### Do you know what you are logging?
+
+1. Make sure your log messages are clear
+2. Get rid of potential NPEs from code like
+    ```java
+    log.debug("Processing request with id: {}", request.getId());
+    ```
+3. Watch out with logging lazily initialized objects, e.g. the collections
+   returned by the Hibernate API
+4. Debuggable classes need an appropriate `toString` method
+    1. Note you may want to use the JDK's `Arrays.deepToString`
+
+### Avoid side effects
+
+1. E.g. lazily initialized objects, as noted above
+2. Too much logging can slow your app down; e.g. when there's more than say
+   50MB of logs per hour
+
+### Be concise and descriptive
+
+1. Each logging statement should contain both data and description.
+    ```java
+    log.debug("Message with id '{}' processed", message.getJMSMessageID());
+    ```
+2. Definitely just a description is not enough. The _context_ of the loggable
+   text is important to note.
+
+### Tune your pattern
+
+For example, in Logback, the author uses 
+
+```xml
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} %-5level [%thread][%logger{0}] %m%n</pattern>
+    </encoder>
+</appender>
+```
+
+He doesn't recommend adding filename, class name, and line number--because it
+_allows_ you to feel OK getting sloppy with your debug messages and it is
+slow--but it sounds like a pretty good idea to me....
+
+### Log method arguments and return values
+
+1. If you follow the simple rule of logging each method input and output
+(arguments and return values), you don’t even need a debugger any more. 
+2. Of course, you must be reasonable, but every method that: 
+    1. accesses external systems (e.g. databases)
+    2. blocks
+    3. waits, etc. 
+   should be considered. Simply follow this pattern:
+
+    ```java
+    public String printDocument(Document doc, Mode mode) {
+        log.debug("Entering printDocument(doc={}, mode={})", doc, mode);
+        String id = //Lengthy printing operation
+        log.debug("Leaving printDocument(): {}", id);
+        return id;
+    }
+    ```
+
+3. Because you are logging both the beginning and the end of method invocation,
+you can 
+    1. manually discover inefficient code 
+    2. detect possible causes of deadlocks and starvation 
+        * simply by looking after “entering” without corresponding “leaving”.
+    3. If your methods have meaningful names, reading logs would be a pleasure.
+    4. Analyzing what went wrong is much simpler
+        * since on each step you know exactly what has been processed.
+    5. You could build this in using an AOP aspect
+        * though that could get messy
+4. Consider DEBUG or TRACE levels as best suited for these types of logs. 
+5. But it is always better to have too much rather than too few logging
+   statements. 
+6. Treat logging statements with the same respect as unit tests
+    1. your code should be covered with logging routines as it is with unit
+       tests. 
+    2. No part of the system should stay with no logs at all.
+    3. Remember, sometimes observing logs rolling by is the only way to tell
+       whether your application is working properly or hangs forever.
+
+### Watch out for external systems
+
+1. if you communicate with an external system, consider logging every piece of
+   data that comes out from your application and gets in.
+2. Period.
+3. What is the point of having a fast, but broken application, that no one can
+   fix?
+
+### Log exceptions properly
+
+1. Avoid logging exceptions, let your framework or container (whatever it is)
+   do it for you
+2. It is the responsibility of whomever _catches_ the exception to log it
+3. The _correct_ way to log an exception is _exactly_ as follows
+    ```java
+    log.error("Error reading configuration file", e);
+    ```
+
+### Logs easy to read, easy to parse
+
+1. Both humans and shell scripts should be able to get their own respective
+   benefits from your logs
+2. E.g. check this out
+    ```java
+    log.debug("Request TTL set to: {} ({})", new Date(ttl), ttl);
+    // Request TTL set to: Wed Apr 28 20:14:12 CEST 2010 (1272478452437)
+
+    final String duration = 
+        DurationFormatUtils.formatDurationWords(durationMillis, true, true);
+    log.info("Importing took: {}ms ({})", durationMillis, duration);
+    // => Importing took: 123456789ms (1 day 10 hours 17 minutes 36 seconds)
+    ```
+    1. The "millis" are parseable and therefore graphable, and the "duration"
+       is 'understandable'
+
+# Other stuff
+
+## Deadlock
+
 **6/7/15**
 
 ### How do we ensure that deadlock does not occur?
