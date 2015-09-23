@@ -11,7 +11,6 @@ latex input:		 mmd-natbib-plain
 latex input:		 mmd-article-begin-doc
 latex footer:	 mmd-memoir-footer
 
-
 ## Session
 #### 8/23/14
 

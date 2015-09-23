@@ -502,6 +502,29 @@ From [Regular-Expresions.info](http://www.regular-expressions.info/lookaround.ht
   code as line-feed (`'\n'`), but does both CR-LF in one go
 
 ## Character Encodings
+
+#### 9/9/15
+
+##### Java Charset
+* In Java, we have the Standard Library's _immutable_ (and thread-safe) `public
+  abstract class java.nio.charset.Charset extends Object implements
+  Comparable<Charset>`, which is a "named mapping between sequences of sixteen-
+  bit Unicode *code units* and sequences of *bytes*".
+* This class provides methods
+    * `ByteBuffer encode(String str)` -- encodes a string into bytes in this
+      charset
+    * `CharBuffer decode(ByteBuffer bb)` -- decodes bytes in this charset into
+      Unicode characters
+* You might want to use it for example to __declare the encoding of a text file
+  to read__ 
+
+    ```java 
+    new InputStreamReader( 
+        new FileInputStream(new File(".")),
+        StandardCharsets.UTF_8   // alternative to string constant "UTF-8" 
+    );
+    ```   
+
 #### 2/4/15
 
 * **ASCII** --- 7-bit character set maps characters to the range [0,127]
