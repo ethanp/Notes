@@ -79,6 +79,10 @@ implemented, that provides its user connection-oriented reliable transmission.
    above layers
     * **Ethernet**
     * **Wifi**
+    * __ARP__ (Address Resolution Protocol) -- resolves network layer addresses
+      (e.g. IPv4 address) into link layer addresses (i.e. MAC address)
+        * For IPv6, this functionality is provided by the _Neighbor Discovery
+          Protocol (NDP)_
 2. **Internet** -- (OSI 3) -- congestion control and routing global unique IP
    addresses and IP packets
     * **IP** (Internet Protocol) -- addresses hosts and routes packets across
@@ -95,16 +99,21 @@ implemented, that provides its user connection-oriented reliable transmission.
     * **HTTP** -- used by the WWW
         * **SOAP** [or old-school XML-RPC]
         * **REST API**
-    * **POP3** (Post Office Protocol Version 3) -- for retrieving email from
-      mail server
-    * **IMAP** (Internet Message Access Protocol) -- for retrieving email from
-      mail server
+    * **POP3** (Post Office Protocol Version 3) and **IMAP** (Internet Message
+      Access Protocol) -- both are for retrieving email from a mail server
     * **DNS** (Domain Name System) -- for translating name to an IP address
       (uses UDP)
         * More about this in its own section below
     * **ICMP** (Internet Control Message Protocol) -- provides error messages
-        * *Traceroute*
-        * *Ping*
+        * Part of the Internet Protocol Suite (aka. TCP/IP)
+        * Transport protocol like TCP/UDP but not used for exchanging data
+        * Examples
+            * "Requested service is not available"
+            * "Host or router could not be reached"
+            * TTL = 0 => "time to live exceeded in transit"
+        * Useful for the following user-level programs
+            * Traceroute*
+            * *Ping*
 
 ### Networking Concepts
 
@@ -112,8 +121,16 @@ implemented, that provides its user connection-oriented reliable transmission.
 * **Packet** -- small piece of the data to be sent (see IP, below)
     * Allows for wire-time to shared effectively, and for integrity checks
 * **Latency** -- request's *round-trip time*
-* **Firewall** -- software in the *router* (and your OS may have one) that
-  inspects, modifies, or blocks specified traffic flowing through it
+* **Firewall** -- hardware or software that inspects, modifies, and/or drops
+  specified packet traffic flowing through it
+    * Configured with rules about which packets to allow in and out
+        * Eg. may look at the IP addresses and/or transport protocols
+    * If it implements "stateful inspection" the drop rules may involve
+      analyzing the header information from a *sequence* of packets (a la FSM),
+      which may e.g. be doing a port scan of your network
+    * A **proxy gateway** aka. **bastion host** is a firewall that pretends to
+      be the application but it's actually a proxy that is filtering improperly
+      formatted commands from getting to the true application server
 * **Node** -- a machine on a network
 * **Address** -- a sequence of bytes uniquely identifying a *node*
     * In IPv4 these are 4 full unsigned bytes (0-255), e.g. 199.1.32.90
