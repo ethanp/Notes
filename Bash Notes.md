@@ -702,6 +702,12 @@ You can read *multiple* variables at once, splitting the input string using
     echo "thing1:thing2:thing3" | IFS=: read vA vB vC
     echo $vB    # => thing2
 
+```bash
+$ read a b c
+2 3 5   # type to STDIN
+$ echo $a $b $c # => 2 3 5
+```
+
 ### exec
 
 With *no arguments*, change the current shell's *file descriptors*.

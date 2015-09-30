@@ -569,6 +569,17 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
 
 ## Miscellaneous
 
+### Packet Sniffing Promiscuous Mode
+
+* __Promiscuous mode__ -- a mode of the network interface controller (NIC), in
+  which it passes _all received traffic_ to the CPU, rather than only those
+  frames addressed to this NIC (viz. via MAC address)
+    * Used for _packet sniffing_
+* __Packet sniffing__ -- intercepting and logging traffic, then passing it to a
+  _packet analyzer_
+    * Can be used to become a bad guy, _or_ to catch bad guys
+    * Useful for monitoring your network
+
 ### Overlay Network
 
 * A network built on top another network
