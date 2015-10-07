@@ -349,6 +349,113 @@ This is from Wikipedia's page on HTTP.
     </body>
     </html>
 
+### HTTP/0.9
+
+* Name was "back-assigned" from when HTTP/1.0 was released
+* e.g.
+    ```html
+
+    <!-- request -->
+    GET /the-site-i-want \r\n
+
+    <!-- response -->
+    <html>
+      <head><title>All the htmls!</title></head>
+      <body><p> HTTP/0.9 does not have headers and assumes HTML <p></body>
+    </html>
+    ```
+* Opens a new TCP connection per request/response cycle
+    * This means we have to wait an extra round-trip for the 3-way TCP
+      handshake
+* Request: {method}{path}{CLRF}
+* Response: {html}{close-TCP-conn}
+
+### HTTP/1.0
+* Released in 1996
+* Adds `HEAD`, `POST`, and **headers**
+* Use `Content-Length` header field to denote size of entity body instead of
+  closing the connection
+* Request: {method}{path}{"HTTP/1.0"}{CLRF}
+* Response: {"HTTP/1.0"}{status code}{status
+  English}{CLRF}{headers}{CLRFx2}{body}{close-TCP-conn}
+
+### HTTP/1.1
+* Request & Response: same except "HTTP/1.1", and _not_ closing TCP at the end
+* Persistent connections
+    * TCP connections "persist" by _default_ between requests 
+    * improves _latency_, but not really _bandwidth_ (except perhaps window
+      increasal)
+    * Helps when pages feature _linked resources_ (e.g. images)
+* Typically, browsers will use multiple connections to download the linked
+  resources in parallel
+    * Typically up to 8 per domain to reduce thread-usage overhead on the
+      server
+* __HTTP pipelining__ -- specifies that the next request can be sent before the
+  previous request's response has been received
+    * Not great because due to being a simple text protocol, the server must
+      still send responses in request-order, meaning big responses (e.g.
+      images) will get in the way of other responses (e.g. client-side
+      javascript)
+
+### HTTP/2
+* __Optimizes transport__, while __preserving high-level compatibility with
+  HTTP/1.1__
+    * Methods, status codes, header fields, URI schemes, port numbers, etc. are
+      unchanged
+* It's a __binary, multiplexed__ network protocol
+    * This means you can't use `telnet` for debugging, but _can_ use `curl`
+      which has integrated deserialization for the console
+* Sends data in __frame__s, such as `HEADERS`, `DATA`, `SETTINGS`, `GOAWAY`
+* Upgrades from HTTP/1.1
+    1. Use the `Upgrade` header
+        ```html
+        <!-- request -->   
+        GET /index.html HTTP/1.1
+        Host: server.example.com
+        Connection: Upgrade, HTTP2-Settings
+        Upgrade: h2c
+        HTTP2-Settings: <base64url encoding of HTTP/2 SETTINGS payload>
+
+        <!-- response -->
+        HTTP/1.1 101 Switching Protocols
+        Connection: Upgrade
+        Upgrade: h2c
+        {empty line}
+        {server sends HTTP/2 frames}
+        ```
+    2. Use __Application-Layer Protocol Negotiation (ALPN)__ (IETF [RFC 7301][alpn-spec],
+      July 2014)
+        * This means your using the TLS handshake protocol to ask to run HTTP/2
+          over the [encrypted] TLS connection
+        * Java 8 does not support ALPN, but Jetty does and Java 9 will
+* __Header compression__ -- client and server each maintain a `headers` table
+  storing previous headers. These headers don't need to be resent.
+    * This cuts a _lot_ of overhead out of transmissions
+    * This removes the need to combine all assets into a single giant asset
+* __Multiplexing and Streams__
+    * Individual req-res exchanges each get a __stream__ id
+    * The `HEADERS` frame is what initializes a stream
+    * Different streams may be _interleaved_ through the same socket
+    * Streams can be assigned a __priority__ in the `HEADERS` frame
+        * Priorities are only "advice" and "SHOULD" be followed
+    * This removes the need for domain sharding
+* __Push__ -- server can proactively send as-yet-unrequested resources to the
+  client's cache for future use, as soon as a stream has been established
+    * This is useful for sending linked assets that would otherwise require the
+      client to download the referencing html, parse it, and explicitly request
+      those assets
+    * This is neither the same-as or a replacement-for server-sent events (??)
+      or WebSockets, both introduced with HTML5
+    * Server sends a `PUSH_PROMISE` frame, includes the supposed request's URI,
+      followed by `HEADER` then `DATA` frames containing the pushed response
+      message
+
+#### Sources
+* [JavaWorld Jetty & HTTP/2][jwj]
+
+[alpn-spec]: https://tools.ietf.org/html/rfc7301
+[jwj]: http://www.javaworld.com/article/2916548/java-web-development/http-2-for-java-developers.html
+
 ## REST
 
 ### Summary
@@ -521,7 +628,7 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
   ("unicast") or multiparty ("multicast") *sessions*, as well as file transfer
   and online games; runs over over TCP, UDP, or SCTP
     * Defines messages for establishment, termination, and other essential
-      elements of a call liike changing addresses or ports, inviting more
+      elements of a call like changing addresses or ports, inviting more
       participants, and adding or deleting media streams
     * The media itself is transmitted over another application protocol,
       RTP/RTP (Real-time Transport Protocol) *(see below)*
