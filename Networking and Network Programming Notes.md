@@ -450,11 +450,59 @@ This is from Wikipedia's page on HTTP.
       followed by `HEADER` then `DATA` frames containing the pushed response
       message
 
+#### Frame Types
+
+* `DATA` -- arbitrary, variable-length byte-sequences associated with a stream
+    * one or more are used, for instance, to carry HTTP request or response
+      payloads.
+    * Set `END_STREAM` flag to `0` to indicate this is the last frame for this
+      stream
+* `HEADERS` -- opens a stream, may declare dependency on another stream,
+  assigns a priority ["weight"], may end the stream, may have a "header block
+  fragment" (subject to compression)
+* `PRIORITY` -- specifies stream dependency and priority
+* `RST_STREAM` -- request's cancellation of a stream with an error code
+* `SETTINGS` -- specifies the sender's characteristics to the receiver; sent by
+  client and/or server
+    * Header table size, enable push, max concurrent streams, initial window
+      size, max frame size, max header list size
+* `PUSH_PROMISE` -- notify peer of the stream-id of a stream the sender intends
+  to initiate
+* `PING` -- mechanism for measuring minimal round-trip time from the sender, as
+  well as determining whether an idle connection is still functional
+    * MUST contain 8 bytes of whatever you want
+    * If you receive a PING with ACK flag not set, you MUST send a PING _with_
+      the ACK flag set in response, with an identical payload
+    * PINGs have _higher priority_ than _anything_ else
+* `GOAWAY` -- initiate shutdown of a connection or signal serious error
+  conditions
+    * allows an endpoint to gracefully stop accepting new streams while still
+      finishing processing of previously established streams
+    * Receivers of a GOAWAY frame MUST NOT open additional streams on the
+      connection, although a new connection can be established for new streams.
+    * Endpoints SHOULD always send a GOAWAY frame before closing a connection
+      so that the remote peer can know whether a stream has been partially
+      processed or not
+* `WINDOW_UPDATE` -- used to implement _flow control_
+    * The sender MUST NOT send a flow-controlled frame (viz. `DATA`) with a
+      length that exceeds the space available in either the connection or the
+      stream flow-control windows advertised by the receiver
+    * The receiver of a frame sends a WINDOW_UPDATE frame as it consumes data
+      and frees up space in flow-control windows, one for each of the 2
+      relevant windows
+    * Flow-controlled frames from the sender and WINDOW_UPDATE frames from the
+      receiver are completely asynchronous with respect to each other
+* `CONTINUATION` -- contains more of a `header block fragment` under
+  transmission
+
+
 #### Sources
 * [JavaWorld Jetty & HTTP/2][jwj]
+* [http2-spec][]
 
 [alpn-spec]: https://tools.ietf.org/html/rfc7301
 [jwj]: http://www.javaworld.com/article/2916548/java-web-development/http-2-for-java-developers.html
+[http2-spec]: https://http2.github.io/http2-spec
 
 ## REST
 
