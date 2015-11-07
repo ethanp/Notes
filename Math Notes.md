@@ -15,6 +15,16 @@ latex footer:		mmd-memoir-footer
 This document requires MathJax (and possibly
 [`MultiMarkdown`](http://fletcherpenney.net)) to be viewed properly.
 
+# Basics to know and tell #
+
+### Common approximations ###
+
+These work for small x, they come from the Taylor series expansion.
+
+\\[\frac{1}{1+x}=1-x+x^2-x^3+...\approx 1-x\\]
+
+\\[\frac{1}{1-x}=1+x+x^2+x^3+...\approx 1+x\\]
+
 # Probability & Statistics #
 
 ## Probability ##
