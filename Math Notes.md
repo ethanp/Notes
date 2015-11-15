@@ -19,7 +19,7 @@ This document requires MathJax (and possibly
 
 ### Common approximations ###
 
-These work for small x, they come from the Taylor series expansion.
+These work for small \\(x\\), they come from the Taylor series expansion.
 
 \\[\frac{1}{1+x}=1-x+x^2-x^3+...\approx 1-x\\]
 

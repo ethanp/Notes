@@ -22,77 +22,102 @@ latex footer:		mmd-memoir-footer
   what you're trying to do"
 * **Buffer overflow** --- while writing data to a buffer, a program overruns
   the buffer's boundary and overwrites adjacent memory
-    * They are the basis of many software vulnerabilities and can be maliciously exploited
-        * By e.g. overwriting the return address in a stack frame, meaning that execution will "return" to the attacker's address, which contains his data
+    * They are the basis of many software vulnerabilities and can be
+      maliciously exploited
+        * By e.g. overwriting the return address in a stack frame, meaning that
+          execution will "return" to the attacker's address, which contains his
+          data
     * Bounds checking can prevent buffer overflows
-* **(Public Key/Digital) Certificate** --- an electronic document that uses a **digital signature** to bind a **public key** with ID info; e.g. name, org., address, etc.
+* **(Public Key/Digital) Certificate** --- an electronic document that uses a
+  **digital signature** to bind a **public key** with ID info; e.g. name, org.,
+  address, etc.
     * Used to verify that a public key belongs to an individual
-    * If you trust the certificate, you also trust that messages signed by the sender’s private key were sent by that person.
+    * If you trust the certificate, you also trust that messages signed by the
+      sender’s private key were sent by that person.
     * Managed with a **public-key infrastructure** scheme
-    * Issued by a **certificate authority**, a third-party trusted by both the owner of the certificate, and the party relying upon the certificate to validate the ID of the owner
+    * Issued by a **certificate authority**, a third-party trusted by both the
+      owner of the certificate, and the party relying upon the certificate to
+      validate the ID of the owner
     * To provide a means of determining the legitimacy of a certificate, the
       sender’s certificate is signed by someone else, whose certificate is in
       turn signed by someone else, and so on, forming a chain of trust to a
       certificate that the recipient inherently trusts, called an anchor
       certificate.
 * **Checksum** --- allow detection and repair of small number of changes
-    * It's goal is similar to a hash function, but the use-case and therefore algorithms used are different
+    * It's goal is similar to a hash function, but the use-case and therefore
+      algorithms used are different
 * **Cryptanalysis** --- the study of breaching cryptographic security systems
-    * Mathematical analysis of cryptographic algorithms and exploiting weaknesses in their implementation
-    * Given encrypted data, retrieve as much info as possible about the unencrypted data
-* **Cryptographic hash function** --- takes an arbitrary block of data and returns a
-    fixed-size bit string, the *cryptographic hash value*, s.t. any change to the data
-    will change the hash value
+    * Mathematical analysis of cryptographic algorithms and exploiting
+      weaknesses in their implementation
+    * Given encrypted data, retrieve as much info as possible about the
+      unencrypted data
+* **Cryptographic hash function** --- takes an arbitrary block of data and
+  returns a fixed-size bit string, the *cryptographic hash value*, s.t. any
+  change to the data will change the hash value
 * **Cryptosystem**
     1. Any computer system that involves cryptography (e.g. eMail)
-    2. A suite of algorithms needed to implement a particular form of encryption and decryption, generally of the *asymmetric* variety, e.g.
+    2. A suite of algorithms needed to implement a particular form of
+       encryption and decryption, generally of the *asymmetric* variety, e.g.
         1. Key generation
         2. Cipher
             1. Encryption
             2. Decryption
-* **Dictionary attack** --- trying a dictionary full of *likely* passwords in an attempt to gain unauthorized access
-* **Digest** --- I believe this is the output of a **cryptographic hash function** such as **SHA-1**
+* **Dictionary attack** --- trying a dictionary full of *likely* passwords in
+  an attempt to gain unauthorized access
+* **Digest** --- I believe this is the output of a **cryptographic hash
+  function** such as **SHA-1**
 * **[Distributed] Denial-of-Service ([D]DOS) attack** --- attempt to make a
   machine or network resource unavailable to its intended users
-    * Generally consists of efforts to temporarily or indefinitely interrupt
-      or suspend services of a host connected to the Internet.
+    * Generally consists of efforts to temporarily or indefinitely interrupt or
+      suspend services of a host connected to the Internet.
     * One common method of attack involves saturating the target machine with
       external communications requests, so much so that it cannot respond to
       legitimate traffic, or responds so slowly as to be rendered essentially
       unavailable.
 * **Firewall** --- block messages based on origin, content, frequency, etc.
     * e.g. block all traffec from particular hosts or to particular TCP ports
-* **Hamming weight** --- the number of symbols in a string that are different from the "zero" of the alphabet used
-    * Equivalent to the **Hamming distance** from the all-zero string of the same length
+* **Hamming weight** --- the number of symbols in a string that are different
+  from the "zero" of the alphabet used
+    * Equivalent to the **Hamming distance** from the all-zero string of the
+      same length
     * E.g. the \\(l_{1}\\) norm of a bit vector
 * **Exploit** --- a piece of software, a chunk of data, or a sequence of
   commands that takes advantage of a bug, glitch or vulnerability in order to
   cause unintended or unanticipated behavior to occur on computer software,
   hardware, or something electronic.
-* **Handshake** --- automated negotiation process that dynamically sets parameters of a communications chanel before communication begins
+* **Handshake** --- automated negotiation process that dynamically sets
+  parameters of a communications chanel before communication begins
     * After establishing connection, before transferring desired information
     * Agreement on: (e.g.) transfer rate, coding alphabet, protocol, etc.
-    * Might just say "got the message" over and over, or might say "data was corrupted, please resend"
-* **HMAC** --- *Keyed-Hash Message Authentication Code* --- a **MAC** that uses a **keyed hash function**
+    * Might just say "got the message" over and over, or might say "data was
+      corrupted, please resend"
+* **HMAC** --- *Keyed-Hash Message Authentication Code* --- a **MAC** that uses
+  a **keyed hash function**
 * **HTTPS** --- layers HTTP on top of **SSL/TLS**
-* **Initialization vector** --- a pseudorandom number added to a message before encrypting to make this instance of the encryption unique
+* **Initialization vector** --- a pseudorandom number added to a message before
+  encrypting to make this instance of the encryption unique
 * **Integrity** --- detect accidental and intentional message changes
-* **Keychain** --- apps ask this thing, via unique identifier, to open things with its key, so the app never actually sees the key itself
-* **MAC** --- *Message Authentication Code* --- a short piece of information used to **authenticate** a message and to provide **integrity** and **authenticity** assurances on the message.
+* **Keychain** --- apps ask this thing, via unique identifier, to open things
+  with its key, so the app never actually sees the key itself
+* **MAC** --- *Message Authentication Code* --- a short piece of information
+  used to **authenticate** a message and to provide **integrity** and
+  **authenticity** assurances on the message.
     * Often created using a **keyed (cryptographic) hash function**
         * I.e. one that accepts as input a **secret key**
-* **Modular arithmetic** --- \\(a \equiv b\\) (mod \\(n\\)) **if** \\(((a-b)\,\%\,n == 0 \\))
-    * E.g. \\(\,38 = 14 \,( \mathrm{mod}\, 12) \\) because \\((14-2)\, \% \,12 == (38-2) \,\%\, 12 == 0 \\)
-    * I guess I might summarize this operation as saying: "a and b are the
-      same distance from being multiples of n"
+* **Modular arithmetic** --- \\(a \equiv b\\) (mod \\(n\\)) **if**
+  \\(((a-b)\,\%\,n == 0 \\))
+    * E.g. \\(\,38 = 14 \,( \mathrm{mod}\, 12) \\) because \\((14-2)\, \% \,12
+      == (38-2) \,\%\, 12 == 0 \\)
+    * I guess I might summarize this operation as saying: "a and b are the same
+      distance from being multiples of n"
 * **Nonce** --- arbitrary (generally pseudorandom) number used only once in a
   cryptographic communication
     * E.g. used to **authenticate** users in a way that can't be reused in
       **replay attacks**
         * First you ask the server for a nonce, then you use the result to
           encrypt your **password** and send it
-* **Private-key / Symmetric Cryptography** --- uses one key for both
-  encryption and decryption
+* **Private-key / Symmetric Cryptography** --- uses one key for both encryption
+  and decryption
 * **Privilege escalation** --- gain elevated access to resources that are
   normally protected from an application or user
 * **Public-key / Asymmetric Cryptography** --- requires a *secret* **private
@@ -128,9 +153,8 @@ latex footer:		mmd-memoir-footer
     * **SSL provides an encrypted TCP connection**
     * **data integrity**
     * **endpoint authentication**
-    * First they *assure the counterparty*, aka *handshake*, then they
-      exchange a *symmetric key* which is then used to encrypt data sent
-      between them
+    * First they *assure the counterparty*, aka *handshake*, then they exchange
+      a *symmetric key* which is then used to encrypt data sent between them
     * Often uses port 443 for **HTTPS**
     * *Uses:* eCommerce and banking
     * For more, see `Networking and Network Programming Notes.md`
@@ -166,7 +190,8 @@ to the app, who then lets them in.
 ### Buffer Overflow (C[++] only, pretty much)
 ##### 12/8/14
 
-This example is from the Coursera course "Software Security" video "Buffer Overflow"
+This example is from the Coursera course "Software Security" video "Buffer
+Overflow"
 
     void func(char *arg1) {
         int authenticated = 0;
@@ -190,16 +215,15 @@ even though the authentication didn't check-out.
 
 1. Overwrite the stack-frame's saved return address to return to data that has
    been overwritten using the overflow with code to invoke the shell (via the
-   `execve` system call) and give the attacker access to running what she
-   wants
+   `execve` system call) and give the attacker access to running what she wants
 2. Overwrite the header created by `malloc`
 3. Overflow the `int` passed to malloc
 4. Overwrite the program's *secret key* with a known key, so that future
    encrypted messages can be decrypted
 5. Modify state variables, like in the example above where `authenticated` was
    overwritten
-6. Server programs might communicate with a database with SQL strings, which
-   we can overwrite
+6. Server programs might communicate with a database with SQL strings, which we
+   can overwrite
 7. If you don't know exactly where to jump to, you can create a `nop` sled,
    where processor will jump somewhere into your sled and slide into your code
 8. "Read overflow" --- *read* instead of write beyond the buffer
@@ -229,8 +253,8 @@ even though the authentication didn't check-out.
 
 #### Protections
 
-1. **Stack canary** --- save a number at a known location on the stack, and make
-   sure it doesn't get overwritten during the function, else abort
+1. **Stack canary** --- save a number at a known location on the stack, and
+   make sure it doesn't get overwritten during the function, else abort
 2. Make stack (and heap) non-executable
     1. But we can still jump to code that calls `execve` *inside* `libc`, which
        is known to be in our process's address space
@@ -247,8 +271,7 @@ even though the authentication didn't check-out.
     1. There are similar guides for other languages
 2. Use techniques like static program analysis, fuzz testing, and symbolic
    execution
-3. Make sure the length the user gave you is not longer than their actual
-   input
+3. Make sure the length the user gave you is not longer than their actual input
 4. Validate input
 5. Put pessimistic checks on assumed preconditions
 6. Use safe versions of the string functions
@@ -256,13 +279,14 @@ even though the authentication didn't check-out.
     2. And `strcat` becomes `strlcat`
 7. Don't forget about the byte added by the NUL terminator
 8. Get pointer arithmetic right, e.g. (`int + 1`) adds 4 bytes
-9. Don't reuse memory malloc'd before by setting `p` to `NULL` after
-   passing it to `free(p)`
-10. Use `goto` chains to properly free memory when you exit early from a function
+9. Don't reuse memory malloc'd before by setting `p` to `NULL` after passing it
+   to `free(p)`
+10. Use `goto` chains to properly free memory when you exit early from a
+    function
     1. I think they did this all the time in the Linux kernel
 11. Use safe libraries
-    1. the Very Secure FTP string library or `std::string` which don't
-       rely on null-terminators to find the length of strings
+    1. the Very Secure FTP string library or `std::string` which don't rely on
+       null-terminators to find the length of strings
     2. Use smart pointers (standard in C++11)
     3. For networking use Google's *protocol buffers* or *Apache Thrift*
 12. Use a safe allocator
@@ -289,12 +313,12 @@ which retrieves all data then deletes it.
 
 ##### Protections
 
-1. **Sanitize** the input --- deleting or escape characters we don't want,
-   like `' ; --`
+1. **Sanitize** the input --- deleting or escape characters we don't want, like
+   `' ; --`
 2. Stronger, **whitelist** --- make sure that it matches something that is
    valid before appending it to the query string.
-3. **Limit privileges** that this instance of a connection to the database
-   has, so it doesn't have the right to e.g. drop the database.
+3. **Limit privileges** that this instance of a connection to the database has,
+   so it doesn't have the right to e.g. drop the database.
 4. **Encrypt sensitive data** in the database, so when they get it they can't
    read it.
 
@@ -368,7 +392,8 @@ References:
 #### Why bcrypt?
 
 * It is *slow* to compute, unlike MD5, SHA-X
-* *Salts* don't prevent **dictionary attacks** *(see Glossary above)* or brute force attacks
+* *Salts* don't prevent **dictionary attacks** *(see Glossary above)* or brute
+  force attacks
 * It has a parameter to allow you to choose the compute requirements
 * It has salts built-in to prevent **rainbow table** attacks
 
@@ -376,18 +401,21 @@ References:
 
 * The salt is a **128-char string**
 * You save `"salt:HASH(salt+password)"` into the database
-    * Note the salt is visible there as plaintext, this is OK as long as you're not just *giving these away*
+    * Note the salt is visible there as plaintext, this is OK as long as you're
+      not just *giving these away*
 * This means no one can use a table of pre-hashed strings to attack you
-* They *can* find your salt, but then they'd have to compute all the hashes *for each user*
+* They *can* find your salt, but then they'd have to compute all the hashes
+  *for each user*
 
 #### Some Don'ts
 
 Paraphrased from
 [stackexchange](http://security.stackexchange.com/questions/211/how-to-securely-hash-passwords)
 
-> **Complexity is bad. Homemade is bad. New is bad.** If you remember that, you'll avoid 99% of
-> problems related to password hashing, or cryptography, or even security in general.
-> Do *not* write a tangled mess of operations and expect that to confuse attackers.
+> **Complexity is bad. Homemade is bad. New is bad.** If you remember that,
+> you'll avoid 99% of problems related to password hashing, or cryptography, or
+> even security in general. Do *not* write a tangled mess of operations and
+> expect that to confuse attackers.
 
 #### Some Dos
 
@@ -403,7 +431,8 @@ Paraphrased from
 
 #### Message-Digest
 
-* **MD5** --- *has had some problems*; produces 128-bit / 16-byte / 32-digit-hex hash value
+* **MD5** --- *has had some problems*; produces 128-bit / 16-byte / 32-digit-
+  hex hash value
     * It's not *that* secure, it seems like
 * **SHA-1** --- produces 160-bit / 20-byte / 40-digit-hex
     * **Uses** --- encryption (not so secure), data integrity (e.g. Git)
@@ -411,44 +440,57 @@ Paraphrased from
 
 #### Other Noteworthy Algorithms
 
-* **AES** (Advanced Encryption Standard) --- **symmetric** and popular within the U.S. government
+* **AES** (Advanced Encryption Standard) --- **symmetric** and popular within
+  the U.S. government
 * **Base64** -- encode into alphanumeric+2
     * The last 2 chars might be `[(+,/),(+,-),(-,_),(.,-),(_,:),(!,-), etc.]`
 
 #### RSA
-Rivest, Shamir, Adleman --- **deterministic, asymmetric** cryptosystem widely used for secure data transmission
+Rivest, Shamir, Adleman --- **deterministic, asymmetric** cryptosystem widely
+used for secure data transmission
 
 * *Public* encryption key, *Private* decryption key
 * Based on the difficulty of factoring the product of two large prime numbers
 * Public key --- the product of two large prime numbers and an auxiliary value
 * Private key --- the two large prime numbers
 * **[Operation](http://en.wikipedia.org/wiki/RSA_(algorithm))**
-    * Choose two *distinct* prime numbers *p* and *q* (at random, of similar bit-length)
+    * Choose two *distinct* prime numbers *p* and *q* (at random, of similar
+      bit-length)
     * Compute \\(n = pq\\) and \\(\Phi(n) = (p-1)(q-1)\\)
-    * Choose an integer \\(e\\) s.t. \\(1 < e < \Phi(n)\\), and also \\(e\\) & \\(\Phi(n)\\) are *coprime* (share no prime factors)
+    * Choose an integer \\(e\\) s.t. \\(1 < e < \Phi(n)\\), and also \\(e\\) &
+      \\(\Phi(n)\\) are *coprime* (share no prime factors)
         * *e* is the *public key exponent*
-        * smaller *e* will be more efficient to compute, but slightly less secure
+        * smaller *e* will be more efficient to compute, but slightly less
+          secure
     * *d* := multiplicative inverse of *e* (modulo \\(\Phi(n)\\)) [sic]
         * *d* is the *private key exponent*
     * **Encryption**:
         1. Alice sends public key \\((n, e)\\) to Bob
-        2. Bob turns message \\(M\\) into an integer m s.t. \\(0 \leq m < n\\) using an agreed-upon reversible **padding scheme** protocol
-        3. Bob computes the ciphertext \\(c \equiv {m}^{e}\\) (mod \\(n\\)) and transmits \\(c\\) to Alice
+        2. Bob turns message \\(M\\) into an integer m s.t. \\(0 \leq m < n\\)
+           using an agreed-upon reversible **padding scheme** protocol
+        3. Bob computes the ciphertext \\(c \equiv {m}^{e}\\) (mod \\(n\\)) and
+           transmits \\(c\\) to Alice
     * **Decryption**:
-        1. Alice recovers \\(m\\) from \\(c\\) by computing \\(m \equiv {c}^{d} \;(\mathrm{mod} \; n\\))
+        1. Alice recovers \\(m\\) from \\(c\\) by computing \\(m \equiv {c}^{d}
+           \;(\mathrm{mod} \; n\\))
         2. Now she reverses the padding scheme to recover \\(M\\) from \\(m\\)
-    * **Signing Messages**: note that Bob (the public key holder) can **authenticate**
-      messages Alice **signs** using her private key. This means that Bob can verify
-      both that Alice sent it, and that the message hasn't been tampered with in
-      the process.
+    * **Signing Messages**: note that Bob (the public key holder) can
+      **authenticate** messages Alice **signs** using her private key. This
+      means that Bob can verify both that Alice sent it, and that the message
+      hasn't been tampered with in the process.
         * This is *key*
-* One can avoid a lot of the known methods of attack by embedding structured, randomized padding into the value m before encrypting it
-    * Padding is very difficult, so there is a patent-expired secure padding scheme known as **RSA-PSS**
-    * Padding schemes "are as essential for the security of message signing as they are for message encryption"
+* One can avoid a lot of the known methods of attack by embedding structured,
+  randomized padding into the value m before encrypting it
+    * Padding is very difficult, so there is a patent-expired secure padding
+      scheme known as **RSA-PSS**
+    * Padding schemes "are as essential for the security of message signing as
+      they are for message encryption"
 * Integer factorization and the RSA problem
-    * For \\( \mathrm{len}(n)  \leq 300 \\), \\(n\\) can be factored in a few hours on a PC using free software
+    * For \\( \mathrm{len}(n)  \leq 300 \\), \\(n\\) can be factored in a few
+      hours on a PC using free software
     * For \\( \mathrm{len}(n) \geq 2048 \\), you should be safe for a while
-    * Shor's algorithm shows that a quantum computer would be able to factor in polynomial time, breaking RSA
+    * Shor's algorithm shows that a quantum computer would be able to factor in
+      polynomial time, breaking RSA
 
 ## Notes about Practice
 
@@ -456,9 +498,9 @@ Rivest, Shamir, Adleman --- **deterministic, asymmetric** cryptosystem widely us
 
 Asymmetric encryption is often used for establishing a shared communication
 channel. Because asymmetric encryption is computationally expensive, the two
-endpoints often use asymmetric encryption to exchange a symmetric key, and
-then use a much faster symmetric encryption algorithm for encrypting and
-decrypting the actual data.
+endpoints often use asymmetric encryption to exchange a symmetric key, and then
+use a much faster symmetric encryption algorithm for encrypting and decrypting
+the actual data.
 
 Asymmetric encryption can also be used to establish trust. By encrypting
 information with your private key, someone else can read that information with
@@ -468,8 +510,8 @@ your public key and be certain that it was encrypted by you.
 
 1. Alice generate public/private key pair
 2. Alice sends the public key to Bob, unencrypted
-3. Alice encrypts her message (or any portion of the message) using her
-   private key and sends it to Bob
+3. Alice encrypts her message (or any portion of the message) using her private
+   key and sends it to Bob
 4. Bob decrypts it with Alice’s public key, proving it came from Alice
 5. Bob encrypts his message using Alice’s public key and sends it to Alice.
 6. Alice decrypts the message with her private key.
@@ -492,11 +534,15 @@ key came from Alice.
 #### Overview
 
 1. Client and server exchange an *SSL certificate* in a `.crt` file ($10-300)
-2. Now client *authenticates* server (using Web of Trust, scariest part of the process)
+2. Now client *authenticates* server (using Web of Trust, scariest part of the
+   process)
 3. Client uses the server's public key to send him an encrypted secret
-4. Server decrypts this secret using his *private* key (which *only* the authenticated server can do!)
-5. Both the client and the server use the secret to locally generate the session symmetric key
-6. Now they can talk safely because no one else knows their session symmetric key
+4. Server decrypts this secret using his *private* key (which *only* the
+   authenticated server can do!)
+5. Both the client and the server use the secret to locally generate the
+   session symmetric key
+6. Now they can talk safely because no one else knows their session symmetric
+   key
     * However, a third party with access to the shared secret will be able to
       generate the session symmetric key and decrypt the communication.
 
