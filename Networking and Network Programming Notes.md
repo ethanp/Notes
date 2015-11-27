@@ -232,7 +232,15 @@ The protocol is defined by a *state machine* with *Three Phases*
 
 Similar to connection establishment, but slightly different.
 
+##### Bandwidth Delay Product (BDP)
 
+This is a figure representing the number of bytes _in flight_. It is
+
+\\[linkCapacity \bullet RTT = \frac{\#bits}{sec}\bullet sec = \#bits\\]
+
+The point is we want to design an effective algorithm for setting this value in
+such a way that it maximizes use of the network without leading to congestion.
+And that is what TCP is for.
 
 ### Sockets
 
@@ -407,7 +415,7 @@ This is from Wikipedia's page on HTTP.
       which has integrated deserialization for the console
 * Sends data in __frame__s, such as `HEADERS`, `DATA`, `SETTINGS`, `GOAWAY`
 * Upgrades from HTTP/1.1
-    1. Use the `Upgrade` header
+    * Use the `Upgrade` header
         ```html
         <!-- request -->   
         GET /index.html HTTP/1.1
@@ -423,11 +431,11 @@ This is from Wikipedia's page on HTTP.
         {empty line}
         {server sends HTTP/2 frames}
         ```
-    2. Use __Application-Layer Protocol Negotiation (ALPN)__ (IETF [RFC 7301][alpn-spec],
-      July 2014)
-        * This means your using the TLS handshake protocol to ask to run HTTP/2
-          over the [encrypted] TLS connection
-        * Java 8 does not support ALPN, but Jetty does and Java 9 will
+    * Use __Application-Layer Protocol Negotiation (ALPN)__ (IETF [RFC 7301
+       ][alpn-spec], July 2014)
+        * This means you're using the TLS handshake protocol to ask to run
+          HTTP/2 over the [encrypted] TLS connection
+        * Java 8 does not support ALPN, but Jetty does and __Java 9 will__
 * __Header compression__ -- client and server each maintain a `headers` table
   storing previous headers. These headers don't need to be resent.
     * This cuts a _lot_ of overhead out of transmissions
@@ -580,21 +588,79 @@ synonym for PATCH.
 
 * TCP & UDP do not provide encryption on their own
 * **SSL provides an encrypted TCP connection**, yielding improved
-    * data integrity
-    * endpoint authentication
+    * data __encryption__
+    * data __integrity__
+    * endpoint __authentication__
+        * _Client_ can authenticate _server_, and (optionally) _vice-versa_
+    * Without requiring modification of application layer protocols above it
+* TLS has beeen adapted to run over UDP, in a protocol called "DTLS"
+* TLS provides its own message framing mechanism
+    * Which signs each message with a MAC (one-way hash, i.e. checksum)
+        * Only the endpoints know the cryptographic hash function
+        * This provides _integrity_ and _authenticity_
+* A third-party observer can still infer
+    * Connection endpoints
+    * Type of encryption
+    * Data transaction frequency
+    * Approximate data throughput
+* SSL was Netscape's propriatary protocol
+    * TLS 1.0 is the IETF standardization of SSL (RFC 2246, 1999)
+    * Then we have TLS 1.1: 2006; then TLS 1.2: 2008
 * In addition to encrypting data over the wire (like SSL), TLS authenticates a
   server with a certificate to prevent spoofing.
 *  Uses long-term public and secret keys to exchange a short term session key
    to encrypt the data flow between client and server
-* First an X.509 certificate (asymmetric) authenticates the counterparty
-* Then they negotiate a symmetric key to be used to encrypt data between the
-  two parties
-    * They start by finding a cipher and hash function that both support
-    * The client encrypts a random number with the server's public key, and
-      sends it; from this they negotiate a session key
-    * Importantly, this symmetric key cannot be derived from the X.509
 * This creates a *stateful* connection
 * There are numerous known attacks on each version of SSL & TLS
+* __Forward secrecy__ -- if an attacker gets a server's private key, they still
+  cannot decrypt the current or any previously recorded sessions
+    * We must use [Eliptic Curve] _Diffie-Hellman_ (ECDH) instead of _RSA_
+      handshake to achieve this
+
+#### In very basic terms
+* First an X.509 certificate (asymmetric) authenticates the counterparty
+* The two parties negotiate a symmetric key to be used to encrypt data
+    * They start by finding a cipher and hash function that both support
+    * The client encrypts a random number with the server's public key, and
+      sends it
+        * From this they negotiate a session key
+    * Importantly, this symmetric key cannot be derived from the X.509
+
+#### TLS handshake protocol
+1. TCP handshake ("3-way")
+    1. SYN
+    2. SYN ACK
+    3. ACK
+2. TLS Handshake (2 extra roundtrips)
+    1. ClientHello (bundled with TCP ACK above)
+    2. ServerHello, Certificate, ServerHelloDone (optnly request client cert)
+    3. ClientKeyExchange, ChangeCipherSpec, Finished
+    4. ChangeCipherSpec, Finished
+3. Application Data can be sent through "TLS tunnel"
+
+##### Abbreviated Handshake
+* If the client has previously communicated with the server, we can reuse
+  negotiated parameters, and employ an "abbreviated handshake", which requires
+  only _one_ roundtrip
+* TLS False Start allows application to be sent before the server acknowledges
+  the ChangeCipherSpec, to reduce new handshake latency-overhead to one
+  roundtrip
+* Ideally, we should use _both_
+
+#### Application Layer Protocol Negotiation (ALPN)
+* To easily enable custom application layer protocols without assiging a new
+  well-known port to each one, we can
+    1. initiate the connection over the HTTPS port 443
+    2. Append supported protocols in a `ProtocolNameList` to the `ClientHello`
+       message
+    3. Server appends selected `ProtocolName` to `ServerHello` message
+* This removes need for using the HTTP Upgrade mechanism, which would require
+  more round-trips before the final application protocol can actually be used
+
+#### References
+1. High Performance Browser Networking [Chapter 4][ch4]
+
+[ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html
 
 #### HTTPS (HTTP Secure)
 

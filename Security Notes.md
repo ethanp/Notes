@@ -43,6 +43,10 @@ latex footer:		mmd-memoir-footer
       turn signed by someone else, and so on, forming a chain of trust to a
       certificate that the recipient inherently trusts, called an anchor
       certificate.
+* **Challenge-Response** Authentication --- authentication involves one party
+  presenting a "challenge" and the other providing a "response"
+    * E.g. password authentication: "What is your password?" "It is abc$123"
+    * __TODO__ learn more about this
 * **Checksum** --- allow detection and repair of small number of changes
     * It's goal is similar to a hash function, but the use-case and therefore
       algorithms used are different
