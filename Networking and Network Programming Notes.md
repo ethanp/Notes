@@ -657,7 +657,7 @@ synonym for PATCH.
 * This removes need for using the HTTP Upgrade mechanism, which would require
   more round-trips before the final application protocol can actually be used
 
-#### References
+ #### References
 1. High Performance Browser Networking [Chapter 4][ch4]
 
 [ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html

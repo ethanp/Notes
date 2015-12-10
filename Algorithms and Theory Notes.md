@@ -631,6 +631,19 @@ Gazillions of options
 ## Bloom Filter
 See `Data Structures Notes.md`
 
+## Euclid's algorithm
+
+(2.3+ kya!)
+
+Computes the greatest common divisor of two nonnegative integers
+
+```scala
+@tailrec
+def gcd(int p, int q): Int = {
+    if (q == 0) p 
+    else gcd(q, p % q)
+}
+```
 
 # Vocab
 

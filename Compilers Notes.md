@@ -19,24 +19,24 @@ Stack Overflow etc.
 
 #### Theoretical Vocabulary terms
 
+* **Decision problem** --- yes-or-no question on an infinite set of inputs
 * **Undecidable problem** --- a *decision problem* for which it is known to be
   *impossible* to construct a *single algorithm* that *always* leads to a
   *correct* yes-or-no answer
-* **Decision problem** --- yes-or-no question on an infinite set of inputs
-* **The Halting Problem** --- given an arbitrary program and an arbitrary
-  finite input, decide whether the program will ever terminate or not; a
-  single algorithm running on a Turing machine to decide such a question
-  necessarily cannot exist, thus this question is *undecidable* for Turing
-  machines.
-* The *problem* of generating the *optimal* target program from the source
-  code is *undecidable* in general
+* **The Halting Problem** --- given an arbitrary program and arbitrary finite
+  input, decide whether (or not) the program will ever terminate
+    * **Result** --- a single algorithm running on a Turing machine to decide
+      this question necessarily cannot exist, thus it is *undecidable* (for
+      Turing machines)
+* **The problem of generating the *optimal* target program from the source
+  code** --- also *undecidable* in general (I find that surprising)
 
 ## Introduction
 
 ### The Very Beginning
 
 1. A **compiler** turns *source code* into an executable *program* which can
-   *afterwards* be used to input data is turned into output data
+   *afterwards* be used to transform input data into output data
 2. An **interpreter** uses the source code *itself* to turn input data into
    output data
 3. Since the *compiler* generally produces *machine-language* that can be
@@ -63,19 +63,18 @@ Stack Overflow etc.
     3. **linker** --- resolve "external memory addresses" (references to code-
        locations in another *object file*)
     4. **loader** --- loads all relevant executable *object files* into memory
-
-    We can also consider the whole pipeline to be the "Compiler". We might do
-    this so that we don't have to compile the whole thing at once, and so that
-    the executable code can be spread across multiple files, loaded
-    dynamically, and reused between multiple programs.
-5. Some compilers produce *assembly*-language code rather than machine code.
+5. We can also consider the whole pipeline to be the "Compiler". We might do
+   this so that we don't have to compile the whole thing at once, and so that
+   the executable code can be spread across multiple files, loaded dynamically,
+   and reused between multiple programs.
+6. Some compilers produce *assembly*-language code rather than machine code.
    This is more human readable and therefore makes it easier to debug the code
    and the compiler itself. Also the assembly may still have [unresolved]
    *symbols* in it refering to locations in other parts of the source code
    that were not compiled at the same time (e.g. *libraries*). These symbols
    will referring to "external memory addresses" will be "resolved" by the
    *linker*.
-6. It could be a good idea to use C as a target language for a compiler
+7. It could be a good idea to use C as a target language for a compiler
    because there are highly robust, optimized, and efficient compilers going
    from C to all sorts of architectures that will likely be maintained and
    improved until we move on to quantum computers and possibly beyond.
