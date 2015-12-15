@@ -61,5 +61,21 @@
 [ans-fst]: https://github.com/ansible/ansible/commits/devel?page=498
 
 ## Vagrant
+* Creates identical development environments repeatably across machines
+* after installing it, you run `vagrant init [title]` and it creates a `Vagrantfile`
+* In the `Vagrantfile`, you specify how it should retrieve a Linux distro, and how to make a virtual machine in VirtualBox running locally talk to your local (host) machine
+* You might now locally run an ansible (or chef, etc.) command to further customize and standardize the environment in that virtual machine
+* One of the problems that Vagrant solves is allowing developers to test their changes locally on a system that is configured _exactly_ like the production environment
+
+## Debian Packages
+* Can be either a _source_ or _binary_ package
+* __Binary__ -- distributed using the Debian archive format with suffix `.deb`
+    - executables
+    - config files
+    - man pages
+* __Source__ -- typically you get one of these to then build the executable locally and then run it
+* The package may state other packages on which it depends, replaces, conflicts with, etc.
+* [un]installation of debian packages is managed with the `dpkg` software
+
 ## Elastic Search
 ## Kibana

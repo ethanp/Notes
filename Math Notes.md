@@ -29,6 +29,21 @@ These work for small \\(x\\), they come from the Taylor series expansion.
 
 ## Probability ##
 
+### Introductory Vocabulary ###
+
+* **Population** -- the complete set of items under consideration by a statistical analysis
+* **Estimator** -- a rule for calculating an estimate of a given quantity based on observed data
+	* There are *point* and *interval* estimators that yield a scalar and range respectively
+* **Sample space** -- the set of possible outcomes
+* **Estimator bias** -- the difference between the estimator's *expected value* and the true value of the parameter being investigated
+	* Sometimes a biased estimator is used because no unbiased estimator is known unless more assumptions are made about the population, or the relevant unbiased estimator may be too expensive to compute
+* **Simple random sample** -- each individual has the same probability of being chosen at any stage during the sampling process
+	* Provides an *unbiased estimate* of the true population characteristics
+* **Probability distribution**
+	* Discrete random variables -- probability mass function
+	* Continuous random variables -- probability density function
+	* *Categorical distribution*
+
 ### Combinations (*n* choose *k*) ##
 
 \\[{n\choose k}=\frac{n!}{k!(n-k)!}\\]
@@ -46,11 +61,24 @@ These work for small \\(x\\), they come from the Taylor series expansion.
    different permutations, so we can cancel them out by dividing by
    \\(k!\\), leaving us with the final formula.
 
+### Distributions ###
+
+#### Probability Distribution ####
+
+* Assigns a probability to each possible outcome of a random procedure
+#### Poisson Process ####
+
+
+#### Exponential ####
+
+* Describes the time between events in a _Poisson process_
+
 ## Statistics #
 
-## Markov Models
 
-### Mathematical Monk Chapter 14
+### Markov Models
+
+#### Mathematical Monk Chapter 14
 
 1. **Markov models -- "the future is independent of the past, given the
    present"**
