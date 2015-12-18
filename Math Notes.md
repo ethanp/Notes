@@ -29,6 +29,38 @@ These work for small \\(x\\), they come from the Taylor series expansion.
 
 ## Probability ##
 
+### Introductory Vocabulary ###
+
+* **Population** -- the complete set of items under consideration by a statistical analysis
+* **Sample space** -- the set of possible outcomes
+* **Simple random sample** -- each individual has the same probability of being chosen at any stage during the sampling process
+	* Provides an *unbiased estimate* of the true population characteristics
+* **Probability distribution** -- assigns a probability to each possible outcome of a random procedure
+	* *Discrete* random variables -- **probability mass function**
+	* *Continuous* random variables -- **probability density function**
+	* ***Categorical* distribution**
+* **Estimator** -- a rule for calculating an estimate of a given quantity based on observed data
+	* There are *point* and *interval* estimators that yield a scalar and range respectively
+	* Notation
+		* \\(\theta\\) -- *parameter* being estimated
+		* \\(\hat{\theta}\\) -- *estimator*
+	* *Error* -- \\(e(x)=\hat{\theta}(x)-\theta\\)
+	* **Bias** -- the difference between the estimator's *expected value* and the true value of the parameter being investigated, i.e. \\(E_\theta[\hat{\theta}]-\theta\\)
+		* Sometimes a biased estimator is used *because* no unbiased estimator is known unless more assumptions are made about the population, or the relevant unbiased estimator may be too expensive to compute
+		* An **unbiased** estimator's bias is *zero* for *all* values of parameter \\(\theta\\)
+* **Stochastic|Random Process** -- a collection of *random variables* representing the evolution of a system of random values over time
+	* Even if the initial condition is known, there are several directions in which the process may evolve
+	* E.g. stock market, blood pressure, random walks, speech signals
+* **Point process** -- a *random process* for which a realization of the process consists of a *set* of isolated *points* in time and/or space
+	* For example, the occurrence of lightning strikes
+	* **Poisson [point] process** -- the simplest and most common example of a point process
+		* Important for *queueing theory*
+			* E.g. model arrival times of customers to a store
+		* Also can be used to model the locations of trees in a forrest
+		* Each point is *[stochastically] independent* to all the other points
+			* This means it is not a good fit for some modeling scenarios
+		* Also, see the *Poisson distribution* section below
+
 ### Combinations (*n* choose *k*) ##
 
 \\[{n\choose k}=\frac{n!}{k!(n-k)!}\\]
@@ -46,11 +78,29 @@ These work for small \\(x\\), they come from the Taylor series expansion.
    different permutations, so we can cancel them out by dividing by
    \\(k!\\), leaving us with the final formula.
 
+### Distributions ###
+ 
+#### Binomial Distribution ####
+
+* Describes the probability of the sum of *n Bernoulli trials* with probability *p*
+#### Poisson Distribution ####
+
+* The probability that N = n is given by -- \\(P\{N=n\}=\frac{\lambda^n}{n!}e^{-\lambda}\\), where \\(\lambda\\) is the single *Poisson parameter* defining this Poisson distribution
+* It is the limiting case of the *binomial distribution*, such that \\(\lambda=np\\)
+
+#### Exponential Distribution ####
+
+* Describes the time between events in a _Poisson process_
+* The PDF is \\(f(x;\lambda)=\lambda e^{-\lambda x}\\) for nonnegative \\(x\\), and zero otherwise
+* The CDF is \\(F(x;\lambda)=1-e^{-\lambda x}\\) for nonnegative \\(x\\), and zero otherwise
+* The mean and variance are \\(\frac{1}{\lambda},\frac{1}{\lambda^{2}}\\)
+
 ## Statistics #
 
-## Markov Models
 
-### Mathematical Monk Chapter 14
+### Markov Models
+
+#### Mathematical Monk Chapter 14
 
 1. **Markov models -- "the future is independent of the past, given the
    present"**
