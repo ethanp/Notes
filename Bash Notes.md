@@ -746,6 +746,17 @@ Wait for all background jobs to finish
 
 Read and execute commands contained in a separate file.
 
+### ssh
+
+* For logging in and executing commands on a remote machine
+* The communication is _both_ __secure__ and __encrypted__ (even over an
+  insecure network)
+* It can be used to forward
+    * X11 connections
+    * arbitrary TCP ports
+    * UNIX-domain sockets
+* __TODO__ It looks like that requires a `-R` flag but I'm not sure yet.
+
 ## Some crazed bash commands
 
 ### Coursera Lecture Time Aggregator
