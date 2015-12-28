@@ -12,16 +12,58 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## x86-64
+
+* A.k.a. x64, x86_64, AMD64
+* Spec released by AMD in 2000
+    * First implemented in AMD K8 in 2003
+* This is the 64-bit version of the x86 instruction set
+* Fully backward compatible with 16- and 32-bit x86 code
+    * With no performance penalties
+* Has 64-bit (8 bytes) virtual addresses
+    * only 48 bits are in use today (2015)
+* Has 16 (instead of 8) general-purpose registers
+    * rax, rbx, rcx, rdx 
+        * note: abcd
+    * rbp, rsp 
+        * base and stack pointer
+    * rsi, rdi
+        * source and destination (no longer meaningful)
+    * r8, r9, r10, r11, r12, r13, r14, r15
+        * These weren't available in the 32-bit x86
+    * Using the same register name
+        * but with 'e' in place of 'r', means the lower 32-bits of that
+          register
+        * without the first letter, means the lower 16-bits of that register
+* Has 16 (instead of 8) _single instruction, multiple data_ (SIMD, "parallel")
+
+### Linux-specific usage
+* It used to be that arguments to function-calls were passed on the stack
+* Now that there are so many general-purpose registers, Linux uses 8 registers to pass the first 8 arguments
+    * Viz. rbx, rsp, rbp, r12, r13, r14, r15
+    * For some reason, these _same_ values must be in those registers when the
+      called-function returns
+    * Similarly, the argument registers for _system calls_ are rdi, rsi, rdx,
+      r10, r8, r9
+
+#### Reference
+* [null program](http://nullprogram.com/blog/2015/05/15/)
+
 ## Buffer Cache
 
 1. This is the thing you always here them clearing in systems papers' benchmarks.
 2. It is the memory used by the operating system to cache information from disk
-3. It is used for reads as well as writes (eg. to batch writes, optimize location, and complete asynchronously)
-    * This is why you're not supposed to rip your floppy drive out (lol), because some data might *seem* like it has been written, but lo and behold it is still in the buffer cache
+3. It is used for reads as well as writes (eg. to batch writes, optimize
+   location, and complete asynchronously)
+    * This is why you're not supposed to rip your floppy drive out (lol),
+      because some data might *seem* like it has been written, but lo and
+      behold it is still in the buffer cache
 4. The `sync` command *flushes* the buffer to disk
-5. Specifically, the buffer cache holds file *blocks*, the smallest units of disk I/O
+5. Specifically, the buffer cache holds file *blocks*, the smallest units of
+   disk I/O
 6. The cache may hold directories, super blocks, etc. too [cached `ls`]
-7. Linux automatically uses all free RAM for buffer cache, and takes some space back when programs need it for memory
+7. Linux automatically uses all free RAM for buffer cache, and takes some space
+   back when programs need it for memory
 8. The cache data is shared between processes
 
 
@@ -30,7 +72,48 @@ they're wrong.
 
 ## Unix System Calls
 
+### Making a system call (at least for Linux) in NASM
+
+C prototype for `write()` syscall
+
+    ssize_t write(int fd, const void *buf, size_t count);
+
+Recall from above the argument registers for _system calls_ are rdi, rsi, rdx,
+r10, r8, r9. So we load the arguments in that order.
+
+Then we must load `rax` with the integer identifying the system call we want to
+make. For Linux, `write` has ID `1`.
+
+    mov rdi, 1        ; fd
+    mov rsi, buffer
+    mov rdx, 10       ; 10 bytes
+    mov rax, 1        ; SYS_write
+    syscall
+
+### clone (Linux only)
+
+* Used by Linux to implement _threads_ of execution
+* Similar to the regular UNIX `fork()`, except that you can pass flags saying
+  which parts of the execution context should be shared between this process
+  and its new child
+    * E.g. for threads, the the only thing that's new is the _stack_, i.e.
+        
+            CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND \
+            | CLONE_PARENT | CLONE_THREAD | CLONE_IO |
+
+#### Reference
+* [null program](http://nullprogram.com/blog/2015/05/15/)
+
 ### mmap
+
+    void* mmap(
+        void*  addr, // "suggestion" of where mapping should be placed
+        size_t len, 
+        int    prot, 
+        int    flags, 
+        int    fildes, 
+        off_t  off
+    ); 
 
 3/16/15
 
@@ -42,6 +125,16 @@ they're wrong.
    (something accessible through a *file-descriptor*), allowing applications to
    treat the mapped portion as though it were RAM.
 3. mmaps are always aligned to the page size (usually 4KB)
+4. Giving `addr = 0` means the OS gets full authority to decide where to
+   allocate the memory
+5. Returns a pointer to the top of the address space allocated
+
+#### Some flags
+
+1. Use `PROT_[READ|WRITE|EXEC|NONE]` to set this range's `rwx` options
+2. Use `MAP_FIXED` to _demand_ that the given `addr` be used as the start-
+   address
+
 
 #### Why use it?
 

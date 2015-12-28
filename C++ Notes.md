@@ -73,19 +73,28 @@ The following can be called with *or* without 3rd parameter '`t`'.
 Declaration
 
     // C
-    void plus_5(int *ip) {      *ip = *ip + 5;    }
+    void plus_5(int *ip) {
+      *ip = *ip + 5;
+    }
     
     // C++
-    void plus_5(int &ip) { // &amp      ip = ip + 5;			  // lack of *astrxs    }
-Usage
-    // C    int n = 3;
+    void plus_5(int &ip) { // &amp
+      ip = ip + 5;			   // lack of *astrxs
+    }
+Usage
+    // C
+    int n = 3;
     plus_5(&n);
     
     // C++
-    int n = 3;    plus_5(n);  // no &amp### Const
-**Makes a value/pointer un-modify-able** (to help you reason about it)
-### Casting
-* You can cast type anything to type anything
+    int n = 3;
+    plus_5(n);  // no &amp
+
+### Const
+**Makes a value/pointer un-modify-able** (to help you reason about it)
+
+### Casting
+* You can cast type anything to type anything
 * Some types are implicitly casted to other types (e.g. `int -> long`)
 * Like C, you can *implicitly* cast **to** a `void *`
 
@@ -106,13 +115,13 @@ Declaration
   *global* variable
     
         int global1 = my_func();
-        int global2 = 2 * global 1;
+        int global2 = 2 * global1;
     
         main() { ... }
 
 * These are dynamically **initialized *before* `main()` is entered**.
 * This can lead to nasty bugs when linking against other files, so
-  be keahfo.
+  be-keahfo.
 
 ### Some keywords
 
@@ -216,8 +225,12 @@ Only one copy of the data is maintained for all objects of the class
         // in class declaration
         void operator=(ABC &other); 
         
-        // then we define        void ABC::operator=(ABC &other) { /* code */ }### Virtual Functions
-* **Virtual functions** behave according to the *run-time* type of
+        // then we define
+        void ABC::operator=(ABC &other) { /* code */ }
+
+
+### Virtual Functions
+* **Virtual functions** behave according to the *run-time* type of
   the object they are called on
     1. Declare a pointer to the *base* class `ABC`
     2. Point it to an instance of the *derived* class `DEF`

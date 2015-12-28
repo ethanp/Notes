@@ -251,7 +251,7 @@ You can use it in a Makefile like this
 ### printf --- basically like you'd expect
 
     $ printf "hello %s, that's $%.2f please for %d hamburglers\n" Jann 2.32 3
-    hello Jann, that's $2.32 please for 3 hamburglers
+    # => hello Jann, that's $2.32 please for 3 hamburglers
 
 ### ps -- Process Status
 
