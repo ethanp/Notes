@@ -11,6 +11,16 @@ latex input:        mmd-natbib-plain
 latex input:        mmd-article-begin-doc
 latex footer:       mmd-memoir-footer
 
+## scipy
+
+### CDFs of normal distributions
+
+```python
+scipy.stats.norm.cdf(x, loc = 30, scale=4)
+```
+
+means given \\(\mathcal{N}(\mu=30,\sigma=4)\\), find \\(P(X < x)\\)
+
 ## Special Class Methods
 
 ### \_\_getitem__(self, key)

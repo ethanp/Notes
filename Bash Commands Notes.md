@@ -16,6 +16,10 @@ This document contains summaries of commands that I have found useful-enough to
 read through the documentation to create these summaries. They should be in
 alphabetical order.
 
+For all these commands, probably the best _first_ resource, is to run `tldr
+[cmd]`, using the [tldr](https://github.com/tldr-pages/tldr) command from
+github.
+
 ### ack -- better than grep
 
 Basic:
