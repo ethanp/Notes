@@ -154,6 +154,18 @@ of `cmd-opt-q` in my Sublime.
     to broken up into 20
     char chunks
 
+### grep
+
+__Origin:__ g/re/p means "global regex print" or something like that in the
+`ed` editor or something like that.
+
+* **-w** -- match only whole words
+    * e.g. `grep -w the` will _not_ match "thee" or "they"
+* **-i** -- ignore case
+* **-E** -- normal regexes
+    * Otherwise, you have to e.g.
+        * Use `\|` instead of `|` to __search for multiple patterns__ at once
+
 ### jot --- print sequential or random data
 
 * *Very* similar to `seq`

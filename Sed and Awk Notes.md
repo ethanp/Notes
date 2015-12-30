@@ -246,7 +246,7 @@ Print first field of lines matching `pattern`
 | `FNR`         | current record's number (e.g. line-no)    |
 | `FS`          | field seperator (regex, default: `" "`)   |
 | `NF`          | #fields in current record                 |
-| `NR`          | record-number in job                      |
+| `NR`          | record-number in job (first is 1 [not 0]) |
 | `OFS`         | output field-separator (default: `" "`)   |
 | `ORS`         | output record-separator (default: `"\n"`) |
 | `RS`          | input record-separator (default: `"\n"`)  |
