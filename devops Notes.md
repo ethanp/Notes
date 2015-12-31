@@ -1,3 +1,51 @@
+## Storage
+
+### Measuring performance
+
+* Throughput -- how many bytes per second can be transferred
+    * This is what most consumers look at, but it is often _not_ the system's
+      bottleneck
+* Latency -- how long it takes for a data transfer to _begin_
+* IOPS -- number of input or output operations per second supported by the
+  device
+    * This is generally the bottleneck in the enterprise or data center
+
+#### References
+
+* [throughput vs latency vs iops][tli]
+
+[tli]: http://www.thessdreview.com/featured/ssd-throughput-latency-iopsexplained/
+
+## Monitoring
+
+### Like what?
+
+* Generally time-series data
+* Network bandwidth
+* temperatures
+* CPU load
+
+### Database styles
+
+* __RRD__ -- _round robin_ database based on a _circular buffer_
+* __TTL__ -- _time to live_ database that stores data at a decreasing
+  granularity as it gets older
+    * This may involve running further aggregations on it to store it at a
+      lower granularity
+
+### Data load models
+
+* __Pull__ -- the database polls some intermediate data queue
+* __Push__ -- the generators issue (e.g.) HTTP POSTs containing JSON data
+
+### Tools
+
+* Shai's [crayon](https://github.com/shai-d/crayon)
+* Nagios
+* Graphite
+* Munin (not that good)
+* Ganglia
+
 ## Ansible
 
 ### Layman's Terms
