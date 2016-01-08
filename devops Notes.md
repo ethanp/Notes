@@ -81,6 +81,17 @@
 * One of the problems that Vagrant solves is allowing developers to test their
   changes locally on a system that is configured _exactly_ like the production
   environment
+* __Provider__ -- your _virtual machine_ vendor
+    * Defaults to VirtualBox because that's free
+    * You may want to install and then use the more stable and performant VMware solution "for any real work"
+* __Boxes__ -- the package format for Vagrant environments
+    * _Many_ have been provided by the community
+    * They support _versioning_
+* __Networking__ -- configuration for connecting your guest machine(s) to The Network
+    * For example if you have a server running in the virtual machine that you want to connect to from your local/host/laptop's browser, you may want to forward a port like so
+        ```
+        config.vm.network :forwarded_port, guest: 5601, host: 5601
+        ```
 
 ## Debian Packages
 * Can be either a _source_ or _binary_ package
