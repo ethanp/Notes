@@ -18,30 +18,42 @@ Many notes are from *C++ the Core Language*, by Gregory Satir & Doug Brown.
 ### Overloading
 
 * C++ allows more than one function with the same name as long as their signatures [set of parameters in the definition] differ
-* **This is unlike C**.
+    * **This is unlike C**.
 * They *can**not*** *just* differ in their **return** types
 
 ### I/O
 
-#### `cout` for `printf`
+#### Print using cout
 
     #include <iostream.h>
-    cout << (<output>);
-    cout << myInt;
-    cout << myFloat;
-    cout << "a string\n";
-    cout << "sqrt: " << sqrt(myInt) << '\n';
+    std::cout << (<output>);
+    std::cout << myInt;
+    std::cout << myFloat;
+    std::cout << "a string\n";
+    std::cout << "sqrt: " << sqrt(myInt) << std::endl;
     
     // print to standard error
-    cerr << "negative number passed\n";
-    
+    std::cerr << "negative number passed\n";
+
+
+#### How to make this work for your custom class
+
+Make this work for your own class by writing the following (*outside* of the `class` definition). Don't include the backslash. Without the backslash the multimarkdown compiler pukes.
+
+    std::ostream & operator<<\(std::ostream & Str, Object const & v) { 
+      // print something from v to str, e.g: Str << v.getX();
+      return Str;
+    }
+
+Ref: [stove](http://stackoverflow.com/questions/5171739/tostring-override-in-c)
+
 ### Default parameters
 
 The following can be called with *or* without 3rd parameter '`t`'.
 
     int fctn(int p1, int p2, char t='n')
 
-### `new` & `delete` for `malloc` & `free`
+### new & delete for malloc & free
 
 * Single float
     
@@ -68,7 +80,7 @@ The following can be called with *or* without 3rd parameter '`t`'.
         Bar *bp = new Bar;
         delete bp;
 
-### References
+### "References"
 
 Declaration
 
@@ -78,10 +90,12 @@ Declaration
     }
     
     // C++
-    void plus_5(int &ip) { // &amp
-      ip = ip + 5;			   // lack of *astrxs
+    void plus_5(int &ip) { // note the inclusion of an ampersand
+      ip = ip + 5; // no asterix, even though this is NOT a local variable 
     }
+
 Usage
+
     // C
     int n = 3;
     plus_5(&n);
@@ -93,9 +107,12 @@ Usage
 ### Const
 **Makes a value/pointer un-modify-able** (to help you reason about it)
 
+#### Refs:
+1. [stove](http://stackoverflow.com/questions/455518/)
+
 ### Casting
-* You can cast type anything to type anything
-* Some types are implicitly casted to other types (e.g. `int -> long`)
+* You are free to cast between _any_ two types
+* Some types are implicitly casted to other types (e.g. `int -> long`) when necessary
 * Like C, you can *implicitly* cast **to** a `void *`
 
         void *v;
@@ -130,10 +147,15 @@ Usage
   don't actually understand this)
 * **inline** --- *hint* to the compiler that the function should be
   expanded in-place like a macro
-    * More powerful than macros because inlining is performed by the
+    * More "powerful" than macros because inlining is performed by the
       compiler rather than the preprocessor
+        * Although I don't know what 'power' _is_ in that context
 
 ## Classes
+ 
+#### Class vs Struct
+
+The _default_ access level for classes is `private`, and for structs is `public`. Other than that there is _no_ difference. One could believe the main difference is one of humano-cognitive perceptual semantics.
 
 ### Basic Class Example
 
