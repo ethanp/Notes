@@ -61,6 +61,18 @@ as a standalone row.
 
 ## RDBMS SQL
 
+### Scan vs Seek
+* In the RDBMS world, scans and seeks are different ways the system reads data.
+* For a __scan__, the system iterates over the _entire_ table, evaluating the
+  given predicate
+* For a __seek__, we use the index to navigate directly to those rows that
+  satisfy the predicate
+* We can see what the system is going to do for a given query e.g. on Microsoft
+  SQL Server using `showplan`
+
+#### Reference
+* [msdn](http://blogs.msdn.com/b/craigfr/archive/2006/06/26/647852.aspx)
+
 ### Left Outer Join
 
 #### What is the syntax?

@@ -292,27 +292,44 @@ See hashing section below
 
 ### String Search with KMP (Knuth Morris Pratt)
 
-The key here, is that as we inch-worm along through the `haystack`, we use a
-precomputed array to figure out how much to inch forward whenever there's a
-mismatch.
+In this problem, we're looking for an instance of a string `needle` in a larger
+string `haystack`. The key here, is that as we inch-worm along through the
+`haystack`, we use a precomputed array to figure out how much to inch forward
+whenever there's a mismatch.
+
+The explanation in [this video][kmp vid] is excellent. _After_ watching that
+and reading the pseudocode below, the explanation in "Compilers" made a lot of
+sense (pg. 136-138). A proof-heavy explanation (that I haven't read) is also
+available in CLRS.
+
+[kmp vid]: https://www.youtube.com/watch?v=GTJr8OvyEVQ
 
 #### Computing the table
+
+* __Proper prefix__ -- a prefix that is _not_ the _entire_ string
+
+The table tells us, for each position in the `needle`, the longest _proper
+prefix_ that is also a suffix of the `needle` _up to this position_. It is calculated in time \\(O(|needle|)\\)
 
 ```python
 def computeTable(needle):
     T = [0] * len(needle)   # alloc table
     T[0] = -1   # fixed starting values
-    T[1] = 0    # fixed starting values
-    pos = 2   # where we are in the needle
-    ctr = 0   # number of prefix-matching letters seen so-far
+    T[1] = 0    # "     "        "
+    pos = 2     # where we are in the needle
+    ctr = 0     # number of prefix-matching letters seen so-far
     while pos < len(needle):
         if needle[pos-1] == needle[ctr]:
+            # expand size of prefix-matching-suffix
             ctr += 1
             T[pos] = ctr
             pos += 1
         elif ctr > 0:
+            # We _had_ a prefix-matching-suffix, now it broke.
+            # Check if we can recover without starting all over.
             ctr = T[ctr]
         else:
+            # no prefix matches any suffix
             T[pos] = 0
             pos += 1
     return T
@@ -336,8 +353,8 @@ more* than the number of matches seen so far. Nah mean.
 Let `m` be the location of the start of the possible match in `haystack`. Let
 `i` be the index of the character in the `needle` against which we're currently
 checking. As long as the needle is matching the haystack, we keep checking and
-incrementing `i`, like the _naïve algorithm_. However, when we find a mismatch,
-we do the following maneuver
+incrementing `i`, like the (brute force) _naïve algorithm_. However, when we
+find a mismatch, we do the following maneuver
 
 ```python
 if T[i] > -1:   
@@ -346,13 +363,12 @@ if T[i] > -1:
     m += i - T[i]
     i = T[i]
 else:
-    # we're still looking to match the 1st character
+    # we're still looking to match the 1st character (i == 0)
     # so we just inch along
-    i = 0
     m += 1
 ```
 
-In other words, in the fast-cast, we move to the next location for which we
+In other words, in the fast-case, we move to the next location for which we
 know based on the shape of the `needle` that it repeats its initial substring,
 so we can move to the next place where that much substring is matched.
 
