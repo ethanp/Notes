@@ -38,7 +38,9 @@ Many notes are from *C++ the Core Language*, by Gregory Satir & Doug Brown.
 
 #### How to make this work for your custom class
 
-Make this work for your own class by writing the following (*outside* of the `class` definition). Don't include the backslash. Without the backslash the multimarkdown compiler pukes.
+Make this work for your own class by writing the following (*outside* of the
+`class` definition). Don't include the backslash. Without the backslash the
+multimarkdown compiler pukes.
 
     std::ostream & operator<<\(std::ostream & Str, Object const & v) { 
       // print something from v to str, e.g: Str << v.getX();
@@ -142,11 +144,11 @@ Usage
 
 ### Some keywords
 
-* **volatile** --- does less optimizations, for when a variable might
+* **volatile** --- does "less optimizations", for when a variable might
   be used by another thread or a memory-mapped device or something. (I
   don't actually understand this)
 * **inline** --- *hint* to the compiler that the function should be
-  expanded in-place like a macro
+  expanded in-place "like a macro"
     * More "powerful" than macros because inlining is performed by the
       compiler rather than the preprocessor
         * Although I don't know what 'power' _is_ in that context
@@ -155,7 +157,9 @@ Usage
  
 #### Class vs Struct
 
-The _default_ access level for classes is `private`, and for structs is `public`. Other than that there is _no_ difference. One could believe the main difference is one of humano-cognitive perceptual semantics.
+The _default_ access level for classes is `private`, and for structs is
+`public`. Other than that there is _no_ difference. One could believe the main
+difference is one of humano-cognitive perceptual semantics.
 
 ### Basic Class Example
 
@@ -185,10 +189,15 @@ The _default_ access level for classes is `private`, and for structs is `public`
 
     ABC(ABC &copy_from_me);
 
+Note, the declaration/definition does __not__ state a return type.
+
 Allows you to say (not sure this is correct)
 
     ABC a2;
     ABC a1 = a2;
+
+Now `a1` has the same __value(s)__ as `a2`, but does _not_ point to the same
+block of memory.
 
 ### "Member functions" (i.e. methods)
 
@@ -209,20 +218,20 @@ They can be defined *inside* or *outside* the class definition
     }
     
     
-### Modifiers
+### Access Modifiers/Levels
 
-#### public & private
 
 * **public** --- can be accessed by any code
-* **private** --- can be accessed by the class’s own member functions
-  (and *"friends"*) only
+* **protected** --- can be accessed within subclasses only
+* **private** --- can only be accessed by the class’s own member functions
+  (and *"friends"*)
 * One object ***can*** access the `private` members of another object
-  from the same `class`, but **can*not*** access `private` members of
+  from the same `class`, but **can _not_** access `private` members of
   the `class` it subclasses.
 
 #### Member variables
 
-##### `static`
+##### static
 
 Only one copy of the data is maintained for all objects of the class
 (just like Java)
@@ -235,10 +244,38 @@ Only one copy of the data is maintained for all objects of the class
 * You define it right before you say which class you are deriving from.
 * The *default* is `private`
 
-        class DEF : public ABC {
-          ...
+        class A 
+        {
+        public:
+            int x;
+        protected:
+            int y;
+        private:
+            int z;
         };
-    
+
+        class B : public A
+        {
+            // x is public
+            // y is protected
+            // z is not accessible from B
+        };
+
+        class C : protected A
+        {
+            // x is protected
+            // y is protected
+            // z is not accessible from C
+        };
+
+        class D : private A    // 'private' is default for classes
+        {
+            // x is private
+            // y is private
+            // z is not accessible from D
+        };
+        
+    ([ref](http://stackoverflow.com/questions/860339))
 
 ### Overloading operators
 
