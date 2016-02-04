@@ -1,7 +1,8 @@
 ## Parquet
 
-1. *"Parquetry"* is a geometric mosaic of wood pieces used for decorative
+1. *"Parquet"* is a geometric mosaic of wood pieces used for decorative
    effect.
+    * "Parquetry" is the art thereof
 2. The goal is to compress data for use with processing tools like Spark and
    Hadoop, so that it takes less time to scan the data from disk
 3. It interoperates with "object models" like Avro, Thrift, ProtoBuff, Pig,

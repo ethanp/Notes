@@ -374,7 +374,21 @@ Check this out
     * X11 connections
     * arbitrary TCP ports
     * UNIX-domain sockets
-* __TODO__ It looks like that requires a `-R` flag but I'm not sure yet.
+
+#### SSH Tunnelling
+
+    ssh -L [<local host>:]<local port>:<remote host>:<remote port> <gateway>
+
+By default, `<local host>` will be `localhost`.
+
+What this does is, start a serversocket listening a local(`host:port`) using
+the "SSH client". When a connection to that is established, traffic received by
+that client will be encrypted, and forwarded to the `sshd`[aemon] listening on
+port 22 of `gateway`. Once traffic is received, the `sshd` will establish a
+(normal, unencrypted) connection to remote(`host:port`), and forward the data
+received by the SSH client there. Response traffic originating from
+remote(`host:port`) will go back to the `sshd`, back through the encrypted
+tunnel to the SSH client, and back to whomever connected to that client.
 
 ### tail --- print the end of the file
 
