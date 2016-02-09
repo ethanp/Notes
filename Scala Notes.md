@@ -13,6 +13,130 @@ latex footer:		mmd-memoir-footer
 
 # Language Features
 
+## Built-in annotations
+
+#### @volatile var isRunning = false
+
+* The given variable will be used by multiple threads
+* Produces the same code as the `volatile` _modifier_ in Java
+
+#### @unchecked
+
+Don't worry if `match` expression seems non-exhaustive.
+
+#### @switch
+
+Produces a compiler error if the following `match` statement is not either a
+JVM `switch` instruction (viz. `tableswitch` or `lookupswitch`) or a direct
+`jump` instruction.
+
+##### Example
+
+This example is found in the JSON parser for `spray-json` in
+[`JsonParser.scala`][jsp].
+
+```scala
+(cursorChar: @switch) match {
+      case 'f' => simpleValue(`false`(), JsFalse)
+      case 'n' => simpleValue(`null`(), JsNull)
+      case 't' => simpleValue(`true`(), JsTrue)
+      case '{' => advance(); `object`()
+      case '[' => advance(); `array`()
+      case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' => `number`()
+      case '"' => `string`(); jsValue = JsString(sb.toString)
+      case _ => fail("JSON Value")
+    }
+```
+ 
+[jsp]: https://github.com/spray/spray-json/blob/master/src/main/scala/spray/json/JsonParser.scala#L56
+
+#### @deprecated def bigMistake = ???
+
+Calls to `bigMistake` will receive a deprecation warning at compile-time.
+IntelliJ will cross-out uses of such deprecated methods.
+
+### Refs
+
+* [Slides][asld]
+
+[asld]: http://www.slideshare.net/knoldus/annotations-14963496
+
+## Type bounds & polymorphism
+
+#### class Kwass[A <: B] { ... } ("upper bound")
+
+`A` must be a _subtype_ of `B`
+
+#### class Kwass[A <% B] { ... } ("view bound")
+
+`A` must _either_ be a _subtype_ of `B` _or_ have an available _implicit
+conversion_ to type `B`.
+
+#### class Kwass[A >: B] { ... } ("lower bound")
+
+`A` must be a _supertype_ of `B`
+
+#### def theFunc[P <: B: Manifest]: P
+
+`P` must be a _subtype_ of `B` _and_ have a `Manifest[P]`. 
+
+Side note: A `Manifest` is an old Scala way of making normally erased type-
+information available at runtime. Since 2.10, one should use a `TypeTag`.
+
+#### class Kwass[+A]
+
+Scala on its own does not define the following: if `A` is a [proper] subclass
+of `B`, then is `List[A]` a [proper] subclass of `List[B]`? If it _is_, then in
+places where a `List[B]` is required, a `List[A]` would work.
+
+The above is called _covariance_. The opposite (`[-A]`) is called
+_contravariance_; it means that `List[B]` a [proper] subclass of `List[A]`,
+which is useful (e.g.) for parameters to functions. The default (`[A]`) is
+called _invariance_ and means that `List[A]` is _not related to_ `List[B]`, and
+can't be substituted-in in any situtation.
+
+#### List\[_] ("wildcard")
+
+```scala
+def count(l: List[_]) = l.size 
+```
+
+We don't care what the type parameter is, and in fact we are irretrievable forgetting it.
+
+We can still apply bounds to wildcard types (though not _view_ bounds)
+
+```scala
+def count(l: List[_ <: AnyRef]) = l.size 
+```
+
+now `count` won't work on a `List[Int]`.
+
+#### trait Function1[-T1, +R] extends AnyRef ("multiple type parameters")
+
+This just means the different type parameters are bound to different things. In the case of `Function1`, `-T1` is the (contravariant) single-parameter type, and `+R` is the (covariant) return type of the (partial function) `apply`d to `Function1`
+
+```scala
+val succ = new Function1[Int, Int] {
+  def apply(x: Int): Int = x + 1
+}
+assert(succ(0) == 1)
+```
+
+Note that for the above definition of `succ`, we may _not_ neglect to specify
+the type parameters of `Function1` because the compiler will in the end use the
+user-specified types to verify that the implementation of the class is type-
+safe.
+
+### Refs
+
+* [Twitter's Scala School: "Type Basics"][tstb]
+* [Twitter's Scala School: "Advanced Types"][tss]
+* ["Scala and Erasure"][bbn]
+
+[tstb]: https://twitter.github.io/scala_school/type-basics.html
+[tss]: https://twitter.github.io/scala_school/advanced-types.html#viewbounds
+[bbn]: http://blogs.atlassian.com/2012/12/scala-and-erasure/
+
 ## self =>
 **3/24/15**
 
@@ -58,8 +182,9 @@ definition, and the syntax looks exactly the same, with **two differences**.
    when the `trait` is mixed into a concrete `class`. This is key to allowing
    traits to work as *stackable modifications*.
 
-Sealed classes
---------------
+
+##Sealed classes
+
 **7/15/14**
 
 From *Programming in Scala* by Martin Odersky, Lex Spoon, and Bill Venners; pgs
@@ -101,8 +226,8 @@ You will get a compiler warning like the following:
     missing combination          BinOp
 
 
-Nested for-yield statements
----------------------------
+## Nested for-yield statements
+
 **5/27/14**
 
 * I've adapted Wikipedia's Haskell example to Scala.
@@ -135,8 +260,8 @@ What's Haapnin
     * But note [the entire *point* of the `Option` monad is that] we didn't
       have to do anything special here to take care of that
 
-*Vector* Seq
---------------------
+## *Vector* Seq
+
 **6/10/14**
 
 * According to [Stack Overflow](http://stackoverflow.com/questions/20612729/how-does-scalas-vector-work),
@@ -148,8 +273,7 @@ What's Haapnin
 * Sounds quite like a B-Tree
 
 
-Accessibility specifiers in class definitions
----------------------------------------------
+## Accessibility specifiers in class definitions
 
 **5/14/14**
 
@@ -180,9 +304,7 @@ Same as above, but with a public getter.
 Same as above
 
 
-
-Private instance variables
---------------------------
+## Private instance variables
 
 [SO](http://stackoverflow.com/questions/9698677/privatethis-vs-private)
 
@@ -199,8 +321,8 @@ work in subclass instances).
 Make the variable *visible to only this specific instance, and subclass
 instances*.
 
-Override Keyword
-----------------
+
+## Override Keyword
 
 **3/8/14**
 
@@ -211,8 +333,8 @@ Override Keyword
 * If a declaration (whether a *class*, a *trait*, or a *member*) includes the
   `final` keyword then it may not be overridden
 
-Futures and Promises
---------------------
+
+## Futures and Promises
 
 **3/1/14**
 
@@ -472,8 +594,7 @@ the `Future` is completed, the `Promise` gets completed with the result of that
     }
 
 
-Case Class vs. Regular Class
-----------------------------
+## Case Class vs. Regular Class
 
 **2/23/14**
 
@@ -488,8 +609,7 @@ Case classes just add to classes, they don't take away. They give you:
 5. the small amount of functionality that they get from automatically
    inheriting from `scala.Product`.
 
-Implicit Variables and Parameters
----------------------------------
+## Implicit Variables and Parameters
 
 **2/2/14**
 
@@ -642,8 +762,7 @@ Example from **P09** in
     }
     
 
-My Guide to a crazy function
-----------------------------
+## My Guide to a crazy function
 
 Check out the following function from a nice [tutorial on Iteratees](http://blog.higher-order.com/blog/2010/10/14/scalaz-tutorial-enumeration-based-io-with-iteratees/)
 
