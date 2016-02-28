@@ -16,7 +16,9 @@ latex footer:       mmd-memoir-footer
 ### CDFs of normal distributions
 
 ```python
-scipy.stats.norm.cdf(x, loc = 30, scale=4)
+from scipy import stats
+X = 24
+stats.norm.cdf(X, loc = 30, scale=4)
 ```
 
 means given \\(\mathcal{N}(\mu=30,\sigma=4)\\), find \\(P(X < x)\\)

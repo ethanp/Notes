@@ -309,7 +309,8 @@ available in CLRS.
 * __Proper prefix__ -- a prefix that is _not_ the _entire_ string
 
 The table tells us, for each position in the `needle`, the longest _proper
-prefix_ that is also a suffix of the `needle` _up to this position_. It is calculated in time \\(O(|needle|)\\)
+prefix_ that is also a suffix of the `needle` _up to this position_. It is
+calculated in time \\(O(|needle|)\\)
 
 ```python
 def computeTable(needle):

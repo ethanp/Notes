@@ -12,17 +12,24 @@ latex input:        mmd-article-begin-doc
 latex footer:       mmd-memoir-footer
 
 ## Overview
+
 * The *only* transport-layer protocols Java supports are TCP & UDP; for
   anything else, you must link to native code (JNI)
+
+
+## Tips for Traps
+
 * Don't write to the network through a `PrintStream`
     * It chooses end-of-line chars based on your platform, not the protocol
       (HTTP uses `\r\n`)
-    * It uses the default char encoding of your platform, not whatever the
-      server expects
+    * It uses the default char encoding of your platform (likely UTF-8), not
+      whatever the server expects (likely UTF-8)
     * It eats all exceptions into this `boolean checkError()` method, when
       you're better off just using the normal exception hubbub
 
-## class InetAddress
+## Connecting to Addresses
+
+### class InetAddress
 
 * `java.net.InetAddress` --- Java's representation of an IP address (v4 or v6)
     * DNS lookups are provided by this class
@@ -33,12 +40,13 @@ latex footer:       mmd-memoir-footer
     This will look in your cache, and if it's not there connect to your DNS to
     get the IP address
 
-## class URL
+### class URL
 
 * Simplest way to locate and retrieve data from the network
-* `final class java.net.URL extends Object` uses the *strategy design pattern*
+* `final class java.net.URL (extends Object)` uses *strategy design pattern*
   instead of inheritance to configure instances for different kinds of URLs
-    * E.g. protocol handlers are strategies
+    * E.g. protocol handlers are strategies (note these are _application_
+      layer protocols, e.g. HTTP)
 * Think about it has having fields like
     * Protocol, hostname, port, path, query string, fragment identifier
 * Immutable (makes it thread safe)
@@ -59,12 +67,19 @@ latex footer:       mmd-memoir-footer
     * There is a similar `decode(String s, String encoding)` method
 
 
-## Jsoup
+## Web Scraping
+
+### Jsoup
 
 This is a 3rd party library for downloading and traversing Web content which
-looks quite friendly.
+allows jQuery-style selecting.
 
-## Snippet to search int array for available port
+    Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
+    Elements newsHeadlines = doc.select("#mp-itn b a");
+
+## Utilities
+
+### Bind server to first available port among given choices
 
 [From Stackoverflow][find port]
 
@@ -72,17 +87,13 @@ looks quite friendly.
 
     public ServerSocket create(int[] ports) throws IOException {
         for (int port : ports) {
-            try {
-                return new ServerSocket(port);
-            }
-            catch (IOException ex) {
-                continue; /* try next port */
-            }
+            try { return new ServerSocket(port); }
+            catch (IOException ex) { continue; } /* try next port */
         }
         throw new IOException("no free port found");
     }
 
-Use it like so:
+Now use it like so:
 
     try {
         ServerSocket s = create(new int[] { 3843, 4584, 4843 });
@@ -90,17 +101,19 @@ Use it like so:
     }
     catch (IOException ex) { System.err.println("no available ports"); }
 
-## Netty
+## Advanced protocol development
 
-* It is for implementing network protocols for e.g. when a plain-jane HTTP
-  server is not going to cut it for serving your huge files.
-* It is an asynchronous event-driven network application framework along with
-  tooling for the rapid development of maintainable high-performance, high-
-  scalability protocol servers and clients.
-* It is a NIO client server framework which enables quick and easy development
-  of network applications such as protocol servers and clients. It greatly
-  simplifies and streamlines network programming such as TCP and UDP socket
-  server development.
+### Netty
+
+* Library for implementing fast & scalable network protocols over TCP/UDP
+    * e.g. when a plain-jane HTTP server is not going to cut it for serving
+      your huge files.
+* It uses Java's NIO framework, but is easier to use
+* It is an _asynchronous event-driven network application framework_ along
+  with tooling for rapid development of maintainable, high-performance,
+  high-scalability protocol servers and clients.
+* It facilitates TCP/UDP socket server development for custom protocols using
+  Java's NIO framework
 
 #### Sources
 * [Netty User Guide](http://netty.io/wiki/user-guide-for-4.x.html)
