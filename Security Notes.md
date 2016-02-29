@@ -13,24 +13,24 @@ latex input:		mmd-article-begin-doc
 latex footer:		mmd-memoir-footer
 
 ## Glossary
-* **Access controll** --- are you allowed access to the data/system?
+* **Access control** --- defining who is allowed access to the data/system
     * You may need to acquire a *"capability"* first
-* **Auditing** --- _what did you do_ while you were logged in?
-* **Authentication** --- the process of verifying that "you are who you say you
-  are", i.e. assuring the message's origin
+* **Auditing** --- determining _what you did_ during your session
+* **Authentication** --- the process of verifying that "you are who you say
+  you are", i.e. assuring the message's origin
 * **Authorization** --- the process of verifying that "you are permitted to do
   what you're trying to do"
 * **Buffer overflow** --- while writing data to a buffer, a program overruns
   the buffer's boundary and overwrites adjacent memory
     * They are the basis of many software vulnerabilities and can be
       maliciously exploited
-        * By e.g. overwriting the return address in a stack frame, meaning that
-          execution will "return" to the attacker's address, which contains his
-          data
+        * By e.g. overwriting the return address in a stack frame, meaning
+          that execution will "return" to the attacker's address, which
+          contains his data/code
     * Bounds checking can prevent buffer overflows
-* **(Public Key/Digital) Certificate** --- an electronic document that uses a
-  **digital signature** to bind a **public key** with ID info; e.g. name, org.,
-  address, etc.
+* **[(Public Key|Digital)] Certificate** --- an electronic document that uses a
+  **digital signature** to bind a **public key** with ID info; e.g. name,
+  org., address, etc.
     * Used to verify that a public key belongs to an individual
     * If you trust the certificate, you also trust that messages signed by the
       sender’s private key were sent by that person.
@@ -45,8 +45,7 @@ latex footer:		mmd-memoir-footer
       certificate.
 * **Challenge-Response** Authentication --- authentication involves one party
   presenting a "challenge" and the other providing a "response"
-    * E.g. password authentication: "What is your password?" "It is abc$123"
-    * __TODO__ learn more about this
+    * E.g. password authentication: "What is your password?" "It is `abc$123`"
 * **Checksum** --- allow detection and repair of small number of changes
     * It's goal is similar to a hash function, but the use-case and therefore
       algorithms used are different
@@ -56,10 +55,12 @@ latex footer:		mmd-memoir-footer
     * Given encrypted data, retrieve as much info as possible about the
       unencrypted data
 * **Cryptographic hash function** --- takes an arbitrary block of data and
-  returns a fixed-size bit string, the *cryptographic hash value*, s.t. any
-  change to the data will change the hash value
+  returns a fixed-size bit string (the *cryptographic hash value*)
+    * any change to the data will change the hash value in an unpredictable way
+    * it is often meant to be computationally-intensive to derive any inputs
+      (infinite input space, finite output space) from a given output
 * **Cryptosystem**
-    1. Any computer system that involves cryptography (e.g. eMail)
+    1. Any computer system that involves cryptography (e.g. email)
     2. A suite of algorithms needed to implement a particular form of
        encryption and decryption, generally of the *asymmetric* variety, e.g.
         1. Key generation
@@ -68,52 +69,72 @@ latex footer:		mmd-memoir-footer
             2. Decryption
 * **Dictionary attack** --- trying a dictionary full of *likely* passwords in
   an attempt to gain unauthorized access
-* **Digest** --- I believe this is the output of a **cryptographic hash
-  function** such as **SHA-1**
+* **Digest** --- the output of a **cryptographic hash function** such as
+  **SHA-1**
 * **[Distributed] Denial-of-Service ([D]DOS) attack** --- attempt to make a
   machine or network resource unavailable to its intended users
-    * Generally consists of efforts to temporarily or indefinitely interrupt or
-      suspend services of a host connected to the Internet.
     * One common method of attack involves saturating the target machine with
       external communications requests, so much so that it cannot respond to
       legitimate traffic, or responds so slowly as to be rendered essentially
       unavailable.
-* **Firewall** --- block messages based on origin, content, frequency, etc.
-    * e.g. block all traffec from particular hosts or to particular TCP ports
-* **Hamming weight** --- the number of symbols in a string that are different
-  from the "zero" of the alphabet used
-    * Equivalent to the **Hamming distance** from the all-zero string of the
-      same length
-    * E.g. the \\(l_{1}\\) norm of a bit vector
+        * A simple protection is to cache recently seen IP's and throttle
+          responses to repeat requesters (not sure whether this is a "best
+          practice", but I've seen it used on Github)
+    * The goal may be extortion, e.g. "give us money or we will DOS you"
 * **Exploit** --- a piece of software, a chunk of data, or a sequence of
   commands that takes advantage of a bug, glitch or vulnerability in order to
   cause unintended or unanticipated behavior to occur on computer software,
   hardware, or something electronic.
+* **Firewall** --- block messages based on origin, content, frequency, etc.
+    * e.g. drop all packets to or from particular hosts or ports
+    * can be done in software, in hardware, on the router, on the host, or in
+      a dedicated unit
+* **Hamming weight** --- the number of symbols in a string that are different
+  from the "zero" of the alphabet used
+    * Equivalent to the **Hamming distance** from the all-zero string of the
+      same length
+    * A.k.a. the \\(l_{1}\\)-norm of a bit vector
 * **Handshake** --- automated negotiation process that dynamically sets
   parameters of a communications chanel before communication begins
     * After establishing connection, before transferring desired information
     * Agreement on: (e.g.) transfer rate, coding alphabet, protocol, etc.
     * Might just say "got the message" over and over, or might say "data was
       corrupted, please resend"
-* **HMAC** --- *Keyed-Hash Message Authentication Code* --- a **MAC** that uses
-  a **keyed hash function**
-* **HTTPS** --- layers HTTP on top of **SSL/TLS**
+    * E.g. TLS has a handshake to determine the symmetric key, which takes
+      place after the TCP handshake completes
+* **HMAC** --- *Keyed-Hash Message Authentication Code* --- a **MAC** that
+  uses a *keyed hash function*, i.e. a **cryptographic hash function**
+  parameterized by a secret key
+* **HTTPS** --- layers HTTP on top of **SSL/TLS**, so instead of writing bare
+  ASCII to the network, outgoing traffic is encrypted, and then decrypted by
+  the receiving host
+    * This is (hopefully!!) how you connect to your bank. You can (and should
+      always) verify this by checking that before you log in, the URL has the
+      little green lock with the name of your bank on it.
 * **Initialization vector** --- a pseudorandom number added to a message before
   encrypting to make this instance of the encryption unique
+    * This is useful if you're sending a lot of messages. Consider, if
+      everytime you send a particular message it hashes to the same value, an
+      interceptor with only access to your encrypted messages can simply look
+      at the _pattern_ of encrypted values and determine what you're doing.
 * **Integrity** --- detect accidental and intentional message changes
-* **Keychain** --- apps ask this thing, via unique identifier, to open things
-  with its key, so the app never actually sees the key itself
+* **Keychain** --- say your app needs to access something it shouldn't always
+  have access to. It asks your keychain, via its unique identifier, to open
+  things instead. Your keychain makes a determination that this usage is safe,
+  and performs whatever action was requested. In this way your app never gains
+  access to the key.
 * **MAC** --- *Message Authentication Code* --- a short piece of information
-  used to **authenticate** a message and to provide **integrity** and
-  **authenticity** assurances on the message.
-    * Often created using a **keyed (cryptographic) hash function**
-        * I.e. one that accepts as input a **secret key**
+  used to provide **integrity** and **authenticity** assurances on a message.
+    * Often created using a **keyed (cryptographic) hash function** (a.k.a.
+      "MAC algorithm") that a **secret key** and a message, and outputs the MAC
+    * The receiver will run the key, message, and MAC through a verification
+      algorithm to ensure integrity and authenticity
 * **Modular arithmetic** --- \\(a \equiv b\\) (mod \\(n\\)) **if**
   \\(((a-b)\,\%\,n == 0 \\))
-    * E.g. \\(\,38 = 14 \,( \mathrm{mod}\, 12) \\) because \\((14-2)\, \% \,12
-      == (38-2) \,\%\, 12 == 0 \\)
     * I guess I might summarize this operation as saying: "a and b are the same
       distance from being multiples of n"
+    * E.g. \\(\,38 = 14 \,( \mathrm{mod}\, 12) \\) because \\((14-2)\, \% \,12
+      == (38-2) \,\%\, 12 == 0 \\)
 * **Nonce** --- arbitrary (generally pseudorandom) number used only once in a
   cryptographic communication
     * E.g. used to **authenticate** users in a way that can't be reused in
