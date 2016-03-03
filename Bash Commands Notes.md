@@ -318,6 +318,115 @@ $ read a b c
 $ echo $a $b $c # => 2 3 5
 ```
 
+### rsync -- copy files well
+
+* Copies files between two host, at most one of which may be remote. 
+* It is efficient because it uses its own algorithm to __transfer only the
+  diffs__ between the two sets of files using a "checksum-search" algorithm.
+* Supports copying symlinks, owners, groups, permissions, exclusion options.
+* Doesn't require root.
+* Optimizes transfer latency. 
+* Can run over 
+    * SSH -- by using syntax `remote_host:path`
+    * raw TCP -- by connecting to an rsync daemon, using syntax
+      `remote_host::path`.
+
+#### Basic usage
+
+```bash
+$ rsync -t *.c remote:dir/
+```
+
+This will transfer all `.c` files from the current directory _into_ the `dir`
+directory on `remote`. We use the `-t` option to update modification times on
+the remote system to match those on this system. If we don't do that, when we
+create a file on the remote system as part of the replication, it will have the
+current time. Then, the next time the synchronization protocol runs, it will
+compare the modification times, find that they're different, and _recopy_ all
+the `.c` files to `remote`; not what we want.
+
+#### The slash syntax
+
+* Having a slash or not at the end of the destination has no effect
+* If we have a slash on the source, it means copy the _contents_ of the
+  directory, but _not_ the specified directory object
+* Without a slash on the source, it means copy the directory object _and_ its
+  contents
+* It seems like one way to remember this is that `src/` is short for `src/*`
+  (though I'm not 100% sure that's correct)
+
+#### Another example
+
+```bash
+$ rsync -avz foo:src/bar /data/tmp  # aka
+$ rsync --archive --verbose --compress foo:src/bar /data/tmp
+```
+
+Here, "archive"  mode,  is used to  ensure  that  symbolic  links,  devices,
+attributes,  permissions,  ownerships,  etc.  are  preserved  in the transfer;
+"verbose" is used to increase verbosity; and "compress" is used to compress
+file data as it is sent to the destination, trading increased CPU for decreased
+network utilization. Recall that in the first example we used `-t` to update
+m-times, but here we don't need that because `-a` will transfer "attributes",
+including m-times.
+
+#### Copy multiple specific files from remote host
+
+```bash
+$ rsync -av host:'dir1/file1 dir2/file2' /dest
+```
+
+Copies `file1` and `file2` into `/dest`. It says additional files _must_ be
+separated by _exactly_ one space. This leads to the observation that spaces
+that exist _within_ filenames must be backslash-escaped, even if the path is in
+single-quotes.
+
+#### Rsync daemon
+
+If this program is running on the remote host, you are able to create a
+`/etc/rsyncd.conf` file on the remote host to configure how it handles rsync
+connections, both over plain TCP, and over SSH.  To actually enable that use
+the double-colon syntax, and [optionally] specify SSH by specifying
+`--rsh=ssh`.
+
+For example, one may use this to
+
+* configure the maximum number of connections
+* specify a log file
+* set a timeout
+* create "modules", which are short aliases to longer paths on the filesystem.
+
+I guess for my current project, I'd rather specify this stuff on the local
+machine so that it works for all hosts at once, rather than have to set this
+thing up on all remote hosts.
+
+#### Some useful-looking options
+
+* **--update** -- skip files that are newer on the receiver
+* **--archive** -- same as `-rlptgoD` (see below)
+* **--append** -- so normally the rsync algorithm will create a new copy of the file and then move it into place.
+* **--inplace** -- so normally the rsync algorithm will create a new copy of
+  the file and then move it into place. This will prevent that. Note that if
+  there are a few blocks in the middle of the file that were unchanged, doing
+  `inplace` means rsync will have to recopy those blocks when it otherwise
+  wouldn't-have. Note: the file will be in an _inconsistent state_ during the
+  transfer. Implies `--partial`.
+* **--partial** -- normally rsync deletes partially-transferred files if
+  transfer is interrupted. This prevents that.
+* **--progress** -- prints progress of transfer, and summary at the end;
+  implies `--verbose`
+* 
+
+#### This is what archive does
+
+* **-r, --recursive** -- recurse into directories
+* **-l, --links** -- copy symlinks as symlinks
+* **-p, --perms** -- preserve permissions
+* **-t, --times** -- preserve times
+* **-g, --group** -- preserve groups
+* **-o, --owner** -- preserve owner
+* **-D** -- preserve devices and special files
+
 ### seq -- create a sequence of numbers
 
     seq [first [incr]] last

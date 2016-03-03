@@ -17,12 +17,15 @@ From the Akka Docs
 
 7/9/15
 
-The `MessageDispatcher` is "the engine of the Akka machine". Every `ActorSystem` has a dispatcher
+The `MessageDispatcher` is "the engine of the Akka machine". Every
+`ActorSystem` has a dispatcher
 
     val system = ActorSystem()
     val executor: ExecutionContextExecutor = system.dispatcher
 
-You can override the default in your configuration file, or pass your own `ExecutionContext` instance to the `ActorSystem` constructor. The default is a `fork-join-executor` which is very fast.
+You can override the default in your configuration file, or pass your own
+`ExecutionContext` instance to the `ActorSystem` constructor. The default is a
+`fork-join-executor` which is very fast.
 
 There are in general 4 types of Dispatcher
 
@@ -62,28 +65,33 @@ From the Akka Docs
 
 4/9/15
 
-A `Router` is an `Actor` that has a list of `ActorRef`s that it forwards
-messages to according to some predefined logic, e.g. in package `akka.routing`
-we find:
+### Overview
 
-1. Round robin
-2. Random
-3. Broadcast
-4. Smallest mailbox
-5. Ballancing pool
+* A `Router` is an `Actor` that has a list of `ActorRef`s that it _forwards_
+  messages that are sent to it (via `.!()`) according to some predefined logic.
+* It also forwards the response back to the original sender
+
+### Routers pre-defined in package `akka.routing`
+
+1. Round robin -- forward to routee chosen in a round-robin fashion
+2. Random -- forward to a random routee
+3. BroadcastGroup/Pool -- forwards each message to _all_ routees
+4. Smallest mailbox -- forward to routee with shortest mailbox queue
+5. Balancing pool -- all routees share the same mail box, and the router tries
+   to redistribute work from busy routees to idle ones
 5. Consistent hashing --- select routee based on sent message
 6. Scatter gather --- broadcast message, *first* result is sent back to sender
 7. Tail chopping --- send to one, then another after delay, etc.; send *first*
    result back to sender
 
-It can load everything it needs from a config file, or configuration can be
-done programmatically.
+### Specifics
 
-The router forwards without changing the message's original sender.
+* A router can load configuration from a config file, or it can be done
+  programmatically.
+* The routee-count can be dynamic according to a configured resizing policy
+* We can intentionally send a message to all routees by wrapping it in a
+  `Broadcast` envelope
 
-By default, replies to routee messages will be routed back to the routee.
-
-The number of routees can be dynamic according to your resizing policy
 
 ## Actor Refs and Paths
 From the Akka Docs
@@ -358,7 +366,10 @@ Notes from the Hello-Akka Tutorial
 
 ### Notes from the Tutorial itself
 
-##### Akka is a toolkit and runtime for building highly concurrent, distributed, and fault-tolerant event-driven applications on the JVM.
+#### Akka is a toolkit and runtime 
+
+* for building highly concurrent, distributed, and fault-tolerant event-driven
+  applications on the JVM.
 * Messages can be of arbitrary type
 * Define messages with good names and rich semantic and domain specific
   meaning, even if it's just wrapping your data type. This will make it easier
