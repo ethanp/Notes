@@ -29,14 +29,14 @@ latex footer:   mmd-memoir-footer
   anyway.
 * The *canonical* case is TCP/IP
     * IP *only* provides *unreliable* data[gram] transfer
-        * because many clients don't need reliability. 
+        * because many clients don't need reliability.
     * TCP is a layer *on top* of IP, that requires no special-purpose IP code
       to be implemented
         * It provides connection-oriented, _reliable_ transmission.
 
 #### From [Quora Question][e2e-lay]
 
-* *Soheil Hassas Yeganeh* 
+* *Soheil Hassas Yeganeh*
 * If a network function can be implemented correctly and completely using
   the functionalities available on the end-hosts, that function should be
   implemented on the end-hosts without delegating any task to the network
@@ -94,7 +94,7 @@ latex footer:   mmd-memoir-footer
             * Traceroute*
             * *Ping*
 4. **Application** -- (OSI 5,6,7) -- protocols used by applications
-    * **FTP** -- for transmitting files, out-of-date (see below)
+    * **FTP** -- for transmitting files, (somewhat replaced by HTTP)
     * **SMTP** (Simple Mail Transfer Protocol) -- for sending mail between
       mail servers
     * **HTTP** -- used by the WWW
@@ -105,7 +105,7 @@ latex footer:   mmd-memoir-footer
     * **DNS** (Domain Name System) -- for translating name to an IP address
       (uses UDP)
         * More about this in its own section below
-    
+
 ## Networking Concepts & Vocabulary
 
 * **Node** -- a machine on a network
@@ -183,11 +183,11 @@ latex footer:   mmd-memoir-footer
 * A **TCP Connection** consists of 2 *sockets* (one on each end)
   (*sockets defined below*)
 * Relied upon by e.g. WWW, email, file transfer, SSH, etc.
-* Use **User Datagram Protocol (UDP)** instead if you don't require reliable 
+* Use **User Datagram Protocol (UDP)** instead if you don't require reliable
   data transfer and want reduced *latency* (e.g. for multiplayer video games)
 * First published in a 1974 IEEE paper by Vint Cerf and Bob Kahn
 * **TCP Header** C pseudocode
-    
+
         struct tcp_header {
             uint16_t src_port,
             uint16_t dest_port,
@@ -278,6 +278,85 @@ And that is what TCP is for.
 * You can send a message to a server by sending to it's **IP adress**,
 * You append a **port number** to make sure your message gets "demultiplexed"
   to the correct **process** on that server,
+
+### SSL (Secure Sockets Layer) / TLS (Transport Layer Security)
+
+* TCP & UDP do not provide encryption on their own
+* **SSL provides an encrypted TCP connection**, yielding improved
+    * data __encryption__
+    * data __integrity__
+    * endpoint __authentication__
+        * _Client_ can authenticate _server_, and (optionally) _vice-versa_
+    * Without requiring modification of application layer protocols above it
+* TLS has beeen adapted to run over UDP, in a protocol called "DTLS"
+* TLS provides its own message framing mechanism
+    * Which signs each message with a MAC (one-way hash, i.e. checksum)
+        * Only the endpoints know the cryptographic hash function
+        * This provides _integrity_ and _authenticity_
+* A third-party observer can still infer
+    * Connection endpoints
+    * Type of encryption
+    * Data transaction frequency
+    * Approximate data throughput
+* SSL was Netscape's propriatary protocol
+    * TLS 1.0 is the IETF standardization of SSL (RFC 2246, 1999)
+    * Then we have TLS 1.1: 2006; then TLS 1.2: 2008
+* In addition to encrypting data over the wire (like SSL), TLS authenticates a
+  server with a certificate to prevent spoofing.
+*  Uses long-term public and secret keys to exchange a short term session key
+   to encrypt the data flow between client and server
+* This creates a *stateful* connection
+* There are numerous known attacks on each version of SSL & TLS
+* __Forward secrecy__ -- if an attacker gets a server's private key, they still
+  cannot decrypt the current or any previously recorded sessions
+    * We must use [Eliptic Curve] _Diffie-Hellman_ (ECDH) instead of _RSA_
+      handshake to achieve this
+
+#### In very basic terms
+* First an X.509 certificate (asymmetric) authenticates the counterparty
+* The two parties negotiate a symmetric key to be used to encrypt data
+    * They start by finding a cipher and hash function that both support
+    * The client encrypts a random number with the server's public key, and
+      sends it
+        * From this they negotiate a session key
+    * Importantly, this symmetric key cannot be derived from the X.509
+
+#### TLS handshake protocol
+1. TCP handshake ("3-way")
+    1. SYN
+    2. SYN ACK
+    3. ACK
+2. TLS Handshake (2 extra roundtrips)
+    1. ClientHello (bundled with TCP ACK above)
+    2. ServerHello, Certificate, ServerHelloDone (optnly request client cert)
+    3. ClientKeyExchange, ChangeCipherSpec, Finished
+    4. ChangeCipherSpec, Finished
+3. Application Data can be sent through "TLS tunnel"
+
+##### Abbreviated Handshake
+* If the client has previously communicated with the server, we can reuse
+  negotiated parameters, and employ an "abbreviated handshake", which requires
+  only _one_ roundtrip
+* TLS False Start allows application to be sent before the server acknowledges
+  the ChangeCipherSpec, to reduce new handshake latency-overhead to one
+  roundtrip
+* Ideally, we should use _both_
+
+#### Application Layer Protocol Negotiation (ALPN)
+* To easily enable custom application layer protocols without assiging a new
+  well-known port to each one, we can
+    1. initiate the connection over the HTTPS port 443
+    2. Append supported protocols in a `ProtocolNameList` to the `ClientHello`
+       message
+    3. Server appends selected `ProtocolName` to `ServerHello` message
+* This removes need for using the HTTP Upgrade mechanism, which would require
+  more round-trips before the final application protocol can actually be used
+
+ #### References
+1. High Performance Browser Networking [Chapter 4][ch4]
+
+[ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html
+
 
 ## Network Layer
 ### IP (Internet Protocol)
@@ -387,7 +466,7 @@ This is from Wikipedia's page on HTTP.
 ### HTTP/1.1
 * Request & Response: same except "HTTP/1.1", and _not_ closing TCP at the end
 * Persistent connections
-    * TCP connections "persist" by _default_ between requests 
+    * TCP connections "persist" by _default_ between requests
     * improves _latency_, but not really _bandwidth_ (except perhaps window
       increasal)
     * Helps when pages feature _linked resources_ (e.g. images)
@@ -414,7 +493,7 @@ This is from Wikipedia's page on HTTP.
 * Upgrades from HTTP/1.1
     * Use the `Upgrade` header
         ```html
-        <!-- request -->   
+        <!-- request -->
         GET /index.html HTTP/1.1
         Host: server.example.com
         Connection: Upgrade, HTTP2-Settings
@@ -509,9 +588,9 @@ This is from Wikipedia's page on HTTP.
 [jwj]: http://www.javaworld.com/article/2916548/java-web-development/http-2-for-java-developers.html
 [http2-spec]: https://http2.github.io/http2-spec
 
-## REST
+### REST
 
-### Summary
+#### Summary
 
 * An architectural style for developing distributed, networked systems such as
   the World Wide Web and its applications. *Application components* (e.g.
@@ -520,7 +599,7 @@ This is from Wikipedia's page on HTTP.
   methods: `POST`, `GET`, `PATCH`, and `DELETE`.
 * HTML forms (up to and including HTML 5) can only send `GET` and `POST`.
 
-### POST
+#### POST
 
 * **Providing a block of data** to a handling process
     * Fields from an HTML form
@@ -528,13 +607,13 @@ This is from Wikipedia's page on HTTP.
     * A new resource
     * Appending data to a resource
 
-### If your action is not *idempotent*, then you *MUST* use `POST`
+#### If your action is not *idempotent*, then you *MUST* use `POST`
 
 **`GET`, `PUT` and `DELETE` methods are required to be idempotent.** The client
 should be able to pre-fetch every possible `GET` request for your service
 without it causing visible side-effects.
 
-#### The format
+##### The format
 
 	POST /index.html HTTP/1.1
 	Host: www.example.com
@@ -543,7 +622,7 @@ without it causing visible side-effects.
 
 	licenseID=string&content=string&paramsXML=string
 
-##### Key-Value pair encoding
+###### Key-Value pair encoding
 
 For example, the key-value pairs
 
@@ -555,7 +634,7 @@ are encoded as
 
 	Name=Jonathan+Doe&Age=23&Formula=a+%2B+b+%3D%3D+13%25%21
 
-### PUT
+#### PUT
 
 Create a resource, or overwrite it at the specified new URL.
 
@@ -564,7 +643,7 @@ A successful `PUT` of a given representation would suggest that a subsequent
 being sent in a `200 (OK)` response. `PUT` is **idempotent**, so duplicate
 attempts after a successful one have no effect.
 
-### PUT vs. POST
+#### PUT vs. POST
 
 * `POST` means "create new" as in "Here is the input for creating a user,
   create it for me".
@@ -572,94 +651,18 @@ attempts after a successful one have no effect.
   user 5".
 * `PATCH` to a URL updates part of the resource at that client defined URL.
 
-### PUT vs. PATCH
+#### PUT vs. PATCH
 
 `PUT` must take a full new resource representation as the request entity.
 `PATCH` also updates a resource, but unlike PUT, it *applies a delta* rather
 than replacing the entire resource. Many APIs simply implement PUT as a
 synonym for PATCH.
 
-## Some More Protocols
+## Application Layer Protocols
 
-### SSL (Secure Sockets Layer) / TLS (Transport Layer Security)
+For plain-old HTTP, it's in its own Chapter.
 
-* TCP & UDP do not provide encryption on their own
-* **SSL provides an encrypted TCP connection**, yielding improved
-    * data __encryption__
-    * data __integrity__
-    * endpoint __authentication__
-        * _Client_ can authenticate _server_, and (optionally) _vice-versa_
-    * Without requiring modification of application layer protocols above it
-* TLS has beeen adapted to run over UDP, in a protocol called "DTLS"
-* TLS provides its own message framing mechanism
-    * Which signs each message with a MAC (one-way hash, i.e. checksum)
-        * Only the endpoints know the cryptographic hash function
-        * This provides _integrity_ and _authenticity_
-* A third-party observer can still infer
-    * Connection endpoints
-    * Type of encryption
-    * Data transaction frequency
-    * Approximate data throughput
-* SSL was Netscape's propriatary protocol
-    * TLS 1.0 is the IETF standardization of SSL (RFC 2246, 1999)
-    * Then we have TLS 1.1: 2006; then TLS 1.2: 2008
-* In addition to encrypting data over the wire (like SSL), TLS authenticates a
-  server with a certificate to prevent spoofing.
-*  Uses long-term public and secret keys to exchange a short term session key
-   to encrypt the data flow between client and server
-* This creates a *stateful* connection
-* There are numerous known attacks on each version of SSL & TLS
-* __Forward secrecy__ -- if an attacker gets a server's private key, they still
-  cannot decrypt the current or any previously recorded sessions
-    * We must use [Eliptic Curve] _Diffie-Hellman_ (ECDH) instead of _RSA_
-      handshake to achieve this
-
-#### In very basic terms
-* First an X.509 certificate (asymmetric) authenticates the counterparty
-* The two parties negotiate a symmetric key to be used to encrypt data
-    * They start by finding a cipher and hash function that both support
-    * The client encrypts a random number with the server's public key, and
-      sends it
-        * From this they negotiate a session key
-    * Importantly, this symmetric key cannot be derived from the X.509
-
-#### TLS handshake protocol
-1. TCP handshake ("3-way")
-    1. SYN
-    2. SYN ACK
-    3. ACK
-2. TLS Handshake (2 extra roundtrips)
-    1. ClientHello (bundled with TCP ACK above)
-    2. ServerHello, Certificate, ServerHelloDone (optnly request client cert)
-    3. ClientKeyExchange, ChangeCipherSpec, Finished
-    4. ChangeCipherSpec, Finished
-3. Application Data can be sent through "TLS tunnel"
-
-##### Abbreviated Handshake
-* If the client has previously communicated with the server, we can reuse
-  negotiated parameters, and employ an "abbreviated handshake", which requires
-  only _one_ roundtrip
-* TLS False Start allows application to be sent before the server acknowledges
-  the ChangeCipherSpec, to reduce new handshake latency-overhead to one
-  roundtrip
-* Ideally, we should use _both_
-
-#### Application Layer Protocol Negotiation (ALPN)
-* To easily enable custom application layer protocols without assiging a new
-  well-known port to each one, we can
-    1. initiate the connection over the HTTPS port 443
-    2. Append supported protocols in a `ProtocolNameList` to the `ClientHello`
-       message
-    3. Server appends selected `ProtocolName` to `ServerHello` message
-* This removes need for using the HTTP Upgrade mechanism, which would require
-  more round-trips before the final application protocol can actually be used
-
- #### References
-1. High Performance Browser Networking [Chapter 4][ch4]
-
-[ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html
-
-#### HTTPS (HTTP Secure)
+### HTTPS (HTTP Secure)
 
 * Provides **authentication** of the website and associated web server that one
   is communicating with, which protects against *man-in-the-middle* attacks
@@ -706,7 +709,7 @@ synonym for PATCH.
     Content-Type: application/soap+xml; charset=utf-8
     Content-Length: 299
     SOAPAction: "http://www.w3.org/2003/05/soap-envelope"
-     
+
     <?xml version="1.0"?>
     <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
       <soap:Header>
@@ -784,6 +787,35 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
       provider
 * Tolerates some packet loss to achieve goal of real-time multimedia streaming
 * Generally uses UDP and not TCP
+
+### FTP -- File Transfer Protocol
+
+* _Stateful_ protocol; e.g. "current directory" state is maintained per session on the server
+* This protocol is so old (1971), it predates TCP (originally used "NCP")
+* Client connects over TCP to FTP server listening on port 21
+* This becomes the "control" channel
+* Now we must also establish a separate "data" channel
+* How the "data" channel is established depends on whether we do it in "active" or "passive" mode
+* Using "passive" mode allows us to bypass firewalls and NAT issues
+* For "passive" mode, the server sends a data port to connect to over the control channel, and the client initiates a connection to that port
+* For "active" mode, the client listens on a port that the server connects to
+* To get access to files, the client must supply a username and password
+* If the username is "anonymous", the server may still make some files available, e.g. software patches
+* FTP is from before protocols cared about security, because only rich academics had access to compoopers
+* Everything is transmitted in plain text (lol), including usernames, passwords, and data.
+* There is a securified protocol _extension_ called FTPS
+* There is also a related protocol with similar commands called SFTP which runs over SSH, and over which everything is encrypted
+* One can also use an SSH tunnel or VPN, but that is difficult because multiple TCP connections are required
+* Commands include things like abort, append, change directory, delete file, disconnect, rename, retrieve file, store file
+* Servers send reply codes similar to HTTP status codes
+
+### SFTP -- SSH File Transfer Protocol
+
+* More like a remote file system protocol them just file transfer
+* Allows resuming transfers, listing remote directories, and remote file removal
+* Does not provide authentication or security itself, it expects that from the transfer layer, generally via SSH-2
+* It is still only a "Draft" of the IETF, because it does so many things, and standardization has been stalled since roughly 2006 (interesting)
+
 
 ## Miscellaneous
 
