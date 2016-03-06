@@ -36,24 +36,24 @@ latex footer:   mmd-memoir-footer
 
 #### From [Quora Question][e2e-lay]
 
-* *Soheil Hassas Yeganeh*
-* If a network function can be implemented correctly and completely using
-  the functionalities available on the end-hosts, that function should be
-  implemented on the end-hosts without delegating any task to the network
-  (ie, intermediary nodes in between the end-hosts).
-* This way the new networking functions can be developed without changing
-  the existing network infrastructure. For example, there are many
-  different ways to implement something like HTTP but, you should prefer
-  design alternatives that use solely the functions available on the both
-  ends to the designs that demand new functionalities from routers and
-  switches.
-* Intermediary nodes, on the other hands, can intercept such network
-  functions for optimization, security, and scalability purposes. For
-  instance, firewalls, load balancers, and proxies intercept HTTP flows for
-  security, scalability and optimization. Note that those features are
-  auxiliary and HTTP does not depend on them.
+* According to Google employee *Soheil Hassas Yeganeh*
+* If a network function can be implemented correctly and completely using the
+  functionalities available on the end-hosts, that function should be
+  implemented on the end-hosts without delegating any task to the network (ie,
+  intermediary nodes in between the end-hosts).
+* This way the new networking functions can be developed without changing the
+  existing network infrastructure. For example, there are many different ways
+  to implement something like HTTP but, you should prefer design alternatives
+  that use solely the functions available on the both ends to the designs that
+  demand new functionalities from routers and switches.
+* Intermediary nodes, on the other hands, can intercept such network functions
+  for optimization, security, and scalability purposes. For instance,
+  firewalls, load balancers, and proxies intercept HTTP flows for security,
+  scalability and optimization. Note that those features are auxiliary and
+  HTTP does not depend on them.
 
-[e2e-lay]: http://www.quora.com/How-does-one-explain-end-to-end-principle-in-laymans-terms
+[e2e-lay]: http://www.quora.com/How-does-one-explain-end-to-end-principle-in-
+laymans-terms
 
 ### The Internet is an Onion of Networking Layers
 
@@ -71,8 +71,9 @@ latex footer:   mmd-memoir-footer
 1. **Link** -- (OSI 1,2) -- connects hardware to higher-layer abstractions
     * **Ethernet**
     * **Wifi**
-    * __ARP__ (Address Resolution Protocol) -- resolves network layer addresses
-      (e.g. IPv4 address) into link layer addresses (i.e. MAC address)
+    * __ARP__ (Address Resolution Protocol) -- resolves network layer
+      addresses (e.g. IPv4 address) into link layer addresses (i.e. MAC
+      address)
         * __NDP__ (Neighbor Discovery Protocol) does this for IPv6
 2. **Internet** -- (OSI 3) -- congestion control and routing global unique IP
    addresses and IP packets
@@ -108,24 +109,6 @@ latex footer:   mmd-memoir-footer
 
 ## Networking Concepts & Vocabulary
 
-* **Node** -- a machine on a network
-* **Host** -- an endpoint for networked communication
-* **Protocol** -- a precise set of rules defining how computers communicate
-* **Packet-switched network** -- data is sent in small chunks
-    * This scheme (as opposed to a __circuit-switched network__) allows for
-        * efficient shared-use of network
-        * integrity checks
-* **Latency** -- request's *round-trip time* (RTT)
-* **Firewall** -- hardware or software that inspects, modifies, and/or drops
-  specified packet traffic flowing through it
-    * Configured with rules about which packets to allow in and out
-        * Eg. may look at the IP addresses and/or transport protocols
-    * If it implements "stateful inspection", the drop rules may involve
-      analyzing the header information from a *sequence* of packets (a la FSM),
-      which may e.g. be doing a _port scan_ of your network
-    * A **proxy gateway** aka. **bastion host** is a firewall that pretends to
-      be the application but it's actually a proxy that is filtering improperly
-      formatted commands from getting to the true application server
 * **Address** -- a sequence of bytes uniquely identifying a *node*
     * In IPv4 these are 4 full unsigned bytes (0-255), e.g. 199.1.32.90
         * This allows for 4 billion *total*, not enough to have one per
@@ -133,29 +116,50 @@ latex footer:   mmd-memoir-footer
         * Asia, Australia, and Europe ran out by 2013
     * In IPv6 these are 16 bytes, e.g.
       `FEDC:BA98:7654:3210:FEDC:BA98:7654:3210`, which allows for 3.4E38
-* **DNS** (Domain Name Service) -- translates *hostnames* into IP addresses
-* `127.0.0.1` is the *local loopback address* -- always points to the local
-  computer (*hostname* `localhost`)
-    * For IPv6 it's `0:0:...:0:1`, which can be abbreviated to `::1`
-    * __TODO__ there should be more here about DNS. E.g. check out the
-      associated Eli the Comp Guy video
 * __Broadcast address__ -- messages sent to `255.255.255.255` are *broadcast*
   to everyone attached to the local network
     * This mechanism is used to find the local DHCP server
     * To do this with IPv6, instead of a broadcast address, use a _multicast_
       address with the _all-hosts_ multicast group
+* **DNS** (Domain Name Service) -- translates *hostnames* into IP addresses
+* **Firewall** -- hardware or software that inspects, modifies, and/or drops
+  specified packet traffic flowing through it
+    * Configured with rules about which packets to allow in and out
+        * Eg. may look at the IP addresses and/or transport protocols
+    * If it implements "stateful inspection", the drop rules may involve
+      analyzing the header information from a *sequence* of packets (a la
+      FSM), which may e.g. be doing a _port scan_ of your network
+    * A **proxy gateway** aka. **bastion host** is a firewall that pretends to
+      be the application but it's actually a proxy that is filtering
+      improperly formatted commands from getting to the true application
+      server
+* **Host** -- an endpoint for networked communication
+* **Latency** -- request's *round-trip time* (RTT)
+* __Local loopback address__ -- `127.0.0.1` -- always points to the local
+  computer (*hostname* `localhost`)
+    * For IPv6 it's `0:0:...:0:1`, which can be abbreviated to `::1`
+    * __TODO__ there should be more here about DNS. E.g. check out the
+      associated Eli the Comp Guy video
 * **NAT** (Network Address Translation) -- your internal IP address within
   your LAN is different from your external IP address to The Internet, and
   this translation is done/managed by your router
     * In this way, generally, your router is only using up a single "real" IP
       address for connecting all devices in your house to the Internet
+* **Node** -- a machine on a network
+* **Packet-switched network** -- data is sent in small chunks
+    * This scheme (as opposed to a __circuit-switched network__) allows for
+        * efficient shared-use of network
+        * integrity checks
+* **Peer-to-peer** -- an alternative to the *client/server* model, where any
+  node can initiate a connection with any other
+* **Protocol** -- a precise set of rules defining how computers communicate
 * **Proxy server** -- you connect to the outside world through this server
     * It has a different IP address, so that the outside world never learns
       about your real IP address
     * It can do more thorough inspection of packets being sent by and to you
     * It can be used to implement local area caching
-* **Peer-to-peer** -- an alternative to the *client/server* model, where any
-  node can initiate a connection with any other
+* **Tunneling** -- wherein a packet is wrapped inside the payload of another
+  packet
 
 ## Transport Layer
 
@@ -169,10 +173,11 @@ latex footer:   mmd-memoir-footer
 * **IP packets can be lost, duplicated, corrupted, or delivered out of order**
     * **TCP handles all this; specifically, it *guarantees* that all bytes are
       perfectly received in the correct order**
-* TCP uses **positive acknowledgement with retransmission** as the basis of its
-  algorithm
+* TCP uses **positive acknowledgement with retransmission** as the basis of
+  its algorithm
     * Input data is split into *segments*, and each segment is passed to the
-      IP layer wherein it will be put into a packet and actually sent/delivered
+      IP layer wherein it will be put into a packet and actually
+      sent/delivered
         * Segment described below
     * Sender keeps a record of each packet it sends
     * Sender maintains a timer from when each packet was sent
@@ -180,8 +185,8 @@ latex footer:   mmd-memoir-footer
           but standardized] *timeout* (due to loss, corruption, etc.)
     * Receiver responds with an `ACK` message as it receives the packet
     * The actual algorithm is not in these notes at this time.
-* A **TCP Connection** consists of 2 *sockets* (one on each end)
-  (*sockets defined below*)
+* A **TCP Connection** consists of 2 *sockets* (one on each end) (*sockets
+  defined below*)
 * Relied upon by e.g. WWW, email, file transfer, SSH, etc.
 * Use **User Datagram Protocol (UDP)** instead if you don't require reliable
   data transfer and want reduced *latency* (e.g. for multiplayer video games)
@@ -212,16 +217,16 @@ The protocol is defined by a *state machine* with *Three Phases*
 
 1. Connection establishment --- multistep handshake
 2. Data transfer
-3. Connection termination --- closes established virtual circuits and
-   releases allocated resources
+3. Connection termination --- closes established virtual circuits and releases
+   allocated resources
 
 ##### Connection Establishment
 
 1. Client sends `SYN` message to the server and sets the segment's sequence
    number to a random value `A`
     * I guess it is random to protect from "TCP sequence prediction attacks"
-2. Server replies with `SYN-ACK` message, acknowledgement number is `A+1`,
-   but this packet's number is random value `B`
+2. Server replies with `SYN-ACK` message, acknowledgement number is `A+1`, but
+   this packet's number is random value `B`
 3. Client sends `ACK` to server, sequence number is `A+1`, ack number is `B+1`
 4. Now both are in the `ESTABLISHED` state
 
@@ -235,9 +240,9 @@ This is a figure representing the number of bytes _in flight_. It is
 
 \\[linkCapacity \bullet RTT = \frac{\#bits}{sec}\bullet sec = \#bits\\]
 
-The point is we want to design an effective algorithm for setting this value in
-such a way that it maximizes use of the network without leading to congestion.
-And that is what TCP is for.
+The point is we want to design an effective algorithm for setting this value
+in such a way that it maximizes use of the network without leading to
+congestion. And that is what TCP is for.
 
 ### Sockets
 
@@ -307,8 +312,8 @@ And that is what TCP is for.
    to encrypt the data flow between client and server
 * This creates a *stateful* connection
 * There are numerous known attacks on each version of SSL & TLS
-* __Forward secrecy__ -- if an attacker gets a server's private key, they still
-  cannot decrypt the current or any previously recorded sessions
+* __Forward secrecy__ -- if an attacker gets a server's private key, they
+  still cannot decrypt the current or any previously recorded sessions
     * We must use [Eliptic Curve] _Diffie-Hellman_ (ECDH) instead of _RSA_
       handshake to achieve this
 
@@ -357,6 +362,30 @@ And that is what TCP is for.
 
 [ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html
 
+## Transport Layer
+
+### TCP (Transmission Control Protocol)
+
+### UDP (User Datagram Protocol)
+
+### SCTP (Stream Control Transmission Protocol)
+
+* Message-oriented like UDP
+* Reliable, unicast, full duplex, sessioned, and ordered, with congestion
+  control, like TCP
+* More performant than TCP and more reliable than UDP
+* Originally created for telephony signaling support [*what's that?*]
+* Allows multiple-streams to be multiplexed over a connection, each is
+  individually ordered, with no global order, which allows mitigation of the
+  formiddable *head-of-line blocking* problem
+* Supports "multi-homing", meaning a single endpoint is identified by a list
+  of IP addresses, so that if one becomes unavailable, another can be tried
+* Can be tunneled over UDP
+* One can tunnel TCP over SCTP
+* Defined and accepted as an IETF standard in 2000
+* Looks like the Max OS X 10.11 (El Capitan) kernel does not support SCTP, but
+  there is a "Network Kernel Extension" (NKE) available for it on Github.
+
 
 ## Network Layer
 ### IP (Internet Protocol)
@@ -398,8 +427,8 @@ And that is what TCP is for.
 
 ### Request
 
-This is from *Harold, Elliotte Rusty (2013-10-04). Java Network
-Programming. O'Reilly Media. Kindle Edition.* It may contain typos.
+This is from *Harold, Elliotte Rusty (2013-10-04). Java Network Programming.
+O'Reilly Media. Kindle Edition.* It may contain typos.
 
 
     GET /index.html HTTP/1.1
@@ -474,8 +503,8 @@ This is from Wikipedia's page on HTTP.
   resources in parallel
     * Typically up to 8 per domain to reduce thread-usage overhead on the
       server
-* __HTTP pipelining__ -- specifies that the next request can be sent before the
-  previous request's response has been received
+* __HTTP pipelining__ -- specifies that the next request can be sent before
+  the previous request's response has been received
     * Not great because due to being a simple text protocol, the server must
       still send responses in request-order, meaning big responses (e.g.
       images) will get in the way of other responses (e.g. client-side
@@ -484,8 +513,8 @@ This is from Wikipedia's page on HTTP.
 ### HTTP/2
 * __Optimizes transport__, while __preserving high-level compatibility with
   HTTP/1.1__
-    * Methods, status codes, header fields, URI schemes, port numbers, etc. are
-      unchanged
+    * Methods, status codes, header fields, URI schemes, port numbers, etc.
+      are unchanged
 * It's a __binary, multiplexed__ network protocol
     * This means you can't use `telnet` for debugging, but _can_ use `curl`
       which has integrated deserialization for the console
@@ -507,8 +536,8 @@ This is from Wikipedia's page on HTTP.
         {empty line}
         {server sends HTTP/2 frames}
         ```
-    * Use __Application-Layer Protocol Negotiation (ALPN)__ (IETF [RFC 7301
-       ][alpn-spec], July 2014)
+    * Use __Application-Layer Protocol Negotiation (ALPN)__ (IETF [RFC 7301][alpn-spec],
+      July 2014)
         * This means you're using the TLS handshake protocol to ask to run
           HTTP/2 over the [encrypted] TLS connection
         * Java 8 does not support ALPN, but Jetty does and __Java 9 will__
@@ -525,14 +554,14 @@ This is from Wikipedia's page on HTTP.
     * This removes the need for domain sharding
 * __Push__ -- server can proactively send as-yet-unrequested resources to the
   client's cache for future use, as soon as a stream has been established
-    * This is useful for sending linked assets that would otherwise require the
-      client to download the referencing html, parse it, and explicitly request
-      those assets
+    * This is useful for sending linked assets that would otherwise require
+      the client to download the referencing html, parse it, and explicitly
+      request those assets
     * This is neither the same-as or a replacement-for server-sent events (??)
       or WebSockets, both introduced with HTML5
-    * Server sends a `PUSH_PROMISE` frame, includes the supposed request's URI,
-      followed by `HEADER` then `DATA` frames containing the pushed response
-      message
+    * Server sends a `PUSH_PROMISE` frame, includes the supposed request's
+      URI, followed by `HEADER` then `DATA` frames containing the pushed
+      response message
 
 #### Frame Types
 
@@ -546,14 +575,14 @@ This is from Wikipedia's page on HTTP.
   fragment" (subject to compression)
 * `PRIORITY` -- specifies stream dependency and priority
 * `RST_STREAM` -- request's cancellation of a stream with an error code
-* `SETTINGS` -- specifies the sender's characteristics to the receiver; sent by
-  client and/or server
+* `SETTINGS` -- specifies the sender's characteristics to the receiver; sent
+  by client and/or server
     * Header table size, enable push, max concurrent streams, initial window
       size, max frame size, max header list size
-* `PUSH_PROMISE` -- notify peer of the stream-id of a stream the sender intends
-  to initiate
-* `PING` -- mechanism for measuring minimal round-trip time from the sender, as
-  well as determining whether an idle connection is still functional
+* `PUSH_PROMISE` -- notify peer of the stream-id of a stream the sender
+  intends to initiate
+* `PING` -- mechanism for measuring minimal round-trip time from the sender,
+  as well as determining whether an idle connection is still functional
     * MUST contain 8 bytes of whatever you want
     * If you receive a PING with ACK flag not set, you MUST send a PING _with_
       the ACK flag set in response, with an identical payload
@@ -563,7 +592,8 @@ This is from Wikipedia's page on HTTP.
     * allows an endpoint to gracefully stop accepting new streams while still
       finishing processing of previously established streams
     * Receivers of a GOAWAY frame MUST NOT open additional streams on the
-      connection, although a new connection can be established for new streams.
+      connection, although a new connection can be established for new
+      streams.
     * Endpoints SHOULD always send a GOAWAY frame before closing a connection
       so that the remote peer can know whether a stream has been partially
       processed or not
@@ -664,24 +694,26 @@ For plain-old HTTP, it's in its own Chapter.
 
 ### HTTPS (HTTP Secure)
 
-* Provides **authentication** of the website and associated web server that one
-  is communicating with, which protects against *man-in-the-middle* attacks
-* Also provides **bidirectional encryption** of communications between a client
-  and server, which protects against *eavesdropping* and *tampering* with or
-  *forging* the communication's contents
+* Provides **authentication** of the website and associated web server that
+  one is communicating with, which protects against *man-in-the-middle*
+  attacks
+* Also provides **bidirectional encryption** of communications between a
+  client and server, which protects against *eavesdropping* and *tampering*
+  with or *forging* the communication's contents
 * Everything in the HTTPS message is encrypted, including the headers, and the
   request/response load.
 * Technically, not a protocol in and of itself, but the result of layering
   `HTTP` on `SSL`/`TLS`
 * Relies on *certificate authorities* to verify the owner of the certificate
-    * Snowden's documents revealed that this *still* allows *man-in-the-middle*
-      attacks
-* Note: a site *must* be *completely* hosted over HTTPS (without having some of
-  its contents loaded over HTTP) or the user will be vulnerable to some attacks
-  and surveillance.
+    * Snowden's documents revealed that this *still* allows *man-in-the-
+      middle* attacks
+* Note: a site *must* be *completely* hosted over HTTPS (without having some
+  of its contents loaded over HTTP) or the user will be vulnerable to some
+  attacks and surveillance.
 * Uses `port 443` by default (not `80`)
 * To serve over HTTPS without the client's browser showing a warning, one must
-  create a public key certificate signed by a certificate authority. This may cost $8 -- $70 per year.
+  create a public key certificate signed by a certificate authority. This may
+  cost $8 -- $70 per year.
 
 ### SOAP (Simple Object Access Protocol)
 
@@ -790,32 +822,113 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
 
 ### FTP -- File Transfer Protocol
 
-* _Stateful_ protocol; e.g. "current directory" state is maintained per session on the server
+* _Stateful_ client-server protocol; e.g. "current directory" state is
+  maintained per session on the server
 * This protocol is so old (1971), it predates TCP (originally used "NCP")
 * Client connects over TCP to FTP server listening on port 21
 * This becomes the "control" channel
 * Now we must also establish a separate "data" channel
-* How the "data" channel is established depends on whether we do it in "active" or "passive" mode
+* How the "data" channel is established depends on whether we do it in
+  "active" or "passive" mode
 * Using "passive" mode allows us to bypass firewalls and NAT issues
-* For "passive" mode, the server sends a data port to connect to over the control channel, and the client initiates a connection to that port
+* For "passive" mode, the server sends a data port to connect to over the
+  control channel, and the client initiates a connection to that port
 * For "active" mode, the client listens on a port that the server connects to
 * To get access to files, the client must supply a username and password
-* If the username is "anonymous", the server may still make some files available, e.g. software patches
-* FTP is from before protocols cared about security, because only rich academics had access to compoopers
-* Everything is transmitted in plain text (lol), including usernames, passwords, and data.
+* If the username is "anonymous", the server may still make some files
+  available, e.g. software patches
+* FTP is from before protocols cared about security, because only rich
+  academics had access to compoopers
+* Everything is transmitted in plain text (lol), including usernames,
+  passwords, and data.
 * There is a securified protocol _extension_ called FTPS
-* There is also a related protocol with similar commands called SFTP which runs over SSH, and over which everything is encrypted
-* One can also use an SSH tunnel or VPN, but that is difficult because multiple TCP connections are required
-* Commands include things like abort, append, change directory, delete file, disconnect, rename, retrieve file, store file
+* There is also a related protocol with similar commands called SFTP which
+  runs over SSH, and over which everything is encrypted
+* One can also use an SSH tunnel or VPN, but that is difficult because
+  multiple TCP connections are required
+* Commands include things like abort, append, change directory, delete file,
+  disconnect, rename, retrieve file, store file
 * Servers send reply codes similar to HTTP status codes
 
 ### SFTP -- SSH File Transfer Protocol
 
 * More like a remote file system protocol them just file transfer
-* Allows resuming transfers, listing remote directories, and remote file removal
-* Does not provide authentication or security itself, it expects that from the transfer layer, generally via SSH-2
-* It is still only a "Draft" of the IETF, because it does so many things, and standardization has been stalled since roughly 2006 (interesting)
+* Allows resuming transfers, listing remote directories, and remote file
+  removal
+* Does not provide authentication or security itself, it expects that from the
+  transfer layer, generally via SSH-2
+* It is still only a "Draft" of the IETF, because it does so many things, and
+  standardization has been stalled since roughly 2006 (interesting)
 
+### SSH -- Secure Shell
+
+* Provides encrypted remote-login channel over unsecured network
+* Client-server architecture; 20+ separate server and client implementations
+* Can be used to provide a secure channel for other network services (i.e.
+  services implemented as a network protocol)
+* Two major versions SSH-1 and SSH-2
+* Designed to replace the insecure virtual terminal protocol Telnet, which
+  sends passwords in plaintext
+* Snowden's leaks indicate that the NSA can sometimes decrypt and read the
+  contents of SSH sessions*
+* Authentication of the server is always done with public-key cryptography
+* Authentication of the user can either be done with a public-key, or with a
+  password
+    * To do it by key, put your public key in the server's
+      `~/.ssh/authorized_keys` file
+* The network connection is encrypted via generated public-private key pairs
+* If the two sides have never authenticated before, a man-in-the-middle could
+  pretend to be the server and obtain the user's password
+* Supports remote command execution, tunneling, TCP port forwarding, X11,
+  SFTP, and SCP
+    * In this case, tunneling refers to the fact that SSH can provide a secure
+      channel to protocols that transmit plaintext. As all traffic through SSH
+      is encrypted end-to-end, the protocol running through it does not need
+      to secure itself.
+* TCP port 22 is assigned for SSH servers
+* Created as freeware by Finish guy in Helsinki in 1995 to replace Telnet, and
+  had instant success
+* SSH-2, incompatible with SSH-1, created by IETF working group, and adopted
+  by them as an Internet standard in 2006
+* SSH-2 supports concurrent shell sessions over one SSH connection
+* Internally it has its own stack of layers
+* Transport layer sets does server authentication (every hour), sets up
+  encryption, and exposes an interface for sending plaintext packets. This
+  layer alone is similar to TLS. Optionally provides compression.
+* User authentication layer does user authentication, and runs over the
+  transport layer.
+* Connection layer provides the "channel" abstraction. Channels are
+  multiplexed through the single SSH connection (this is an advantage over
+  TLS). Either side may open a channel.
+    * This layer runs over the user authentication layer.
+    * Standard channel types include "shell" for terminal shells, and "tcpip"
+      for forwarding connections
+        * When one side requests to open a channel, it specifies the type, and
+          if the recipient doesn't know that type, the request will be
+          rejected
+    * Each end may refer to the same channel with a different identifier. The
+      _recipient's_ identifier is used to label packets in that channel.
+    * *Channels are flow-controlled* using a receiver-advertised window (like
+      TCP), where *both sides* have a window
+        * "The window size specifies how many bytes the other party can send
+          before it must wait for the window to be adjusted" with a special
+          window-adjustment message
+* Communication is done with an ssh2 binary packet, which contains the length
+  (encrypted!), payload (encrypted, possibly compressed), random padding, and
+  a MAC; the sequence number is an "implicit" `uint32` (it is not sent over
+  the wire)
+
+#### Example: remote command execution
+
+* the client opens a "session" channel
+* then requests allocation of a pseudo-terminal (with given dimensions)
+* then sends its overriden environment variables
+* then requests startup of a shell program
+* then sends commands to execute
+* then may send signals e.g. `SIGINT` to the server
+* then on termination server sends "exit-status" or "exit-signal" (due to
+  violent termination)
+* Client-side window-size updates can be sent too.
 
 ## Miscellaneous
 
@@ -825,15 +938,16 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
   which it passes _all received traffic_ to the CPU, rather than only those
   frames addressed to this NIC (viz. via MAC address)
     * Used for _packet sniffing_
-* __Packet sniffing__ -- intercepting and logging traffic, then passing it to a
-  _packet analyzer_
+* __Packet sniffing__ -- intercepting and logging traffic, then passing it to
+  a _packet analyzer_
     * Can be used to become a bad guy, _or_ to catch bad guys
     * Useful for monitoring your network
 
 ### Overlay Network
 
 * A network built on top another network
-* A link between 2 nodes in the overlay may require multiple links in the underlying network
+* A link between 2 nodes in the overlay may require multiple links in the
+  underlying network
 * The Internet was originally an overlay upon the telephone network.  Today,
   VoIP is the vice-versa.
 * Distributed systems such as peer-to-peer networks and client-server
@@ -861,9 +975,10 @@ From 1968, an unencrypted-but-otherwise-SSH-like protocol
 
 ## Web Hosting
 
-* **VPS (Virtual Private Server)** --- you're sharing the hardware with someone
-  else, but you're running in a VM so you may pay less than you would have for
-  a minimal website that's not tying up the resources of an entire server.
+* **VPS (Virtual Private Server)** --- you're sharing the hardware with
+  someone else, but you're running in a VM so you may pay less than you would
+  have for a minimal website that's not tying up the resources of an entire
+  server.
 
 ### Rails Web Hosting Companies
 
