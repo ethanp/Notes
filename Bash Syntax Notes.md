@@ -72,15 +72,16 @@ _Remove_ variable/function from the shell
 
 Try `echo`ing these.
 
-| **Variable** | **Meaning** |
-| -----: | :------ |
-| `$!` | PID of the most recent background command |
-| `$$` | PID of the (current) script file or bash terminal |
-| `$?` | Most recent foreground pipeline **exit status** |
-| `$#` | Number of arguments passed to shell script/function |
-| `$*`/`$@` | All command-line arguments (no quoting applied) |
-| `"$*"` | All command-line arguments as a *single* string |
-| `"$@"` | All cmd-line args, each wrapped in quotes |
+| **Variable** | **Meaning**                                            |
+| -----------: | :----------------------------------------------------- |
+| `$!`         | PID of the most recent background command              |
+| `$$`         | PID of the (current) script file or bash terminal      |
+| `$?`         | Most recent foreground pipeline **exit status**        |
+| `$#`         | Number of arguments passed to shell script/function    |
+| `$*`/`$@`    | All command-line arguments (no quoting applied)        |
+| `"$*"`       | All command-line arguments as a *single* string        |
+| `"$@"`       | All cmd-line args, each wrapped in quotes              |
+| `:`          | Alias for `true`; deprecated                           |
 
 #### Functions for manipulating parameters
 
@@ -109,6 +110,10 @@ This is done as you'd expect, and it has *everything* you're used to, like
 **Exponentiation** is done with `**`, like in Python
 
     echo $((2 ** 3))   # => 8
+
+__Note:__ `$((...))` is defined by POSIX and is therefore available in all
+normal shells. KSH and BASH also have `((...))` and `let ...` but those should
+probably not be used seeing as they make the code less portable.
 
 ### If
 
@@ -187,6 +192,59 @@ Loop over command-line arguments
     do
         stuff
     done
+
+**WARNING:** as noted in the [Google Bash styleguide][gbs], variables modified
+in a while loop do not propagate to the parent because **a while loop's**
+**commands run in a subshell**. The implicit subshell in a pipe to while can
+make it difficult to track down bugs. The workaround is to 
+
+```bash
+last_line='NULL'
+your_command | while read line; do
+  last_line="${line}"
+done
+
+# This will output 'NULL'
+echo "${last_line}"
+```
+
+[gbs]: https://google.github.io/styleguide/shell.xml
+
+Their first solution is to use for loop, but that is only possible if the input will *never* contain spaces or special characters (i.e. it is also not user input). 
+
+Their second solution uses "process substitution" with redirected output
+
+```bash
+total=0
+last_file=
+while read count filename; do
+  total+="${count}"
+  last_file="${filename}"
+done < <(your_command | uniq -c)
+
+# This will output the second field of the last line of output from
+# the command.
+echo "Total = ${total}"
+echo "Last one = ${last_file}"
+```
+
+But what the heck is that `<()` construct? The most succinct explanation comes
+from this [redirections cheat sheet][rcs], which has _many_ useful
+explanations, and states, and was written by that guy who is substack's friend
+
+* `cmd <(cmd1)` -- redirect stdout of `cmd1` to an anonymous fifo, then pass
+  the fifo to `cmd` as an argument. Useful when `cmd` doesn’t read from `STDIN`
+  directly.
+* `cmd < <(cmd1)` -- redirect stdout of `cmd1` to an anonymous fifo, then
+  redirect the fifo to `STDIN` of `cmd`.
+*  `cmd <(cmd1) <(cmd2)` -- redirect `STDOUT` of `cmd1` and `cmd2` to two
+   anonymous fifos, then pass both fifos as arguments to `cmd`. Best example:
+
+        diff <(find /path1 | sort) <(find /path2 | sort).
+* `cmd1 > >(cmd2)` -- run `cmd2` with its `STDIN` connected to an anonymous
+  fifo, then redirect `STDOUT` of `cmd` to this anonymous pipe.
+
+[rcs]: http://www.catonmat.net/download/bash-redirections-cheat-sheet.pdf
 
 #### POSIX-Style Command-Line Arguments
 

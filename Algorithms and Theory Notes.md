@@ -376,6 +376,21 @@ so we can move to the next place where that much substring is matched.
 
 ## Hashing
 
+### Checksums
+
+* The goal is to provide __integrity__ against corruption or tampering
+* Good algorithms produce very different outputs for slightly different inputs
+* It's related to cryptographic hashing, but the goal is to be _fast_ to compute
+* Simple schemes involve the _check digit_, like we saw in Intro CS for ISBN,
+  and the _parity bit_ (which is similar) in which we determine whether the count of 1's in our binary string is even (0) or odd (1)
+* __Error correcting codes__, aka forward error correcting, aka channel coding,
+  is a similar technique, but not only provides integrity, but can _fix_ a
+  small amount of corruption (with high probability?)
+* Logically these tend to involve a rolling sum, a modulo, and some XORing
+* In code, one tries to avoid using modulo so much because it is slow
+* In reality, one doesn't implement these, one finds time-tested
+  implementations
+
 ### Building a hash-table of strings
 
 **4/27/15**

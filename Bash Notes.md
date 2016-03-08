@@ -38,6 +38,26 @@ Delete all non-pdf files recursively from directory
 * `| tee afile` means "and also print it to the log-file" (in _addition_ to
   `STDOUT`)
 
+## Settable Options
+
+    set -o <OPTION> [-o <OPTION> ...]
+
+* __errexit__ -- if a command doesn't return 0, `exit 1` from this script
+    * This can also be accomplished with `set -e`
+    * This can be disabled with `set +e`
+    * If it's normal for a command to fail, append `|| true` after it so that
+      the line will always return 0
+* __nounset__ -- treat use of unset variables as a fatal error
+    * helps avoid mistakes with e.g. `rm -rf $chroot/usr/share/doc`
+    * This can also be accomplished with `set -u`
+    * This can be disabled with `set +u`
+* __pipefail__ -- a pipeline normally reports the exit code of its last
+  command. With this option, the exit code of the pipeline is the exit code of
+  the last program to return a non-zero exit code
+* **set -f** -- disable filename globbing
+* **shopt -s failglob** -- glob characters that get passed to a command cause
+  fatal errors
+
 ## POSIX Regex Character Classes
 
 * These can help you be international/multicultural
