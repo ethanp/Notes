@@ -1,7 +1,6 @@
 ## Parquet
 
-1. *"Parquet"* is a geometric mosaic of wood pieces used for decorative
-   effect.
+1. *"Parquet"* is a geometric mosaic of wood pieces used for decorative effect.
     * "Parquetry" is the art thereof
 2. The goal is to compress data for use with processing tools like Spark and
    Hadoop, so that it takes less time to scan the data from disk
@@ -57,8 +56,8 @@
 * **Shuffle** --- triggered by certain Spark operations (e.g. `reduceByKey`)
     * Re-distributes data across partitions
     * involves copying data across executors and machines
-* Don’t spill to disk unless the functions that computed your datasets
-  are expensive, or they filter a large amount of the data
+* Don’t spill to disk unless the functions that computed your datasets are
+  expensive, or they filter a large amount of the data
     * Otherwise, recomputing a partition may be as fast as reading it from disk
 * Spark automatically monitors cache usage on each node and drops out old data
   partitions in a least-recently-used (LRU) fashion
@@ -180,7 +179,9 @@ The **Master**
 
 Creating one
 
-    val conf = new SparkConf().setAppName("Simple Application").setMaster("local")
+    val conf = new SparkConf()
+        .setAppName("Simple Application")
+        .setMaster("local")
     val sc = new SparkContext(conf)
 
 ##### Useful looking methods
@@ -277,13 +278,24 @@ Creating one
 23. __Built for Offline__ -- can replicate to devices (like smartphones) that
     can go offline and handle data sync for you when the device is back online.
 24. Offers a built-in administration interface accessible via web called Futon
-25. To update a document with a particular `_id`, you must supply your latest known `_rev` (revision) field for that document. If yours is out of date compared to the one on the server (or you don't send any `_rev`), the update will fail.
+25. To update a document with a particular `_id`, you must supply your latest
+    known `_rev` (revision) field for that document. If yours is out of date
+    compared to the one on the server (or you don't send any `_rev`), the
+    update will fail.
 26. So `_rev` id's are given on creation and updated of documents
-    * Surprisingly, note: "CouchDB does _not_ guarantee that older versions are kept around."
+    * Surprisingly, note: "CouchDB does _not_ guarantee that older versions are
+      kept around."
     * These are also used as `Etag`s for caching (great call)
-27. Note: always use `PUT` instead of `POST` so that you specify your `_id` instead of letting Couch assign its own `uuid`, because that's just not a useful value. Consider using `Date.now()` instead.
-28. I'm pretty sure Couch closes the TCP connection after every HTTP req/res pair, to reduce state overhead on the server. My intuition is that this would be a bad idea because of the increased overhead of initiating and closing all these connections, but I'll trust the designers to be correct on this one.
-29. replication replicates based on a snapshot at the point in time when replication was started
+27. Note: always use `PUT` instead of `POST` so that you specify your `_id`
+    instead of letting Couch assign its own `uuid`, because that's just not a
+    useful value. Consider using `Date.now()` instead.
+28. I'm pretty sure Couch closes the TCP connection after every HTTP req/res
+    pair, to reduce state overhead on the server. My intuition is that this
+    would be a bad idea because of the increased overhead of initiating and
+    closing all these connections, but I'll trust the designers to be correct
+    on this one.
+29. replication replicates based on a snapshot at the point in time when
+    replication was started
 30. Replication modes
     1. Push -- pushes changes from this server to a remote one
     2. Pull -- requests changes from the remote one
@@ -313,24 +325,85 @@ Creating one
 * At least one of those must be local
     * Make both local to e.g. use this as a snapshotting mechanism
 * If the dest is remote, then it's _"push"_, otw it's _"pull"_
-* Triggered by [the the _act_ of] __storing__ a document in the `/_replicator` database
-    * This triggers a _task_ whose _"replication status"_ can be inspected through the "`/_active_tasks` API"
-* Cancelled by 
-    * deleting the relevant replication document, 
+* Triggered by [the the _act_ of] __storing__ a document in the `/_replicator`
+  database
+    * This triggers a _task_ whose _"replication status"_ can be inspected
+      through the "`/_active_tasks` API"
+* Cancelled by
+    * deleting the relevant replication document,
     * _or_ updating it to set it's `cancel` property to `true`
-* It seems like replication amounts to just hitting the `/db/_changes` api for batches
+* It seems like replication amounts to just hitting the `/db/_changes` api for
+  batches
     * if any of the retrieved `_id`s are missing,
-    * or the `_rev`s don't match, 
+    * or the `_rev`s don't match,
     * a query is sent for those particular documents
 
 #### Algorithm
 
 * There are three _databases_ involved: a Source, a Target, and a Replicator
-    * At the end, the Target's contents will match the contents of Source at the time replication began, wrt the contents of Source
-        * I.e. I don't think Target will delete documents that Source has never seen (and hence never deleted), although I'm not sure about this, and luckily it doesn't matter to me right now.
+    * At the end, the Target's contents will match the contents of Source at
+      the time replication began, wrt the contents of Source
+        * I.e. I don't think Target will delete documents that Source has never
+          seen (and hence never deleted), although I'm not sure about this, and
+          luckily it doesn't matter to me right now.
     * These are _databases_ in the sense of "my RDBMS has 5 databases"
         * _Not_ in the sense of "I have a mysql database installed"
         * What a doozy
-* First of all, we must get the _checkpoint_, i.e. the last `seq_id` seen by the target, in terms that the `source/db/_changes` feed understands
-* `/db/_revs_diff` is something that you pass an `_id` mapped to a list of `_rev`s
-    * It returns to you the list of revisions for that document that the target has _not_ seen
+* First of all, we must get the _checkpoint_, i.e. the last `seq_id` seen by
+  the target, in terms that the `source/db/_changes` feed understands
+* `/db/_revs_diff` is something that you pass an `_id` mapped to a list of
+  `_rev`s
+    * It returns to you the list of revisions for that document that the target
+      has _not_ seen
+
+## Apache Mesos
+
+__Open-source platform for fine-grained resource sharing in the data denter__
+
+* developed at UC-Berkeley
+* The Mesos master node decides how many resources to offer each framework,
+  while each framework determines the resources it accepts and what
+  application to execute on those resources.
+* "provides efficient resource isolation and sharing across distributed
+  applications, or frameworks" in a fine-grained manner, improving cluster
+  utilization.
+* Resources include CPU cores, memory, disk, and ports
+* "Mesos behaves like the parent host at a kids birthday party: 
+    * say you’ve got some 15 kids ("frameworks") 
+    * to supply with food ("resources") 
+    * and can’t possibly know their inclinations ("placement preferences").
+    * But you can offer them a piece of pizza or a bowl of rocket
+    * and they are free to accept it (now or later) or to reject it.
+    * Further, it might be that the dad who dropped off one of the guests
+      told you that his youngster is a vegetarian, 
+    * so there’s no point in you offering him, say, a beef burger
+      ("filters"), etc."
+    * [src][mbp]
+* Mesos only "offers" resources to frameworks; why?
+    * The offer was insufficient
+    * It allows mesos to delegate the responsibility to the framework to
+      enforce data locality, server affinity, etc.
+
+[mbp]: https://medium.com/@mhausenblas/thoughts-on-apache-mesos-1e1d48270665
+
+## Apache Hadoop YARN
+
+__resource management and job scheduling & monitoring__    
+
+* global ResourceManager (RM) -- the ultimate authority that arbitrates
+  resources among all the applications in the system. Has two main components:
+  Scheduler and ApplicationsManager.
+    * Scheduler allocates resources to the various running applications subject
+      to familiar constraints of capacities, queues
+        * Offers no guarantees about restarting failed tasks either due to
+          application failure or hardware failures
+        * Pluggable policies for partitioning resources among applications
+    * ApplicationsManager accepts job-submissions, creates the container for
+      executing the associated ApplicationMaster, and provides the service for
+      restarting the AM on failure
+* per-application ApplicationMaster (AM) -- negotiates appropriate resource
+  containers from the Scheduler, tracking their status, and monitoring progress
+* An application is either a single job or a DAG of jobs.
+* The NodeManager is the per-_machine_ framework agent who is responsible for
+  containers, monitoring resource usage and reporting usage stats to the
+  ResourceManager.

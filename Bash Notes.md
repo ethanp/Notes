@@ -51,6 +51,9 @@ Delete all non-pdf files recursively from directory
     * helps avoid mistakes with e.g. `rm -rf $chroot/usr/share/doc`
     * This can also be accomplished with `set -u`
     * This can be disabled with `set +u`
+    * If you use this, and you want to use a variable that may be unset, use
+      the synax `${MAYBE_EMPTY:-}`, which means "if the variable is unset, use
+      the default string _emptystring_"
 * __pipefail__ -- a pipeline normally reports the exit code of its last
   command. With this option, the exit code of the pipeline is the exit code of
   the last program to return a non-zero exit code
