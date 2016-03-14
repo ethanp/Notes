@@ -11,6 +11,35 @@ latex input:		mmd-natbib-plain
 latex input:		mmd-article-begin-doc
 latex footer:		mmd-memoir-footer
 
+# Nice Idioms
+
+### Equality
+
+March 14, 2016
+
+From Kafka, this is similar in semantics to the Josh-Bloch equality, but
+_Scalarified_ if you will.
+
+```scala
+private[kafka] class StaticTopicCount(
+    val consumerIdString: String,
+    val topicCountMap: Map[String, Int]
+) extends TopicCount {
+
+  // code before ...
+
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case null => false
+      case n: StaticTopicCount => 
+        consumerIdString == n.consumerIdString && 
+        topicCountMap == n.topicCountMap
+      case _ => false
+    }
+  }
+}
+```
+
 # Language Features
 
 ## Built-in annotations
