@@ -12,6 +12,34 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Idioms
+
+##### 3/17/16
+
+### typedef'ing structs
+
+C is from before the days of OOP, but programmers wanted to adjust the language
+to allow themselves to think that way. For this purpose, the use of the word
+`struct my_struct` everywhere is almost redundant; "we already _know_ it's a
+struct because of it's name and location in the line". So by using a `typedef`
+we're able to reduce the need to write `struct` all over the place.
+
+```c
+// in hashmap.h
+struct _hashmap
+typedef struct _hashmap hashmap
+
+// in hashmap.c
+struct _hashmap {
+    struct map_entry** table;
+    size_t size;
+    size_t count;
+}
+```
+
+Now we can refer to a `struct _hashmap` with the simpler verbiage `hashmap`,
+e.g: `sizeof(hashmap)`.
+
 ## GDB
 
 ##### 10/17/14
