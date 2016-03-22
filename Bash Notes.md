@@ -18,6 +18,33 @@ latex footer:		mmd-memoir-footer
 * Notes on some standard UNIX commands that I have found to be particularly
   useful can be found in __Bash Commands Notes.md__
 
+## tmux
+
+### Commands before you've entered a session
+
+* __tmux__ -- create an unnamed session
+* __tmux new -s sessionName__ -- create a named session
+* __tmux ls__ -- list detached sessions
+    * *Or* __tmux list-sessions__
+* __tmux attach -t sessionName__ -- re-attach to session named `session_name`
+
+### These are prefixed with ctrl-b
+
+* __c__ -- create a new window
+* __,__ -- rename window
+* __p__ -- previous window
+* __n__ -- next window
+* __w__ -- list open windows and select which one to enter
+* __%__ -- split vertically (creates new pane _within_ this window)
+* __: split-window__ -- split horizontally
+* __d__ -- _detatch_ from current session (leaves it running)
+    * Now, if you log out of your `ssh` session, that detached session will
+      _still_ be left running
+
+### Other notes
+
+* When you close the last `tmux` window, `tmux` will __exit__
+
 ## Handy full commands
 
 Delete all non-pdf files recursively from directory
