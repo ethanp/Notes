@@ -188,6 +188,16 @@ See **package**
 
 ### Interface lock
 
+Use this when `synchronized` methods and blocks aren't going to cut it,
+e.g. if you want to use their associated `Condition` objects, or if you want
+something more sophisticated than "I wait for the lock, become sole owner, and
+release it when I'm done," e.g. the `ReadWriteLock` (see below), and the non-
+blocking `tryLock()` method (see interface methods). 
+
+Using a `synchronized` block with a `Lock` as a parameter just uses the `Lock`
+object's _associated_ monitor just as usual. It is suggested not to do that
+because it's confusing.
+
 We have (*none* are "optional"):
 
     interface Lock {
@@ -203,7 +213,8 @@ We have (*none* are "optional"):
         void unlock()
     }
 
-In the docs, we are instructed to use the following idiom
+"With this increased flexibility comes additional responsibility." In the docs,
+we are instructed to use the following idiom
 
     Lock l = new ReentrantLock(); // could be *any* type of lock
     l.lock();
@@ -235,22 +246,27 @@ This interface does *not* `extend` anything.
 
 ### Class ReentrantLock
 
-A `ReentrantLock` has the same behavior & semantics as the *implicit monitor
-lock* used by the `synchronized(obj)` keyword, but has "extended capabilities".
+> A `ReentrantLock` has the same behavior & semantics as the *implicit monitor
+lock* invoked with the `synchronized` keyword, but has extended capabilities.
 
-What makes it "reentrant" is that a single thread can repeatedly acquire a
-lock it already owns (which increases its `getHoldCount()`). You must
-`unlock()` over and over until your `hold count == 0`. This allows a single
-thread to acquire a lock, then call another method that also acquires that
-lock, without any issues.
+What makes it "reentrant" is that a single thread can repeatedly acquire a lock
+it already owns (which increases its `getHoldCount()`). If you do that, you
+must correspondingly `unlock()` over and over until your `hold count == 0`.
+This allows a single thread to acquire a lock, then call another method that
+also acquires that lock, without any issues.
 
+If you construct a _fair_ `ReentrantLock`, it will favor granting access to the
+longest-waiting thread. Otherwise, no particular access order is guaranteed.
 Don't make your lock `fair` unless you have a reason, because it makes your
-code much slower. Fairness gives preferential treatment to the longest-waiting
-threads.
+code much slower.
 
-Note that the `Serializable` interface has no methods.
+Note that the `Serializable` interface has no methods to bring to the table.
+Upon deserialization, a `Lock` will be _unlocked_, regardless of the state it
+was in when it was serialized.
 
     class ReentrantLock implements Lock, Serializable {
+        ReentrantLock(boolean fair)
+
         boolean isLocked()
 
         int     getHoldCount() // number of holds by current thread
