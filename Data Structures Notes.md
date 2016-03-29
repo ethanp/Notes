@@ -403,6 +403,35 @@ exercise. Maybe I should start by churning it into pseudocode.
     1. There's a tradeoff between the number of links we require each node to
        have ("degree") and the "route length" queries require
 
+## HyperLogLog
+
+* The goal is to efficiently approximate and track set cardinality
+* This structure also allows you to _union_ two HyperLogLogs and get the
+  approximate cardinality of the union
+* It hashes each entry in multiple ways, and only stores the hashed value
+* In the expectation, if we added \\(n\\) random elements to a set, the minimum
+  element would have expected value \\(\frac{1}{n+1}\\).
+    * So by hashing in a lot of ways, and doing some mathematical statistics,
+      one can look at the minimum value in the case of each of those hashes and
+      use that to estimate the true number of elements in the set.
+
+## Count Min Sketch
+
+* The goal is to get approximate counts of the most popular items in a list
+* We hash each item in multiple ways, and increment the counter associated with
+  each hash's corresponding bucket
+* If some uncommon items hashed to the same bucket sometimes, it probably won't
+  have enough impact to matter
+    * But to be extra-careful, we take the bucket which has the minimum count
+      because that means it had the least collisions overal
+* Rare items are deleted from the counter, and there is a mechanism for them to
+  be re-added later on with an approximately-correct value if they become
+  popular
+ 
+## References
+
+* [https://www.mapr.com/blog/some-important-streaming-algorithms-you-should-know-about]()
+
 # TODO
 
 Scala's `Vector` is a tree of arrays, kind of like a *B-Tree*, also like one

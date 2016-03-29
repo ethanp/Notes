@@ -14,6 +14,7 @@ latex footer:       mmd-memoir-footer
 ### References
 
 * *C++ the Core Language*, by Gregory Satir & Doug Brown
+* *A Tour of C++*, by Bjarne Stroustrup
 
 ## Not Specific to Classes
 
