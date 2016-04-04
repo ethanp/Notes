@@ -71,7 +71,8 @@ This example is found in the JSON parser for `spray-json` in
       case 't' => simpleValue(`true`(), JsTrue)
       case '{' => advance(); `object`()
       case '[' => advance(); `array`()
-      case '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '-' => `number`()
+      case '0' | '1' | '2' | '3' | '4' | '5'
+         | '6' | '7' | '8' | '9' | '-' => `number`()
       case '"' => `string`(); jsValue = JsString(sb.toString)
       case _ => fail("JSON Value")
     }
@@ -105,12 +106,24 @@ conversion_ to type `B`.
 
 `A` must be a _supertype_ of `B`
 
-#### def theFunc[P <: B: Manifest]: P
+#### def theFunc[P <: B : Manifest]: P ("context bound")
 
 `P` must be a _subtype_ of `B` _and_ have a `Manifest[P]`. 
 
 Side note: A `Manifest` is an old Scala way of making normally erased type-
 information available at runtime. Since 2.10, one should use a `TypeTag`.
+
+An example of this can be found in Spark's `util.ListenerBus.scala`.
+
+```scala
+def findListenersByClass[T <: L : ClassTag](): Seq[T]
+```
+
+This method is later called like so
+
+```scala
+val listeners = sc.listenerBus.findListenersByClass[SaveExecutorInfo]
+```
 
 #### class Kwass[+A]
 

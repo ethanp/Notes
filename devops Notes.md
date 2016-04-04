@@ -1,3 +1,34 @@
+## Web Servers
+
+_This is my current understanding anyway._
+
+A typical Web server registers with the operating system to _listen_ on a
+particular TCP port. When a socket is established, the client will send it's
+HTTP request. It is the server's responsibility to send the appropriate HTTP
+response back through the socket (ideally in a secure and efficient manner).
+That's really all it _has_ to do. It often delegates the specifics of _what
+data_ should be contained in the HTTP response to a separate application, such
+as one consructed using a "web application framework" such as Ruby on Rails.
+
+### Apache HTTP Server
+
+Written in 1995, and _took over_ the server market (from e.g. Microsoft).
+
+### Nginx
+
+Written in 2002, to address the need for a server that can efficiently handle
+many concurrent requests, for which Apache was unsatisfactory. It does this
+with an "event driven" model, that involves a single thread serving events
+emitted by all connections. Seems similar to node.js. As a solution to the
+concurrent-request problem, nginx was very successful.
+
+#### Configuration
+
+Each `something [condition] { block }` defines a _"context"_. It contains
+configuration details for _one area of concern_. It may begin with some
+conditional logic to determine whether to apply the configurations to the
+current situation. Context blocks can be nested.
+
 ## Storage
 
 ### Measuring performance
