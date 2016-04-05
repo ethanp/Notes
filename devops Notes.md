@@ -12,11 +12,11 @@ as one consructed using a "web application framework" such as Ruby on Rails.
 
 ### Apache HTTP Server
 
-Written in 1995, and _took over_ the server market (from e.g. Microsoft).
+Created in 1995, and _took over_ the server market (from e.g. Microsoft).
 
 ### Nginx
 
-Written in 2002, to address the need for a server that can efficiently handle
+Created in 2002, to address the need for a server that can efficiently handle
 many concurrent requests, for which Apache was unsatisfactory. It does this
 with an "event driven" model, that involves a single thread serving events
 emitted by all connections. Seems similar to node.js. As a solution to the
@@ -24,10 +24,65 @@ concurrent-request problem, nginx was very successful.
 
 #### Configuration
 
-Each `something [condition] { block }` defines a _"context"_. It contains
-configuration details for _one area of concern_. It may begin with some
-conditional logic to determine whether to apply the configurations to the
-current situation. Context blocks can be nested.
+##### Reference
+
+* Most of this is a restatement of the information contained in this
+  [DigitalOcean tutorial][digtut]
+
+[digtut]: https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts
+
+##### Intro to Contexts
+
+* Each `context_type [condition] { block }` defines a _"context"_
+* It contains configuration details for _one area of concern_
+* The `condition` determines whether to apply the configurations in the `block`
+  to the response to the current request
+    * We can think of it as a CSS "selector"
+* Context blocks can be nested
+* If a value is set inside a `block`, it overrides (i.e. replaces) whatever it
+  was set in a wider scope
+* Different setting possibilities are called _"directives"_, and each
+  `context_type` only allows the setting of its own set of _directives_
+    * Thankfully, if you mess this up, Nginx will exit while initially reading
+      in the configuration file
+* The "main" or "global" context is the one outside of all context blocks
+    * Correspondingly, use it to modify general behavior of your server
+    * E.g. user, group, number of workers, CPU affinity, default error file
+
+##### Events Context
+
+* Set within the global context (i.e. 1st level of nesting)
+* Used to configure how Nginx does its event-based _connection processing_
+    * E.g. how many connections each worker can handle, and some specifics
+      about which OS facilities they use to do so
+
+##### HTTP Context
+
+* Sits at 1st level of nesting in the global context
+* Defines defaults for how to handle HTTP[S] connections
+    * These may be overriden within more specific contexts
+* Configure compression, I/O operations, TCP settings, set document root
+
+##### Server Context
+
+* Sits within `http` context
+* Can be declared multiple times within the same `http` context, without any
+  attached `conditions`
+* Each specifies its own "virtual server" that can service a specific subset of
+  connections
+* Whether a particular block applies to _this_ request depends on the actual
+  "directives" contained _within_ the block
+    * E.g. the ip-addr:port or the hostname (using the `host` directive)
+* Used to configure logging, doc-root, compression, static files, redirects,
+  rewrites, and set (arbitrary) variables
+
+##### Location context
+
+* Define multiple (like `server` contexts) and "select" for them using the
+  `condition` syntax shown above
+* You put them inside `server` contexts, or within other `location`s to add a
+  scope with additional selectivity
+
 
 ## Storage
 
