@@ -34,8 +34,8 @@ latex footer:   mmd-memoir-footer
   glad this is the case
 * SQLite is actually a C library that you [would theoretically] link into your
   code. 
-    * (I'm not sure how this works from Java, maybe it uses JNI, but don't
-      count on it...)
+    * If using SQLiteJDBC, you will have a compiled native SQLite library for
+      your operating system that Java interacts with using JNI, [src][sqlbc]
 * It creates a single file on the OS per database
 * It uses the OS to synchronize access to the database across separate
   processes
@@ -47,6 +47,8 @@ latex footer:   mmd-memoir-footer
 * I don't think it supports user authentication or access controls
 * __Don't use it if__ you need a lot of concurrent writes, because SQLite
   doesn't support that but the other RDBMSs do
+
+[sqlbc]: https://github.com/xerial/sqlite-jdbc/tree/master/src/main/java/org/sqlite/core
 
 ### MySQL and Postgres
 
