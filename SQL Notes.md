@@ -12,6 +12,65 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## SQLite vs MySQL vs PostgreSQL
+
+* All are relational database management systems (RDBMSs)
+* All are open-source
+* All allow you to create databases and stick tables into them
+* All provide partial compliance with the ANSI SQL standard
+    * But only Postgres aims for full ANSI/ISO SQL _compliance_
+* Each provides a different set of datatypes
+* SQLite is the simplest, Postgres is the most advanced
+* Use the simplest database that will work for your project
+    * Complex features are hard to configure properly
+* They are all blazing fast, but not necessarily "big data" compatible
+    * They use the B+-tree-based indexing system
+* They each have associated GUIs to make testing and administration easier
+
+### SQLite
+
+* Provides only a primitive set of datatypes
+* Most likely, this database is good enough for your needs, and you should be
+  glad this is the case
+* SQLite is actually a C library that you [would theoretically] link into your
+  code. 
+    * (I'm not sure how this works from Java, maybe it uses JNI, but don't
+      count on it...)
+* It creates a single file on the OS per database
+* It uses the OS to synchronize access to the database across separate
+  processes
+    * A writer will grab a write-lock on the file so that no one else can
+      concurrently modify it
+    * Readers grab a read-lock which does not lock out other readers
+    * If your database file exists on a networked file system, you may have
+      issues
+* I don't think it supports user authentication or access controls
+* __Don't use it if__ you need a lot of concurrent writes, because SQLite
+  doesn't support that but the other RDBMSs do
+
+### MySQL and Postgres
+
+* These use a client-server model
+* The server modifies the underlying databases
+* The clients send SQL to the server, who responds based on the databases'
+  state
+* Users/access control is well-supported, and security is configurable
+* They support _replication_
+
+### Postgres
+
+* SQL standard compliant
+* Complete support for ACID transactions
+* Multiversion concurrency control (MVCC) instead of read locks
+* Extensible using "stored procedures"
+* Supports nesting of datatypes (??)
+* "More reliable than the other databases" (not sure what that means)
+
+### References
+* [DigitalOcean][do-vs]
+
+[do-vs]: https://www.digitalocean.com/community/tutorials/sqlite-vs-mysql-vs-postgresql-a-comparison-of-relational-database-management-systems
+
 ## Hive
 
 ### Sampling

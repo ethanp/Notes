@@ -28,8 +28,20 @@ concurrent-request problem, nginx was very successful.
 
 * Most of this is a restatement of the information contained in this
   [DigitalOcean tutorial][digtut]
+* Structure notes are from [StOve][strctNg]
 
 [digtut]: https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts
+[strctNg]: http://stackoverflow.com/questions/11693135
+
+##### Structure
+
+* Your config files go in `sites-available/`
+* Then to "enable" that site you symlink it into `sites-enabled/`
+* By removing the the symlink and issuing `service nginx reload`, one can take
+  down a site
+    * With some creativity, one can make it so that if the symlink is not
+      found, a maintenance site is served
+
 
 ##### Intro to Contexts
 
