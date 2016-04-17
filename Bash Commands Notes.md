@@ -552,6 +552,35 @@ To map all uppercase characters to their corresponding lowercase variants:
 
 Wait for all background jobs to finish
 
+### xargs
+
+> This one is my favorite.
+
+It takes a command and a bunch of arguments. It can be used (via `args | xargs
+-n 1 [cmd]`) to goes through each argument and pass it to a separate invocation
+of `[cmd]`. By default, `[cmd] = echo`.
+
+* __-n__ _num_ -- how many of the given arguments to pass to each execution of
+  the given command
+
+    ```bash
+    $ echo a b c d e f| xargs -n 2
+    a b
+    c d
+    e f
+    ```
+* __-p__ -- prompt the user for confirmation for each potential invocation by
+  revealing to them the derived command that will actually be passed to the
+  shell
+* __-t__ -- similar to `-p`, except that it just prints the derived command but
+  does not ask for permission to execute it
+* __-P__ _num_ -- execute using `num` _parallel_ instances of `[cmd]` at a time
+* __-I{}__ _Positional argument_
+
+    ```bash
+    echo "foo" | xargs -I{} echo {} "bar"  # => foo bar
+    ```
+
 ### . (dot)
 
 Read and execute commands contained in a separate file.
