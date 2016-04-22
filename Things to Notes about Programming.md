@@ -199,6 +199,41 @@ you can
 
 # Other stuff
 
+## Programmer Productivity
+
+_Fred Brooks_ (of _Mythical Man-Month_ fame) recently (2010) wrote a book
+(_Design of Designs_) [in part] about programmer productivity, and he mentioned
+how in the 60s, he was able to follow-along with ALL the major things happening
+in computer research, but that over time he has had to give up on being able to
+do that as each thing got WAY more specialized. This is part of why more people
+are needed to do tasks today: they each require a much larger set of more
+specific expertise. The other reason people are more often working
+collaboratively on software than they used to is that by going to market
+sooner, one can have a higher chance of owning a larger market share with your
+product. But he notes that we must remain cognizant that even if having more
+people on a team means we can split up the work as best we can, and each have
+_less_ work to do, as managers, we should realize that in this structure there
+inevitably ends up being MORE work to do overall, especially considering the
+communication overhead between project members. Also different tasks lend
+themselves to being split amongst multiple people than others (think Amdahl's
+Law).
+
+## XML vs JSON
+
+__XML__ is considered to to be a better description format than JSON in certain
+cases. For example consider how you'd write the following in JSON. The point is
+not that it would be _impossible_ in JSON, just that it would be more difficult
+to read and write by hand, and potentially more difficult to define
+transformations for _a la_ XSLT/XPath.
+
+```
+<foo>
+   <x:bar x:prop1="g">
+      <quuz />
+   </bar>
+</foo>
+```
+
 ## Deadlock
 
 **6/7/15**

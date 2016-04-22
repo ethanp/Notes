@@ -29,7 +29,9 @@ Basic:
 
 Specify output format
 
-    ack '^([^:]+)if:(.*)$' --output='$1 and $2 too!'
+```bash
+ack '^([^:]+)if:(.*)$' --output='$1 and $2 too!'
+```
 
 Options:
 
@@ -47,8 +49,10 @@ Options:
 
 ### apropos --- pertaining too ...
 
-    $ apropos database
-    $ man -k database
+```bash
+$ apropos database
+$ man -k database
+```
 
 Find all man-pages containing the word "database".
 
@@ -58,20 +62,24 @@ Find all man-pages containing the word "database".
 
 This is the **opposite of [`dirname`](#dirname)**
 
-    $ basename "./dir space/other dir/file.txt"
-    file.txt
+```bash
+$ basename "./dir space/other dir/file.txt"
+file.txt
 
-    # DON'T do this by accident (viz. ALWAYS quote the filename)
-    $ basename ./dir space/other dir/file.txt
-    dir
-    other
-    file.txt
+# DON'T do this by accident (viz. ALWAYS quote the filename)
+$ basename ./dir space/other dir/file.txt
+dir
+other
+file.txt
+```
 
 You can get it to strip off the file suffix, though this doesn't seem to work
 well with globbing.
 
-    $ basename args.h .h
-    args
+```bash
+$ basename args.h .h
+args
+```
 
 ### cut --- extract column of text
 
@@ -98,27 +106,31 @@ well with globbing.
 
 this is the **opposite of [`basename`](#basename)**
 
-    $ dirname a/b/myfile
-    a/b
+```bash
+$ dirname a/b/myfile
+a/b
 
-    $ dirname a/myfile
-    a
+$ dirname a/myfile
+a
 
-    $ dirname myfile
-    .
+$ dirname myfile
+.
+```
 
 ### exec
 
 With *no arguments*, change the current shell's *file descriptors*.
 
-    exec 2> /tmp/mylog  # redirect shell's stderr
-    exec 3< /file       # open new file descriptor
-    read var1 var2 <&3  # read from fd 3
-    exec 5>&2           # save sterr loc in fd 5
-    exec 2> /otherfile  # new stderr loc
-    ...
-    exec 2>&5           # copy back saved stderr loc
-    exec 5>&-           # close fd 5
+```bash
+exec 2> /tmp/mylog  # redirect shell's stderr
+exec 3< /file       # open new file descriptor
+read var1 var2 <&3  # read from fd 3
+exec 5>&2           # save sterr loc in fd 5
+exec 2> /otherfile  # new stderr loc
+...
+exec 2>&5           # copy back saved stderr loc
+exec 5>&-           # close fd 5
+```
 
 *With* arguments, `exec` starts a new program in its current process and
 control *never* returns to the shell.
@@ -129,13 +141,15 @@ control *never* returns to the shell.
 
 **recursive listing of all the files underneath given file**
 
-    $ find .
-    ./.DS_STORE
-    ./file.txt
-    ./a
-    ./a/anotherFile.txt
-    ./a space b
-    ./a space b/file.txt
+```bash
+$ find .
+./.DS_STORE
+./file.txt
+./a
+./a/anotherFile.txt
+./a space b
+./a space b/file.txt
+```
 
 #### Useful-looking options
 
@@ -147,12 +161,14 @@ control *never* returns to the shell.
 Reformat paragraphs by changing line breaks to not exceed a given width. Think
 of `cmd-opt-q` in my Sublime.
 
-    $ fmt -w 20 << END
-    > this line is going to broken up into 20 char chunks
-    > END
-    this line is going
-    to broken up into 20
-    char chunks
+```bash
+$ fmt -w 20 << END
+> this line is going to broken up into 20 char chunks
+> END
+this line is going
+to broken up into 20
+char chunks
+```
 
 ### grep
 
@@ -211,30 +227,32 @@ This is *just* too cool.
 
 ### paste --- make multiple text files into a csv-type-thing
 
-    $ cat D1
-    A
-    B
-    C
+```bash
+$ cat D1
+A
+B
+C
 
-    $ cat D2
-    1
-    2
-    3
+$ cat D2
+1
+2
+3
 
-    $ paste D1 D2
-    A   1
-    B   2
-    C   3
+$ paste D1 D2
+A   1
+B   2
+C   3
 
-    $ paste -d, D1 D2
-    A,1
-    B,2
-    C,3
+$ paste -d, D1 D2
+A,1
+B,2
+C,3
 
-    # we can transpose too!!
-    $ paste -s D1 D2
-    A   B   C
-    1   2   3
+# we can transpose too!!
+$ paste -s D1 D2
+A   B   C
+1   2   3
+```
 
 ### pkg-config -- determine C compiler flags
 
@@ -266,8 +284,10 @@ You can use it in a Makefile like this
 
 ### printf --- basically like you'd expect
 
-    $ printf "hello %s, that's $%.2f please for %d hamburglers\n" Jann 2.32 3
-    # => hello Jann, that's $2.32 please for 3 hamburglers
+```bash
+$ printf "hello %s, that's $%.2f please for %d hamburglers\n" Jann 2.32 3
+# => hello Jann, that's $2.32 please for 3 hamburglers
+```
 
 ### ps -- Process Status
 
@@ -299,12 +319,14 @@ But I can't remember it exactly.
 
 ##### Example
 
-    echo -n "Enter some text > "
-    read text
-    echo "You entered: $text"
+```bash
+echo -n "Enter some text > "
+read text
+echo "You entered: $text"
 
-    Enter some text > this is some text
-    You entered: this is some text
+Enter some text > this is some text
+You entered: this is some text
+```
 
 You can read *multiple* variables at once, splitting the input string using
 `$IFS`. Recall that you can set `IFS` for the duration of a single command.
@@ -451,21 +473,23 @@ Con`cat`enate the contents of the given files, and sort that list of lines.
 
 Check this out
 
-    $ cat D3
-    B,2
-    A,1
-    E,4
-    D,5
-    C,3
+```bash
+$ cat D3
+B,2
+A,1
+E,4
+D,5
+C,3
 
-    # sort by column two, with separator=,
-    $ sort --key=2 --field-separator=, D3
-    $ sort -k2 -t, D3
-    A,1
-    B,2
-    C,3
-    E,4
-    D,5
+# sort by column two, with separator=,
+$ sort --key=2 --field-separator=, D3
+$ sort -k2 -t, D3
+A,1
+B,2
+C,3
+E,4
+D,5
+```
 
 ##### Useful-looking Options
 
@@ -486,7 +510,9 @@ Check this out
 
 #### SSH Tunnelling
 
-    ssh -L [<local host>:]<local port>:<remote host>:<remote port> <gateway>
+```bash
+ssh -L [<local host>:]<local port>:<remote host>:<remote port> <gateway>
+```
 
 By default, `<local host>` will be `localhost`.
 
@@ -518,20 +544,28 @@ for an input file**
 
 To map all uppercase characters to their corresponding lowercase variants:
 
-    tr A-Z a-z
+```bash
+tr A-Z a-z
+```
 
 
 * **-d** --- **delete** all specified characters
 
-        tr -d ' '   # removes all spaces
+    ```bash
+    tr -d ' '   # removes all spaces
+    ```
 
 * **-c** --- set **complement**
 
-        tr -cd ' '  # removes *everything but* the spaces
+    ```bash
+    tr -cd ' '  # removes *everything but* the spaces
+    ```
 
 * **-s** --- **squeeze** multiple repetitions into a single instance
 
-        tr -s ' ' '\t'  # convert spaces to tabs
+    ```bash
+    tr -s ' ' '\t'  # convert spaces to tabs
+    ```
 
 * **-cs** --- convert and squeeze (used by Doug McIlroy)
 
@@ -544,9 +578,11 @@ To map all uppercase characters to their corresponding lowercase variants:
 
 `uniq -c --count` --- prefix lines by the number of consecutive occurrences
 
-    $ sort < a.txt | uniq -c
-    4 a
-    2 b
+```bash
+$ sort < a.txt | uniq -c
+4 a
+2 b
+```
 
 ### wait
 

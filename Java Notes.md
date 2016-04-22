@@ -495,7 +495,7 @@ MyObject.class`
   incapsulation.
 
 ## Annotations
-**5/21/14**
+**5/21/14 & 4/22/16**
 
 [Oracle Tutorial](http://docs.oracle.com/javase/tutorial/java/annotations/)
 
@@ -504,6 +504,12 @@ MyObject.class`
 * Info for the compiler -- e.g. detect errors or suppress warnings
 * Compile/Deploy-time processing -- generate code for processing XML files
 * Runtime processing
+* They allow you to add metadata to your classes/methods/variables that can be
+  queried at runtime (some built-in ones are queried at compiletime). This is
+  used by frameworks (e.g. Spring) on initialization to wire things together.
+  It can also be used to provide integrity checks against some semantic meaning
+  of the annotation. Python decorators are said to be inspired by this
+  mechanism.
 
 ### Basics
 

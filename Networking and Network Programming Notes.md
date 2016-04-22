@@ -11,6 +11,43 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Protocol Buffers
+
+**Protocol buffers provide a syntax for defining datatypes that are able to be
+_serialized_, either for network transfer or storage.**
+
+* Definitions are written in the _interface description language_ (e.g.
+  `message_type.proto`), and source code for generating and parsing byte-
+  streams for those objects is generated for your language by the protobuf free
+  and open source compiler.
+* Design emphasis was on being simpler to use and more performant than XML.
+* It is used at Google to implement an RPC system.
+* Unlike Apache Thrift (used by Facebook), the implementation does not include
+  or rely upon any particular RPC protocol stack.
+* The binary wire format is compact, forward and backward compatible, but not
+  self-describing except in a special ASCII-format debug mode
+    * i.e. we normally separately need the schema to understand what the data's
+      fields are/mean).
+* Each protobuf _message_ (type) can have _required_, _optional_, and
+  _repeated_ (ordered dynamic array) fields.
+    * Some Google engineers don't use `required` because if they then stop
+      using that field, it must still be included in every serialized object
+      stream, which is inefficient
+* In addition to _messages_ we can define _enum_ types
+* We can also define a _service_ which is a set of named mappings between
+  _request_ messages and _response_ messages
+    * In Java, this will produce an `interface` with the given abstract methods
+* Each field is associated with a unique _tag_ (integer field- number), which
+  doesn't change between releases to provide compatibility.
+* Protobufs can contain _nested messages_ of different (or perhaps the same)
+  type
+* "You should never add behaviour to the generated classes by inheriting from
+  them. This will break internal mechanisms and is not good object- oriented
+  practice anyway." -- Google.com
+* A key feature is that you can use (e.g. Java) _reflection_ to iterate of a
+  message's fields and manipulate its values without knowing the specific
+  message type. E.g. by calling `Message#getAllFields(void)`
+
 ## Network Principles
 
 ### The End-to-End Principle
@@ -363,6 +400,17 @@ congestion. And that is what TCP is for.
 [ch4]: http://chimera.labs.oreilly.com/books/1230000000545/ch04.html
 
 ## Transport Layer
+
+### Simple Authentication and Security Layer (SASL) 
+
+HDFS allows the use of the __Simple Authentication and Security Layer (SASL)__,
+"a framework for providing authentication and data security services in
+connection-oriented protocols via replaceable mechanisms". It provides a "data
+security layer" which in-turn "can provide data integrity, data
+confidentiality, and other services". Basically, it seems like what happens is,
+while implementing _your_ algorithm, you can call methods provided by SASL to
+make use of its security services. Underneath, those methods might use
+passwords, Kerberos, certificates, etc.
 
 ### TCP (Transmission Control Protocol)
 
