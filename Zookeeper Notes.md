@@ -118,6 +118,6 @@ latex footer:       mmd-memoir-footer
 
 ## References
 
-* [No Fluff][nofluff]
+* ["Distributed Coordination With ZooKeeper Part 1: Introduction"ssdsdfsf][nofluff1]
 
-[nofluff]: https://nofluffjuststuff.com/blog/scott_leberknight/2013/06/distributed_coordination_with_zookeeper_part_1_introduction
+[nofluff1]: https://nofluffjuststuff.com/blog/scott_leberknight/2013/06/distributed_coordination_with_zookeeper_part_1_introduction
