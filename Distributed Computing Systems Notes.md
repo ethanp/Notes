@@ -17,7 +17,7 @@ We'd generally like to have as few constraints as possible on the ways we are
 allowed to interact with our system while preserving the guarantees about
 correctness. Rigorous correctness guarantees are always reducible to a set of
 __safety__ constraints about what our system will _not_ do, and a set of
-__liveness__ constraints about what our system __will__ do.
+__liveness__ constraints about what our system _will_ do.
 
 ## Consensus
 
@@ -38,6 +38,25 @@ agent) system in the presence of (some) number of faulty processes.
 * __Agreement__ -- every correct process decides the _same_ value
 * __Validity__ -- if all processes _propose_ \\(v\\), then all correct
   processes _decide_ \\(v\\)
+
+### Uh-oh: FLP
+
+__In a fully asynchronous system there is no algorithm that can be tolerate one
+or more crash failures and still be guaranteed to achieve consensus in a
+bounded time.__
+
+## State machine replication
+
+A general method for implementing a fault-tolerant system by replicating
+servers and coordinating client interactions with server replicas.
+
+Consider the case of having a _single_ replica. Now our system is pretty simple
+for the client to reason about, but if that replica fails, the system will
+become _unavailable_ which is often not desirable.
+
+Consider the case of having _multiple_ replicas. Now if one replica is
+_updated_, and the other replica is _read_, e.g. is the reader guaranteed to
+read the _updated_ value?
 
 ## Consistency Models
 
