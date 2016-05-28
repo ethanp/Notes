@@ -117,6 +117,100 @@ which always takes up linear space.
 1. `LinkedList<T>` -- doubly-linked-list
 2. `ArrayDeque<T>` -- growing array
 
+#### Notes on the implementation java.util.ArrayDeque\<E>
+
+* The implementation is based on the use of a "resizable array" instead of
+  e.g. a doubly-linked list
+* It is generally faster than `Stack` for stacks and `LinkedList` for queues
+* The length of the internal array is always a power of two
+* Its size is immediately doubled whenever it becomes full
+* Empty elements are guaranteed to always contain `null`
+    * This means it must explicitly null-out elements as they are deleted
+* The internal array is a field `Object[] elements`
+    * Recall, Java does not permit the declaration of a `E[]`
+        * Note that Scala _would_ allow declaring a `Array[E]`
+* Fields are maintained to contain the indexes of the `head` and `tail`
+  in `elements`
+    * The `head` is the "front/beginning" -- it points to the first element in
+      the array
+        * This is where elements are "pushed", "popped", and "removed"
+    * The `tail` is the "end" (beautiful friend) -- it points to the element
+      _after_ the last one in the array
+        * this is where elements are "offered" (i.e. queue-add), and "added"
+        * So it is an _invariant_ that `element[tail] == null`
+    * This means that when adding to the "front", we increment `head` _before
+      adding_, but when adding to the "back", we decrement `tail` _after
+      adding_
+* It _is_ allowed for `head > tail`, but _iff_ it becomes `head == tail`, we
+  `doubleCapacity()` of `elements`
+* `elements` is completely _full_ iff `head == tail`
+
+
+##### Common bits of code
+
+###### Incrementing head
+
+```java
+head = (head-1) & (elements.length-1);
+```
+
+Since `elements.length` is a power of two, and `head < elements.length`, this
+will decrement `head`, but if it's already 0, it will wrap around to
+`elements.length-1`, the last index in the internal array. We couldn't
+equivalently use the modulo operator instead, because `neg % pos => neg`.
+
+
+###### Decrementing tail
+
+```java
+tail = (tail+1) & (elements.length-1);
+```
+
+This is equivalent to `++tail % elements.length`, but probably more efficient
+for modern processors.
+
+
+###### Double capacity
+
+* Create the new array `a` of length `elements.length << 1`
+* Copy the elements from `head` of `elements` to the end of `elements` into `a`
+* Copy the elements from `0` to `head == tail` into `a` _after_ the elements
+  above
+* Save `a` as the new `elements` (we don't need to null-out the old `elements`
+  because there are no longer any references to it)
+* Update `head = 0` and `tail = oldElements.length`
+
+
+###### Delete element at arbitrary index i
+
+* This is _not_ an efficient operation, as it inches elements over one slot in
+  the array as necessary
+    * It may "inch" the elements forwards _or_ backwards, depending on which
+      causes the least overall element motion
+* What is the business with `front` and `back`?
+    * What this does is
+        * `if  i >= head => front = i - head`
+            * In this case, we will move elements from `head` to `i` over to
+              the _right_ by 1
+        * `else i < head => front = len - (head-i)`
+    * The goal is as follows
+        * Let 
+            * `elements.length = 16`
+            * `head = 14`
+            * `tail = 8`
+            * `i = 2` -- this is the element we want to delete
+        * So we have `null`s from `tail until head`
+        * Sure, we _could_ move `(i+1) until tail` to the _left_ by 1
+            1. That would require a single arraycopy of 5 elements
+        * More efficiently, we could 
+            1. Move `0 until i` to the _right_ by 1
+            2. Move `elements[0] = elements[elements.length-1]`
+            3. Move `head to (elements.length-2)` to the _right_ by 1
+        * That would require two arraycopies and an assignment, for a total of
+          (step 1) 2 + (step 2) 1 + (step 3) 1 = 4 elements, which is less than
+          the 5 moves from the simpler above
+            * This difference grows as `i` gets smaller and `head` gets bigger
+
 
 ## Bloom Filters
 
@@ -427,100 +521,6 @@ exercise. Maybe I should start by churning it into pseudocode.
 * Rare items are deleted from the counter, and there is a mechanism for them to
   be re-added later on with an approximately-correct value if they become
   popular
-
-## Notes on the implementation java.util.ArrayDeque\<E>
-
-* The implementation is based on the use of a "resizable array" instead of
-  e.g. a doubly-linked list
-* It is generally faster than `Stack` for stacks and `LinkedList` for queues
-* The length of the internal array is always a power of two
-* Its size is immediately doubled whenever it becomes full
-* Empty elements are guaranteed to always contain `null`
-    * This means it must explicitly null-out elements as they are deleted
-* The internal array is a field `Object[] elements`
-    * Recall, Java does not permit the declaration of a `E[]`
-        * Note that Scala _would_ allow declaring a `Array[E]`
-* Fields are maintained to contain the indexes of the `head` and `tail`
-  in `elements`
-    * The `head` is the "front/beginning" -- it points to the first element in
-      the array
-        * This is where elements are "pushed", "popped", and "removed"
-    * The `tail` is the "end" (beautiful friend) -- it points to the element
-      _after_ the last one in the array
-        * this is where elements are "offered" (i.e. queue-add), and "added"
-        * So it is an _invariant_ that `element[tail] == null`
-    * This means that when adding to the "front", we increment `head` _before
-      adding_, but when adding to the "back", we decrement `tail` _after
-      adding_
-* It _is_ allowed for `head > tail`, but _iff_ it becomes `head == tail`, we
-  `doubleCapacity()` of `elements`
-* `elements` is completely _full_ iff `head == tail`
-
-
-### Common bits of code
-
-#### Incrementing head
-
-```java
-head = (head-1) & (elements.length-1);
-```
-
-Since `elements.length` is a power of two, and `head < elements.length`, this
-will decrement `head`, but if it's already 0, it will wrap around to
-`elements.length-1`, the last index in the internal array. We couldn't
-equivalently use the modulo operator instead, because `neg % pos => neg`.
-
-
-#### Decrementing tail
-
-```java
-tail = (tail+1) & (elements.length-1);
-```
-
-This is equivalent to `++tail % elements.length`, but probably more efficient
-for modern processors.
-
-
-#### Double capacity
-
-* Create the new array `a` of length `elements.length << 1`
-* Copy the elements from `head` of `elements` to the end of `elements` into `a`
-* Copy the elements from `0` to `head == tail` into `a` _after_ the elements
-  above
-* Save `a` as the new `elements` (we don't need to null-out the old `elements`
-  because there are no longer any references to it)
-* Update `head = 0` and `tail = oldElements.length`
-
-
-#### Delete element at arbitrary index i
-
-* This is _not_ an efficient operation, as it inches elements over one slot in
-  the array as necessary
-    * It may "inch" the elements forwards _or_ backwards, depending on which
-      causes the least overall element motion
-* What is the business with `front` and `back`?
-    * What this does is
-        * `if  i >= head => front = i - head`
-            * In this case, we will move elements from `head` to `i` over to
-              the _right_ by 1
-        * `else i < head => front = len - (head-i)`
-    * The goal is as follows
-        * Let 
-            * `elements.length = 16`
-            * `head = 14`
-            * `tail = 8`
-            * `i = 2` -- this is the element we want to delete
-        * So we have `null`s from `tail until head`
-        * Sure, we _could_ move `(i+1) until tail` to the _left_ by 1
-            1. That would require a single arraycopy of 5 elements
-        * More efficiently, we could 
-            1. Move `0 until i` to the _right_ by 1
-            2. Move `elements[0] = elements[elements.length-1]`
-            3. Move `head to (elements.length-2)` to the _right_ by 1
-        * That would require two arraycopies and an assignment, for a total of
-          (step 1) 2 + (step 2) 1 + (step 3) 1 = 4 elements, which is less than
-          the 5 moves from the simpler above
-            * This difference grows as `i` gets smaller and `head` gets bigger
 
 ## References
 
