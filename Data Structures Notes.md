@@ -1,16 +1,80 @@
-latex input:    mmd-article-header
-Title:          Data Structures Notes
-Author:         Ethan C. Petuchowski
-Base Header Level:  1
-latex mode:     memoir
-Keywords:       Data Structures, Algorithms
-CSS:            http://fletcherpenney.net/css/document.css
-xhtml header:   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
-copyright:      2014 Ethan C. Petuchowski
-latex input:    mmd-natbib-plain
-latex input:    mmd-article-begin-doc
-latex footer:   mmd-memoir-footer
+latex input: mmd-article-header
+Title:       Data Structures Notes
+Author:      Ethan C. Petuchowski
+Base Header Level:      1
+latex mode:   memoir
+Keywords:     Data Structures, Algorithms
+CSS:          http://fletcherpenney.net/css/document.css
+xhtml header: <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+copyright:    2016 Ethan Petuchowski
+latex input:  mmd-natbib-plain
+latex input:  mmd-article-begin-doc
+latex footer: mmd-memoir-footer
+
+## Union Find
+
+### Problem we're trying to solve
+
+* Say we have a larger number of elements of type `E`
+* Over time, those elements may become part of a singular set of `E`s
+    * But they're not all joining the same set
+* We would like to efficiently be able to
+    1. Combine two sets together
+    1. Ask whether two elements are in the same set
+    1. Ask how many distinct sets there are
+* For example, we may be trying to find the _connected components_ of a
+  graph
+* With the algorithm described below, we will not be able to _remove_ an
+  item from a set. No one knows a good way to pull that off [Sedgewick].
+
+### API it provides
+
+* `UnionFind[E](elems: E*)`
+* `union(a:E, b:E): Unit` -- merge set containing `a` with set containing
+  `b`
+* `numSets: Int` -- the current number of disjoint sets in this UnionFind
+* `sameSet(a:E, b:E): Boolean` -- whether or not `a` and `b` have (even
+  _transitively_) been `union`ed together to be in the same set
+
+
+### How it works
+
+Each set is stored as a tree of its consituent elements. One element in the
+set acts as the root. Which one of the elements is the root is determined by
+the order in which sets are union'ed together, and is not a reflection of any
+characteristic of the root element itself. Its children are all in the same
+set. Those children may each have their own children in the same set, etc.
+
+When we initialize the UnionFind, each element is put in its own set.
+Specifically, we create a Map from element to parent, and to start out, each
+element's parent is itself. We also maintain an instance variable which states
+how many sets there are, and it starts out as \\(||elements||\\).
+
+To perform the `sameSet(a:E, b:E): Boolean` operation, we find out whether `a`
+and `b` are in the same set by walking up their parent pointers to the root
+node, and seeing if the respective set-roots are the same node. Most- naively
+implemented, our "tree" would just be a linked-list, and this operation would
+take ~(elements in the set). However, how long this really takes depends on
+how the tree is formatted. E.g. if we could establish an invariant that the
+tree were to always be a balanced binary tree, then its height would be
+\\(O(\log{n})\\), and that's how long it would take to compare the sets to
+which `a` and `b` belong. If the tree was kept to have (amortized) constant
+height, then the set- membership comparison would take (amortized) constant
+time. In fact, the UnionFind algorithm is able to achieve amortized constant
+height for these set-trees. The way it does this is in how the `union`
+operation happens.
+
+As hinted above, the most naive `union(a:E, b:E): Unit` implementation would
+concatenate to the linked-lists denoting the sets to which `a` and `b` belong.
+To make this faster, after we've walking from `a` and `b` to their roots, we
+can update all the nodes in the list to have their `parent` pointers point
+directly to the root. Then to combine the two sets, we make the smaller set's
+root node point to the larger set's root node. Now we have a strange-looking
+tree, but it is amortized constant time to traverse. To make this work, we
+have to track the size of the sets too. We do this by making changing the Map
+from element to parent (see above) into a Map from element to (parent, set
+size).
+
 
 ## Suffix Tree (for String Search)
 **4/27/15**
@@ -107,7 +171,7 @@ which always takes up linear space.
 
 **Elements can be added/removed/inspected from either the front or the back.**
 
-#### Implementations
+#### Deque Implementations
 
 * **Doubly-linked-list** -- all required operations are O(1), random access O(n)
 * **Growing array** -- *amortized* time is O(1), random access O(1)
@@ -194,7 +258,7 @@ for modern processors.
               the _right_ by 1
         * `else i < head => front = len - (head-i)`
     * The goal is as follows
-        * Let 
+        * Let
             * `elements.length = 16`
             * `head = 14`
             * `tail = 8`
@@ -202,7 +266,7 @@ for modern processors.
         * So we have `null`s from `tail until head`
         * Sure, we _could_ move `(i+1) until tail` to the _left_ by 1
             1. That would require a single arraycopy of 5 elements
-        * More efficiently, we could 
+        * More efficiently, we could
             1. Move `0 until i` to the _right_ by 1
             2. Move `elements[0] = elements[elements.length-1]`
             3. Move `head to (elements.length-2)` to the _right_ by 1
@@ -425,7 +489,7 @@ exercise. Maybe I should start by churning it into pseudocode.
                     // remove a <key,node> from descNode
                     // so we do something like a "rotation"
                     move a key from xNode into descNode
-                    move a key from theSibling into xNode 
+                    move a key from theSibling into xNode
                     move the childPointer from theSibling into descNode
                 }
 
@@ -439,7 +503,7 @@ exercise. Maybe I should start by churning it into pseudocode.
             delete(k, descNode) // recursive call
         }
     }
-    
+
 
 ## SkipList
 
@@ -487,7 +551,7 @@ exercise. Maybe I should start by churning it into pseudocode.
     4. The responsible adds the entry
 3. Getting an entry is quite similar
 4. Uses **consistent hashing** --- has property that when the table is
-   resized, only \\(\frac{#keys}{#slots}\\) keys must be remapped.
+   resized, only \\(\frac{keys}{slots}\\) keys must be remapped.
     1. The hashing techniques make it so that only those members adjacent in
        the keyspace to a new node have to have they're data sloshed around
 5. The **Overlay network** is the set of links connecting nodes
