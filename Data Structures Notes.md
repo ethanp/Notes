@@ -139,13 +139,9 @@ which always takes up linear space.
     * So for the above tree examples, the *height* is **3** (*not* 4)
 
 
-### Heap
+## Heap
 
-1. [Wikipedia](http://en.wikipedia.org/wiki/Heap_(data_structure))
-2. [Algorithms -- Sedgewick, pg. 316]()
-3. [Heapsort Summary Page](http://www.sorting-algorithms.com/heap-sort)
-
-#### 5/4/14
+### Overview
 
 * a binary heap is a **complete** binary tree which satisfies the heap
   ordering property.
@@ -159,29 +155,33 @@ which always takes up linear space.
     * There is no particular relationship among nodes on any given level, even
       among the siblings
 * The heap is one maximally efficient implementation of a **priority queue**
-
-#### 6/27/14
-
-* the parent of the node at position `k` in a heap is at position `k/2`
+* the _parent_ of the node at position \\(k\\) in a heap is at position
+  \\(\frac{k}{2}\\)
 * See implementation with explanation at
   `~/Dropbox/CSyStuff/PrivateCode/PreDraft_6-27-14`
 
+### References
 
-### Deque -- double-ended queue
+1. [Wikipedia](http://en.wikipedia.org/wiki/Heap_(data_structure))
+2. [Algorithms -- Sedgewick, pg. 316]()
+3. [Heapsort Summary Page](http://www.sorting-algorithms.com/heap-sort)
+
+
+## Deque -- double-ended queue
 
 **Elements can be added/removed/inspected from either the front or the back.**
 
-#### Deque Implementations
+### Deque Implementations
 
 * **Doubly-linked-list** -- all required operations are O(1), random access O(n)
 * **Growing array** -- *amortized* time is O(1), random access O(1)
 
-##### Java
+#### Java
 
 1. `LinkedList<T>` -- doubly-linked-list
 2. `ArrayDeque<T>` -- growing array
 
-#### Notes on the implementation java.util.ArrayDeque\<E>
+### Notes on the implementation java.util.ArrayDeque\<E>
 
 * The implementation is based on the use of a "resizable array" instead of
   e.g. a doubly-linked list
@@ -192,7 +192,7 @@ which always takes up linear space.
     * This means it must explicitly null-out elements as they are deleted
 * The internal array is a field `Object[] elements`
     * Recall, Java does not permit the declaration of a `E[]`
-        * Note that Scala _would_ allow declaring a `Array[E]`
+        * However, I believe Scala _would_ allow declaring a `Array[E]`
 * Fields are maintained to contain the indexes of the `head` and `tail`
   in `elements`
     * The `head` is the "front/beginning" -- it points to the first element in
@@ -210,9 +210,9 @@ which always takes up linear space.
 * `elements` is completely _full_ iff `head == tail`
 
 
-##### Common bits of code
+#### Common bits of code
 
-###### Incrementing head
+##### Incrementing head
 
 ```java
 head = (head-1) & (elements.length-1);
@@ -224,7 +224,7 @@ will decrement `head`, but if it's already 0, it will wrap around to
 equivalently use the modulo operator instead, because `neg % pos => neg`.
 
 
-###### Decrementing tail
+##### Decrementing tail
 
 ```java
 tail = (tail+1) & (elements.length-1);
@@ -234,7 +234,7 @@ This is equivalent to `++tail % elements.length`, but probably more efficient
 for modern processors.
 
 
-###### Double capacity
+##### Double capacity
 
 * Create the new array `a` of length `elements.length << 1`
 * Copy the elements from `head` of `elements` to the end of `elements` into `a`
@@ -245,7 +245,7 @@ for modern processors.
 * Update `head = 0` and `tail = oldElements.length`
 
 
-###### Delete element at arbitrary index i
+##### Delete element at arbitrary index i
 
 * This is _not_ an efficient operation, as it inches elements over one slot in
   the array as necessary
@@ -282,9 +282,8 @@ for modern processors.
 
 ### The Point
 
-* **Bloom filters *attempt* to tell you if you have seen a particular data
-  item before**
-* **False-positives** are ***possible***, **false-negatives** are ***not***
+* **Bloom filters _attempt_ to tell you if a particular data item is a repeat**
+* **False-positives** are **_possible_**, **false-negatives** are **_not_**
 
 #### Approximate answers are faster
 
@@ -340,11 +339,14 @@ for modern processors.
 * There is a formula for calculating the optimal number of hash functions to
   use for a given size of the bit array and the number of items you plan to
   store in there
-    * k_opt = 0.7(m/n)
+
+    \\[k_{opt} = 0.7\frac{m}{n}\\]
+
 * There is another formula for calculating the size to use for a given desired
   probability of error and fixed number of items using the optimal number of
   hash functions from above
-    * m = -2n * ln(p)
+
+    \\[m = -2n \cdot \ln p\\]
 
 
 ## Red Black Tree
@@ -353,7 +355,7 @@ for modern processors.
 
 * A form of *balanced* binary search tree with additional imposed
   **invariants** to ensure that all the common operations (insert, delete,
-  min, max, pred, succ, search) happen in O(log(n)) time.
+  min, max, pred, succ, search) happen in \\(O(\log n)\\) time.
 
 #### Invariants
 
@@ -362,7 +364,9 @@ for modern processors.
 3. A red node must have black children
 4. Every `root->NULL` path through the tree has same number of black nodes
 
-Theorem: every red-black tree with *n* nodes has height ≤ 2log_2(n+1)
+Theorem: every red-black tree with *n* nodes has
+
+\\[ height \leq 2\log_2{(n+1)} \\]
 
 #### Implementations
 
@@ -511,7 +515,7 @@ exercise. Maybe I should start by churning it into pseudocode.
 * "Skip list algorithms have the same asymptotic expected time bounds as
   balanced trees and are simpler, faster and use less space." --- inventor
   William Pugh
-    * \\(log(n)\\) for contains, insert, and remove
+    * \\(\log n\\) for contains, insert, and remove
 * a "data structure for storing a sorted list of items, using a hierarchy of
   linked lists that connect increasingly sparse subsequences of the items."
 * It's hard to explain but the picture on Wikipedia makes it clear
@@ -536,7 +540,7 @@ exercise. Maybe I should start by churning it into pseudocode.
     1. decentralization/autonomy --- no central coordinator
     2. fault-tolerance --- nodes can continuously join, leave, or fail
     3. scalability --- still functions efficiently with millions of nodes
-6. Generally each node must coordinate with \\(O(\mathrm{log} n)\\) other nodes
+6. Generally each node must coordinate with \\(O(\log n)\\) other nodes
 7. Can be optionally designed for better security against malicious
    participants, and to allow participants to remain anonymous
 8. Handles load balancing, data integrity, and performance
@@ -589,9 +593,3 @@ exercise. Maybe I should start by churning it into pseudocode.
 ## References
 
 * [https://www.mapr.com/blog/some-important-streaming-algorithms-you-should-know-about]()
-
-# TODO
-
-Scala's `Vector` is a tree of arrays, kind of like a *B-Tree*, also like one
-of the main *file formats*
-
