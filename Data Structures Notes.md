@@ -37,7 +37,7 @@ latex footer: mmd-memoir-footer
   _transitively_) been `union`ed together to be in the same set
 
 
-### How it works
+### How union find it works
 
 Each set is stored as a tree of its consituent elements. One element in the
 set acts as the root. Which one of the elements is the root is determined by
@@ -287,16 +287,18 @@ for modern processors.
 
 #### Approximate answers are faster
 
-* You can usually trade space for time; the more storage you can throw at a
-  problem the faster you can make it run.
-* In general you can also trade certainty for time.
+* As you already knew, you can usually trade space for time; e.g. use more
+  storage, to use less processing time
+* What you may not have known, is that quite often, you can also trade
+  certainty for time in such a way that the approximation degrades in a
+  predictable fashion, so that the approximate result is still useful.
 
 ### Applications
 
 * *Google's BigTable database* uses one to reduce lookups for data rows that
   haven't been stored.
 * The *Squid proxy server* uses one to avoid looking up things that aren't in
-  the cache and so on
+  the cache
 
 ### History
 
@@ -304,29 +306,27 @@ for modern processors.
 
 ### How it works
 
-* Uses multiple different hash functions in-concert
+Executive summary: __Uses multiple different hash functions in-concert__.
 
 #### Initialization
 
-* A Bloom filter starts off with a **bit array** `Bloom[i]` initialized to
-  zero.
+Initialize a **bit array** `Bloom[i]` to zeros.
 
 #### Insertion
 
-* To record each data value you simply compute *k* different hash functions
-* Treat the resulting *k* values as indices into the array and set each of the
-  *k* array elements to `1`.
+* Simply compute *k* different hash functions over the item to insert
+* For the resulting *k* values, set the bit array at those indices to `1`
 
 #### Lookup
 
 * Given an item to look up, apply the *k* hash functions and look up the
   indicated array elements.
-* If any of them are zero you can be 100% sure that you have never encountered
-  the item before.
-* *However* even if all of them are one then you can't conclude that you have
-  seen the data item before.
-    * All you can conclude is that it is *likely* that you have encountered
-      the data item before.
+* If _any_ of them are zero you can be 100% _sure_ that you have never
+  encountered the item before.
+* *However*, even if _all_ of them are one then you can't conclude that you
+  have seen the data item before.
+    * Instead, all you can conclude is that it is *likely* that you have
+      encountered the data item before.
 
 #### Removal
 
@@ -527,7 +527,70 @@ exercise. Maybe I should start by churning it into pseudocode.
 * The last list contains your entire sequence and you'll definitely find your
   element there
 
-## Distributed Hash Table (DHT)
+## Hash Tables
+
+* Generally it is a "map", i.e. a "partial function" from a key-space `T` to a
+  value-space `U`
+    * It is a __map__ in the sense that you present it a key, and if that key
+      is known, it returns to you the value that was previously associated with
+      that key
+    * It is a __partial function__ in the sense that each key maps to at most
+      one value (but may also not map to anything)
+* You can convert it to function as a "set" by storing `null` elements as
+  values
+* The keys are stored in an _array_ of "__buckets__"
+* There is a _prehash_ function that maps a key to a hash-space (integers)
+* To _hash_ a key, you compute \\(prehash(key) \% ||buckets||\\)
+    * This tells you which bucket-index to insert the key at
+* A __hash collision__ occurs when you go to insert a key into a bucket, but
+  there is already a _different_ key in there that mapped to the same bucket
+    * The number of buckets is smaller than the space of `int`s, so collisions
+      occur because of the _pigeonhole principle_
+* How _collisions_ are resolved is up to your hash table implementation
+
+### Open addressing a.k.a. closed hashing a.k.a. (e.g. linear) probing
+
+This is a method of collision resolution, where if you go to put a key into a
+bucket, but there's already something in there, you keep scooting along to try
+other buckets until
+
+1. you find that the key is already in there
+2. an empty array slot is found (which means the key is _not_ already in there)
+
+#### Linear probing
+
+An _open addressing_ method in which the way you "scoot" along to try another
+bucket is by skipping forward a static number of buckets (e.g. 1).
+
+### Hopscotch table
+
+* In a hopscotch table, the "scheme" for inserting elements for which there is
+  already a key is _open addressing_ (see above)
+* This particular implementation is good for use in a _concurrent_ environment
+* It is also good for high table load factors (e.g. over 0.9)
+* The concept was introduced by M. __Herlihy__ et al. in 2008.
+* The goal is to assign buckets to a _"neighborhood"_ such that buckets within
+  a neighborhood are all within the same _cache line_
+* A bucket's neighborhood is its actual bucket index, and then the next
+  \\(H-1\\) bucket indexes
+* When a neighborhood becomes full, the table must be resized 
+* Each key _must_ go into at least the neighborhood of its actual bucket
+* Info about which buckets in a neighborhood are actually occupied is stored in
+  a bitmap, to reduce search time through the bucket
+* If you're trying to insert an item, and there's already something in the
+  bucket
+    1. Run a linear probe to find the first empty slot (doesn't have to be
+       within the right neighborhood)
+    2. If the first empty slot index _j_ _is_ in the right neighborhood,
+       stick the key into _j_
+    3. Otherwise, try to find something from the desireable neighborhood that
+       can be validly moved _into j_, and then stick the new item into the
+       moved item's old slot
+    4. This process's implementation utilizes the neighborhood bitmaps
+       mentioned above, may need to be performed recursively to finally free up
+       a spot in the desireable neighborhood
+
+### Distributed Hash Table (DHT)
 
 1. Same interface as a *hash table* (look up *value* by *key*)
 2. Responsibility for maintaining the mapping \\(keys\rightarrow values\\) is
@@ -545,7 +608,7 @@ exercise. Maybe I should start by churning it into pseudocode.
    participants, and to allow participants to remain anonymous
 8. Handles load balancing, data integrity, and performance
 
-### Structure
+#### Structure
 
 1. We start with a *keyspace* and a defined *partitioning scheme*
 2. To add a new entry

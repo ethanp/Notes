@@ -150,7 +150,7 @@ latex footer:       mmd-memoir-footer
 ## RabbitMQ
 
 * When using __auto-acknowledgement__, the consumer ACKs messages it receives,
-  which tells the broker to delete them
+  which tells the broker that it has the to delete them from the queue
 
 ### RabbitMQ vs Kafka
 
@@ -182,8 +182,16 @@ latex footer:       mmd-memoir-footer
   possible write throughput (similar to things that Redis and Riak are doing)
 * You never have to touch the persistent message store, and in the majority of
   cases, RabbitMQ will never read the persistent store
-* It is just there for insurance in the case of server crash or a low memory
-  situation
+    * It is just there for insurance in the case of server crash or a low
+      memory situation
+* Kafka's "partitions" feature allows you to dynamically adjust the number of
+  consumers concurrently reading a topic. Basically you just add a new consumer
+  of a topic to an existing consumer group, and Kafka will "rebalance"
+  automatically so that the responsibility of reading partiticular partitions
+  within that topic is shared well amongst the consumers in the group. Of
+  course this is only useful in those rare cases that you are building a system
+  to dynamically deal with a rising message influx and overload. I'm not sure,
+  but I kind of doubt RabbitMQ lets you handle that case so effectively.
 
 ## References
 
