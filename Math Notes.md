@@ -31,34 +31,48 @@ These work for small \\(x\\), they come from the Taylor series expansion.
 
 ### Introductory Vocabulary ###
 
-* **Population** -- the complete set of items under consideration by a statistical analysis
+* **Population** -- the complete set of items under consideration by a
+  statistical analysis
 * **Sample space** -- the set of possible outcomes
-* **Simple random sample** -- each individual has the same probability of being chosen at any stage during the sampling process
-	* Provides an *unbiased estimate* of the true population characteristics
-* **Probability distribution** -- assigns a probability to each possible outcome of a random procedure
-	* *Discrete* random variables -- **probability mass function**
-	* *Continuous* random variables -- **probability density function**
-	* ***Categorical* distribution**
-* **Estimator** -- a rule for calculating an estimate of a given quantity based on observed data
-	* There are *point* and *interval* estimators that yield a scalar and range respectively
-	* Notation
-		* \\(\theta\\) -- *parameter* being estimated
-		* \\(\hat{\theta}\\) -- *estimator*
-	* *Error* -- \\(e(x)=\hat{\theta}(x)-\theta\\)
-	* **Bias** -- the difference between the estimator's *expected value* and the true value of the parameter being investigated, i.e. \\(E_\theta[\hat{\theta}]-\theta\\)
-		* Sometimes a biased estimator is used *because* no unbiased estimator is known unless more assumptions are made about the population, or the relevant unbiased estimator may be too expensive to compute
-		* An **unbiased** estimator's bias is *zero* for *all* values of parameter \\(\theta\\)
-* **Stochastic|Random Process** -- a collection of *random variables* representing the evolution of a system of random values over time
-	* Even if the initial condition is known, there are several directions in which the process may evolve
-	* E.g. stock market, blood pressure, random walks, speech signals
-* **Point process** -- a *random process* for which a realization of the process consists of a *set* of isolated *points* in time and/or space
-	* For example, the occurrence of lightning strikes
-	* **Poisson [point] process** -- the simplest and most common example of a point process
-		* Important for *queueing theory*
-			* E.g. model arrival times of customers to a store
-		* Also can be used to model the locations of trees in a forrest
-		* Each point is *[stochastically] independent* to all the other points
-			* This means it is not a good fit for some modeling scenarios
+* **Simple random sample** -- each individual has the same probability of being
+  chosen at any stage during the sampling process
+  * Provides an *unbiased estimate* of the true population characteristics
+* **Probability distribution** -- assigns a probability to each possible
+  outcome of a random procedure
+  * *Discrete* random variables -- **probability mass function**
+  * *Continuous* random variables -- **probability density function**
+  * ***Categorical* distribution**
+* **Estimator** -- a rule for calculating an estimate of a given quantity based
+  on observed data
+  * There are *point* and *interval* estimators that yield a scalar and range
+    respectively
+  * Notation
+    * \\(\theta\\) -- *parameter* being estimated
+    * \\(\hat{\theta}\\) -- *estimator*
+  * *Error* -- \\(e(x)=\hat{\theta}(x)-\theta\\)
+  * **Bias** -- the difference between the estimator's *expected value* and the
+    true value of the parameter being investigated, i.e.
+    \\(E_\theta[\hat{\theta}]-\theta\\)
+    * Sometimes a biased estimator is used *because* no unbiased estimator is
+      known unless more assumptions are made about the population, or the
+      relevant unbiased estimator may be too expensive to compute
+    * An **unbiased** estimator's bias is *zero* for *all* values of parameter
+      \\(\theta\\)
+* **Stochastic|Random Process** -- a collection of *random variables*
+  representing the evolution of a system of random values over time
+  * Even if the initial condition is known, there are several directions in
+    which the process may evolve
+  * E.g. stock market, blood pressure, random walks, speech signals
+* **Point process** -- a *random process* for which a realization of the
+  process consists of a *set* of isolated *points* in time and/or space
+  * For example, the occurrence of lightning strikes
+  * **Poisson [point] process** -- the simplest and most common example of a
+    point process
+    * Important for *queueing theory*
+      * E.g. model arrival times of customers to a store
+    * Also can be used to model the locations of trees in a forrest
+    * Each point is *[stochastically] independent* to all the other points
+      * This means it is not a good fit for some modeling scenarios
 		* Also, see the *Poisson distribution* section below
 
 ### Combinations (*n* choose *k*) ##
@@ -82,18 +96,43 @@ These work for small \\(x\\), they come from the Taylor series expansion.
  
 #### Binomial Distribution ####
 
-* Describes the probability of the sum of *n Bernoulli trials* with probability *p*
+* Describes the probability of the sum of *n Bernoulli trials* with probability
+  *p*
 #### Poisson Distribution ####
 
-* The probability that N = n is given by -- \\(P\{N=n\}=\frac{\lambda^n}{n!}e^{-\lambda}\\), where \\(\lambda\\) is the single *Poisson parameter* defining this Poisson distribution
-* It is the limiting case of the *binomial distribution*, such that \\(\lambda=np\\)
+* The probability that N = n is given by --
+  \\(P\{N=n\}=\frac{\lambda^n}{n!}e^{-\lambda}\\), where \\(\lambda\\) is the
+  single *Poisson parameter* defining this Poisson distribution
+* It is the limiting case of the *binomial distribution*, such that
+  \\(\lambda=np\\)
 
 #### Exponential Distribution ####
 
 * Describes the time between events in a _Poisson process_
-* The PDF is \\(f(x;\lambda)=\lambda e^{-\lambda x}\\) for nonnegative \\(x\\), and zero otherwise
-* The CDF is \\(F(x;\lambda)=1-e^{-\lambda x}\\) for nonnegative \\(x\\), and zero otherwise
+* The PDF is \\(f(x;\lambda)=\lambda e^{-\lambda x}\\) for nonnegative \\(x\\),
+  and zero otherwise
+* The CDF is \\(F(x;\lambda)=1-e^{-\lambda x}\\) for nonnegative \\(x\\), and
+  zero otherwise
 * The mean and variance are \\(\frac{1}{\lambda},\frac{1}{\lambda^{2}}\\)
+
+#### Log-Normal Distribution
+
+These notes are from the Wikipedia article
+
+A continuous probability distribution of a random variable whose logarithm is
+normally distributed. Thus, if the random variable X is log-normally
+distributed, then \\(Y = \ln(X)\\) has a normal distribution. Likewise, if Y
+has a normal distribution, then \\(X = \exp(Y)\\) has a log-normal
+distribution.
+
+Many natural growth processes are driven by the accumulation of many small
+percentage changes. These become additive on a log scale.
+
+A few examples
+
+* Length of internet discussion comments
+* Length of time people spend reading online articles
+* Time to repair a "maintainable system"
 
 ## Statistics #
 
@@ -203,7 +242,11 @@ of a *dataset*. One might want to do this for 2 reasons:
 
 Note
 \\[cov(X,X)=E[X^2]-E[X]^2=\sigma_x^2\\]
-At first glance, it behaves like the slope line of a linear regression: two positively correlated variables have a positive covariance, and same for negative. However, the *magnitude* of the covariance is different, "Notably, correlation is dimensionless while covariance is in units obtained by multiplying the units of the two variables" (Wiki).
+At first glance, it behaves like the slope line of a linear regression: two
+positively correlated variables have a positive covariance, and same for
+negative. However, the *magnitude* of the covariance is different, "Notably,
+correlation is dimensionless while covariance is in units obtained by
+multiplying the units of the two variables" (Wiki).
 
 **TODO...heh**
 
@@ -219,7 +262,8 @@ We're trying to find the equation of the straight line
 
 \\[y = \alpha + \beta x \\]
 
-which would provide a line that minimizes the sum of squared residuals of the linear regression model.
+which would provide a line that minimizes the sum of squared residuals of the
+linear regression model.
 
 We can use
 
@@ -269,8 +313,8 @@ Which means the Euclidean norm \\(\equiv\\) the \\(l_2\\) norm.
 \\[J(A,B)=\frac{|A\cap{B}|}{|A\cup{B}|}\\]
 
 
-Now, letting \\(M_{AB}\\) be the number of data points where binary attribute a=A and b=B, we
-compute the **Jaccard similarity coefficient** as
+Now, letting \\(M_{AB}\\) be the number of data points where binary attribute
+a=A and b=B, we compute the **Jaccard similarity coefficient** as
 
 \\[J=\frac{M_{11}}{M_{01}+M_{10}+M_{11}}\\]
 
@@ -304,12 +348,13 @@ Notes from Brian Douglas's Khan Academy-style  YouTube Videos:
 #### Turns a function of *time* into a function of *frequency.* ####
 
 Any function in the time-domain, can be represented as a sum of sinusoids,
-where each has a different amplitude, frequency, and phase. This is that thing from Diff. EQ class.
-So that's all we're doing.
+where each has a different amplitude, frequency, and phase. This is that thing
+from Diff. EQ class. So that's all we're doing.
 
  \\[\mathrm{Frequency}\;\; \nu_{Hz} := \frac{\omega}{2\pi}[Hz]  \\]
 
-So a Fourier Transform maps you from the Time domain \\(T\\), to the Frequency domain \\(N\\):
+So a Fourier Transform maps you from the Time domain \\(T\\), to the Frequency
+domain \\(N\\):
 
 \\[FT:\; f(t) \rightarrow f(\nu) \\]
 
@@ -395,4 +440,5 @@ closure is a different relation.
 For example, if \\(X\\) is a set of airports and \\(x R y\\) means "there is a
 direct flight from airport \\(x\\) to airport \\(y\\)", then the transitive
 closure of \\(R\\) on \\(X\\) is the relation \\(R^+\\): "it is possible to fly
-from \\(x\\) to \\(y\\) in one or more flights." [Or perhaps, "\\(y\\) is *reachable* from \\(x\\) by plane."]
+from \\(x\\) to \\(y\\) in one or more flights." [Or perhaps, "\\(y\\) is
+*reachable* from \\(x\\) by plane."]
