@@ -512,3 +512,29 @@ The pull model also makes it _easy to rewind_ a consumer."
     * To provide the foundation for processing distributed streams across a
       cluster of consumer machines.
     * Bonus library of helpful stream utilities
+
+### Implementation
+
+#### How Kafka uses Zookeeper
+
+##### For Creating a High-Level Consumer
+
+See the doc-string at the top of `ZookeeperConsumerConnector.scala`. However I
+will summarize.
+
+* A new consumer within a group assigns itself the group-unique `id` defined in
+  its configuration, and registers this `id` as an "ephemeral znode" in
+  Zookeeper.
+* IIRC, this means that if this node were to become disconnected from
+  Zookeeper, that znode would _disappear_, and notify anyone listening for that
+  event.
+* The "value" of the znode (a.k.a. the contents of the _"small"_ file at the
+  hierarchical name identified by the znode) is a list of the topics this
+  consumer "owns" within this consumer-group
+* The consumer asks Zookeeper which brokers own the respective partititons it
+  wants to get (subject to a consumption load-balancing effort being done by
+  Kafka), and subscribes to changes in these brokers' partition-ownerships
+* The assignment of Consumer to Partition is _also_ saved in Zookeeper
+* There is also a map in Zookeeper tracking offsets in brokers' partitions for
+  each topic for each group id
+
