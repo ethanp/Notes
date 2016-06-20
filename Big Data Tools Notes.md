@@ -12,6 +12,9 @@
 6. Instead of storing (a,b,c) tuples as [(a1,b1,c1),(a2,b2,c2),...], Parquet
    stores them as [Encoded(chunk of a's),...,Encoded(chunk of c's)].
     * This (compressed) columnar storage at work
+    * Each chunk is called a __column chunk__
+    * Column chunk indexes are used to form a logical __row group__ containing
+      chunks of the same rows accross columns, for faster lookup
     * This helps us only read the data we need
 7. Parquet's "nested representation" is "borrowed from the Google Dremel paper"
    ([tutorial][twdrm]).
