@@ -105,6 +105,15 @@ latex footer:		mmd-memoir-footer
 * **HMAC** --- *Keyed-Hash Message Authentication Code* --- a **MAC** that
   uses a *keyed hash function*, i.e. a **cryptographic hash function**
   parameterized by a secret key
+    * This allows the verification of _data integrity_ (via MAC) and
+      _authentication_ (via hash keyed by secret key)
+    * Any normal MAC function (e.g. MD5) can be used, then the secret key
+      parameterizes it
+    * Brute force can be used to recover the secret key, but this can be
+      protected against by using a longer key (this slows it down though)
+    * If the receiver (improperly) does not hide the time required to calculate
+      the expected HMAC of the received value, a _timing attack_ is possible to
+      recover the HMAC, and then forge signed messages
 * **HTTPS** --- layers HTTP on top of **SSL/TLS**, so instead of writing bare
   ASCII to the network, outgoing traffic is encrypted, and then decrypted by
   the receiving host
