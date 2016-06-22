@@ -16,6 +16,14 @@ latex footer:       mmd-memoir-footer
 * Using __asynchronous message passing__ instead of _request-response_
   architectures allow us to achieve greater __decoupling__ between our program
   _components_
+* "Message Brokers are usually application stacks with dedicated pieces
+  covering the each stage of the exchange setup. From accepting a message to
+  queuing it and delivering it to the requesting party, brokers handle the duty
+  which would normally be much more cumbersome with non-dedicated solutions or
+  simple hacks such as using a database, cron jobs, etc. They simply work by
+  dealing with queues which technically constitute infinite buffers, to put
+  messages and pop-and-deliver them later on to be processed either
+  automatically or by polling." -- [Digital Ocean][doref]
 * To achieve the highest level of decoupling, we need an independent "receive"
   queue to buffer messages sent when the receiver or the network is down (e.g.
   Kafka and RabbitMQ)
@@ -201,6 +209,7 @@ latex footer:       mmd-memoir-footer
 * [Wikipedia: AMQP][wikiqp]
 * [Rabbit tutorial][rabbitamqp]
 * [Quora: What are the differences between Apache Kafka and RabbitMQ?][qramq]
+* [Digital Ocean: How to Install and Manage RabbitMQ][doref]
 
 [sai]: https://saipraveenblog.wordpress.com/2014/12/08/asynchronous-communication-in-soamsa/
 [wikimb]: https://www.wikiwand.com/en/Message_broker
@@ -208,4 +217,4 @@ latex footer:       mmd-memoir-footer
 [qramq]: https://www.quora.com/What-are-the-differences-between-Apache-Kafka-and-RabbitMQ
 [wikiqp]: https://en.wikipedia.org/wiki/Advanced_Message_Queuing_Protocol?oldformat=true
 [rabbitamqp]: https://www.rabbitmq.com/tutorials/amqp-concepts.html
-
+[doref]: https://www.digitalocean.com/community/tutorials/how-to-install-and-manage-rabbitmq

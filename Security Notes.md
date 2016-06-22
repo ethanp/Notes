@@ -106,7 +106,7 @@ latex footer:		mmd-memoir-footer
   uses a *keyed hash function*, i.e. a **cryptographic hash function**
   parameterized by a secret key
     * This allows the verification of _data integrity_ (via MAC) and
-      _authentication_ (via hash keyed by secret key)
+      _authentication_ (via hash, which is keyed by a _secret_ key)
     * Any normal MAC function (e.g. MD5) can be used, then the secret key
       parameterizes it
     * Brute force can be used to recover the secret key, but this can be
