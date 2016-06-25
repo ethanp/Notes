@@ -11,6 +11,21 @@ latex input:    mmd-natbib-plain
 latex input:    mmd-article-begin-doc
 latex footer:   mmd-memoir-footer
 
+## Business Vocabulary
+
+* __Cash flow__ -- amount of _cash_ going into the company's posession, vs the
+  amount of cash leaving the company's posession
+    * If you're selling off your manufacturing equipment, that will bring in
+      cash flow, but it will not help your _profitability_ (your ability to
+      make a profit in the future)
+* __Profitable__ -- making more money than you're spending
+    * This is an "accounting metric" meaning it has a very specific legal
+      meaning, which I have not looked into
+    * Note that this has nothing to do with the cash flow
+        * If investors are giving you $100K/mo, then that will be positive cash
+          flow, but it won't directly affect your profitability (I think)
+
+
 ## Lean Startup: Eric Ries
 
 ### Introduction
